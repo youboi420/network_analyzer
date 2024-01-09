@@ -13,6 +13,7 @@ typedef enum packet_type_e
     PSH_P_TYPE = TH_PUSH,
     ACK_P_TYPE = TH_ACK,
     URG_P_TYPE = TH_URG,
+    ZERO_WINDOW_TYPE = 1111,
     ERR_P_TYPE = -1
     // ECE_P_TYPE = TH_ECE,
     // CWR_P_TYPE = TH_CWR,

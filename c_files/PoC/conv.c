@@ -27,7 +27,6 @@ void init_list(packet_node_s ** root)
 {
     *root = NULL;
 }
-
 void print_output_to_file(conv_s conversations[MAX_CONVERSATIONS], char * filename)
 {
     FILE * tcp_file, *udp_file;
@@ -50,7 +49,6 @@ void print_output_to_file(conv_s conversations[MAX_CONVERSATIONS], char * filena
     out_filename[strlen(out_filename) - 2] = 't';
     out_filename[strlen(out_filename) - 1] = '\0';
     udp_file = fopen(out_filename, "w");
-
     if (!tcp_file || !udp_file)
     {
         error("error opening the file %s", out_filename);
@@ -94,9 +92,6 @@ void print_output_to_file(conv_s conversations[MAX_CONVERSATIONS], char * filena
     fclose(udp_file);
     free(out_filename);
 }
-
-
-
 int add_packet_to_list(packet_node_s **root, const u_char * original_packet, size_t packet_size, uint32_t id)
 {
     int flag = 1, index;
@@ -188,23 +183,28 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
     struct udphdr *udp_header;
     struct ip *ip_header;
     conv_s conversation;
-    int hash;
-
+    int hash, i;
     ip_header = (struct ip *)(packet + ETH_HEADER_SIZE); // Skip Ethernet header
     conversation.src_ip = ip_header->ip_src;
     conversation.dest_ip = ip_header->ip_dst;
+    strncpy(ip_src_str, inet_ntoa(conversation.src_ip), INET_ADDRSTRLEN);
+    strncpy(ip_dst_str, inet_ntoa(conversation.dest_ip), INET_ADDRSTRLEN);
+    info("packet[%s | %04i | %hhu] (%s)->(%s)", packet, pkthdr->caplen, ip_header->ip_p, ip_src_str, ip_dst_str);
+    printf("------------\n");
+    for(i=0; i<pkthdr->caplen; i++)
+    {
+        /* printf("%c", packet[i]); */
+    }
+    printf("\n------------\n");
+
     
-    if (ip_header->ip_p == IPPROTO_TCP) {
+    if (ip_header->ip_p == IPPROTO_TCP || ip_header->ip_p == IPPROTO_IP) {
         tcp_header = (struct tcphdr *)(packet + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
         conversation.src_port = ntohs(tcp_header->th_sport);
         conversation.dest_port = ntohs(tcp_header->th_dport);
         hash = conversation_hash(&conversation);
-
-        strncpy(ip_src_str, inet_ntoa(conversation.src_ip), INET_ADDRSTRLEN);
-        strncpy(ip_dst_str, inet_ntoa(conversation.dest_ip), INET_ADDRSTRLEN);
         // okay("Processing packet: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
         // okay("[%i]\t[%s]->[%s]:%i\t[%s]->[%s]:%i", hash, ip_src_str, ip_dst_str,(conversations[hash].src_ip.s_addr == conversation.src_ip.s_addr && conversations[hash].dest_ip.s_addr == conversation.dest_ip.s_addr), ip_src_str, ip_dst_str, (conversations[hash].src_ip.s_addr == conversation.dest_ip.s_addr && conversations[hash].dest_ip.s_addr == conversation.src_ip.s_addr));
-
         if ( (conversations_arr[hash].src_ip.s_addr == conversation.src_ip.s_addr && conversations_arr[hash].dest_ip.s_addr == conversation.dest_ip.s_addr) || (conversations_arr[hash].src_ip.s_addr == conversation.dest_ip.s_addr && conversations_arr[hash].dest_ip.s_addr == conversation.src_ip.s_addr) ){
             if (conversations_arr[hash].src_ip.s_addr == conversation.src_ip.s_addr) { /* if source sent it  */
                 conversations_arr[hash].packets_from_a_to_b++;
@@ -224,6 +224,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
             add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
             // okay("New Conversation: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
         }
+        // info("[HEADER|HASH:%i|ID: %i] %i\n", hash, conversations_arr[hash].conv_id, tcp_header->th_win);
         // info("Packets from A to B: %d, Packets from B to A: %d", conversations[hash].packets_from_a_to_b, conversations[hash].packets_from_b_to_a);
     }
     else if (ip_header->ip_p == IPPROTO_UDP)
@@ -232,10 +233,6 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
         conversation.src_port = ntohs(udp_header->uh_sport);
         conversation.dest_port = ntohs(udp_header->uh_dport);
         hash = conversation_hash(&conversation);
-
-        strncpy(ip_src_str, inet_ntoa(conversation.src_ip), INET_ADDRSTRLEN);
-        strncpy(ip_dst_str, inet_ntoa(conversation.dest_ip), INET_ADDRSTRLEN);
-
         if ((conversations_arr[hash].src_ip.s_addr == conversation.src_ip.s_addr && conversations_arr[hash].dest_ip.s_addr == conversation.dest_ip.s_addr) ||
             (conversations_arr[hash].src_ip.s_addr == conversation.dest_ip.s_addr && conversations_arr[hash].dest_ip.s_addr == conversation.src_ip.s_addr)) {
             if (conversations_arr[hash].src_ip.s_addr == conversation.src_ip.s_addr) { /* if source sent it  */
@@ -259,12 +256,17 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
         // info("Packets from A to B: %d, Packets from B to A: %d", conversations[hash].packets_from_a_to_b, conversations[hash].packets_from_b_to_a);
     }
 }
-
-// Save conversation data to JSON file using libjson-c
+int compare_conversations(const void *a, const void *b)
+{
+    const conv_s *conv_a = (const conv_s *)a;
+    const conv_s *conv_b = (const conv_s *)b;
+    return conv_a->conv_id - conv_b->conv_id;
+}
 void save_to_json(const char *filename) {
     json_object *root, *conversations_array, *conversation_object;
     size_t i; FILE * fp;
     char type[4] = "\0";
+    qsort(conversations_arr, MAX_CONVERSATIONS, sizeof(conv_s), compare_conversations);
     root = json_object_new_object();
     conversations_array = json_object_new_array();
     json_object_object_add(root, "conversations", conversations_array);
@@ -294,7 +296,60 @@ void save_to_json(const char *filename) {
     fclose(fp);
     json_object_put(root);
 }
-
+void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
+{
+    int i;
+    packet_node_s * temp = NULL;
+    packet_type_e p_type;
+    for (i = 0; i < MAX_CONVERSATIONS; i++)
+    {
+        if (conversations_arr[i].src_ip.s_addr!= 0 && conversations_arr[i].proto_type == IPPROTO_TCP)
+        {
+            temp = conversations_arr[i].packet_list;
+            while(temp != NULL) 
+            {
+                p_type = analyze_packet(temp->packet_data);
+                printf("================================================================\n");
+                okay("packet[%i/%i] of conversation(%i)", temp->p_id + 1, conversations_arr[i].num_packets, conversations_arr[i].conv_id);
+                switch (p_type)
+                {
+                    /* 
+                        ACK_P_TYPE = TH_ACK,
+                        SYN_P_TYPE = TH_SYN,
+                        FIN_P_TYPE = TH_FIN,
+                        RST_P_TYPE = TH_RST,
+                        PSH_P_TYPE = TH_PUSH,
+                        URG_P_TYPE = TH_URG,
+                        ZERO_WINDOW_TYPE = 1111,
+                        ERR_P_TYPE = -1
+                    */
+                    case ACK_P_TYPE:
+                        info("ACK Packet");
+                        break;
+                    case SYN_P_TYPE:
+                        info("SYN Packet");
+                        break;
+                    case FIN_P_TYPE:
+                        info("FIN Packet");
+                        break;
+                    case RST_P_TYPE:
+                        info("RESET Packet");
+                        break;
+                    case PSH_P_TYPE:
+                        info("PUSH Packet");
+                        break;
+                    case URG_P_TYPE:
+                        info("URG Packet");
+                        break;
+                    default:
+                        info("Unknown packet type [%i]", p_type);
+                        break;
+                }
+                temp = temp->next;
+            }
+        }
+    }
+}
 int main(int argc, char *argv[]) {
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
@@ -316,8 +371,9 @@ int main(int argc, char *argv[]) {
     pcap_loop(handle, 0, packet_handler, NULL);
     pcap_close(handle);
     save_to_json(argv[2]);
-    print_packets(conversations_arr);
-    print_output_to_file(conversations_arr, argv[1]);
+    // print_packets(conversations_arr);
+    // print_output_to_file(conversations_arr, argv[1]);
+    analyze_conversations(conversations_arr);
     free_all(conversations_arr);
     return 0;
 }
