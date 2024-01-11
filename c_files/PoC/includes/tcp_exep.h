@@ -4,7 +4,9 @@
 #define MAX_EXEP 1024
 
 #define ETH_HEADER_SIZE 14
-
+#define ZERO_WINDOW_STR "zero window"
+#define RETRANS_STR "retransmission"
+#define RESET_STR "reset"
 typedef enum packet_type_e
 {
     FIN_P_TYPE = TH_FIN,
@@ -23,9 +25,10 @@ typedef enum packet_exep_e
 {
     NORMAL_EXEP = 21,
     DUP_ACK_EXEP,
-    ZERO_WINDOW,
+    ZERO_WINDOW_EXEP,
     TIMEOUT_EXEP,
-    RETRANS_EXEP
+    RETRANS_EXEP,
+    RESET_EXEP,
 } packet_exep_e;
 
 typedef struct packet_exep_node_s{

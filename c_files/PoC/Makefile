@@ -8,7 +8,7 @@ TEST2 = $(TEST_PATH)/test2.txt
 BUILD = build/
 FLAGS = -Wall -ansi -pedantic
 OBJECT = conv
-
+LIBS = -lpcap -ljson-c
 init:
 	mkdir $(HEADERS_PATH)
 	mkdir $(SRC_PATH)
@@ -16,8 +16,7 @@ init:
 	mkdir $(BUILD)
 
 $(OBJECT):
-	gcc conv.c tcp_exep.c -o ./build/conv -lpcap -ljson-c
-#	gcc $(SRC) -I $(HEADERS) -o $(BUILD)$(OBJECT) 
+	gcc $(SRC) -I $(HEADERS) -o $(BUILD)$(OBJECT) $(LIBS)
 #	gcc $(SRC) -I $(HEADERS) -o $(OBJECT) $(FLAGS)
 
 # clear: $(SRC) $(HEADERS)

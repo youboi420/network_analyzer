@@ -1,28 +1,45 @@
-#include "./includes/conv.h"
-
-#include <netinet/in.h>
-#include <stdio.h>
-#include <pcap.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <json-c/json.h>
-#include <sys/types.h>
-
-#define okay(msg, ...) printf("[+] " msg "\n", ##__VA_ARGS__)
-#define info(msg, ...) printf("[i] INFO: " msg "\n", ##__VA_ARGS__)
-#define warn(msg, ...) printf("[!] " msg "\n", ##__VA_ARGS__)
-#define error(msg, ...)printf("[-] " msg "\n", ##__VA_ARGS__)
-#define MAX_CONVERSATIONS 1000
-#define HASH_CONST 5381
+#include "../includes/conv.h"
 
 /* GLOBALS */
 conv_s conversations_arr[MAX_CONVERSATIONS];
 unsigned int conv_hash_g;
 uint16_t conv_id_tcp_g = 0, conv_id_udp_g = 0;
 
+int main(int argc, char *argv[])
+{
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_t *handle;
+
+    if (argc != 3) {
+        printf("Usage: %s <pcap file> <output json file>\n", argv[0]);
+        return 1;
+    }
+    handle = pcap_open_offline(argv[1], errbuf);
+    if (handle == NULL) {
+        fprintf(stderr, "Error opening pcap file: %s\n", errbuf);
+        return 1;
+    }
+
+    memset(conversations_arr, 0, (sizeof(conv_s) * MAX_CONVERSATIONS));
+    for (int i = 0; i < MAX_CONVERSATIONS; i++) {
+        init_list(&(conversations_arr[i].packet_list));
+    }
+    pcap_loop(handle, 0, packet_handler, NULL);
+    pcap_close(handle);
+    
+    if (DEBUG)
+    {
+        print_packets(conversations_arr);
+        print_output_to_file(conversations_arr, argv[1]);
+    }
+
+    /* sorts the hash table of conversations by id. e.g. 0->N */
+    qsort(conversations_arr, MAX_CONVERSATIONS, sizeof(conv_s), compare_conversations);
+    analyze_conversations(conversations_arr);
+    save_to_json(argv[2]);
+    free_all(conversations_arr);
+    return 0;
+}
 void init_list(packet_node_s ** root)
 {
     *root = NULL;
@@ -124,8 +141,8 @@ int add_packet_to_list(packet_node_s **root, const u_char * original_packet, siz
     }
     return flag;
 }
-
-void print_packet_list(packet_node_s ** root, int max){
+void print_packet_list(packet_node_s ** root, int max)
+{
     packet_node_s * temp = *root;
     int i, index;
     while(temp != NULL)
@@ -149,7 +166,8 @@ void print_packets(conv_s conversations[MAX_CONVERSATIONS])
     }
 }
 
-void free_list(packet_node_s **root) {
+void free_list(packet_node_s **root)
+{
     packet_node_s *temp = *root, *next;
     while (temp != NULL) {
         next = temp->next;
@@ -158,16 +176,16 @@ void free_list(packet_node_s **root) {
         temp = next;
     }
 }
-
-void free_all(conv_s conversations[MAX_CONVERSATIONS]){
+void free_all(conv_s conversations[MAX_CONVERSATIONS])
+{
     int i;
     for(i = 0; i < MAX_CONVERSATIONS; i++){
         if (conversations_arr[i].src_ip.s_addr != 0)
             free_list(&conversations[i].packet_list);
     }
 }
-
-int conversation_hash(const conv_s *conversation) {
+int conversation_hash(const conv_s *conversation)
+{
     conv_hash_g = HASH_CONST;
     conv_hash_g ^= conversation->src_ip.s_addr; // conv_hash_g = ((conv_hash_g << 5) + conv_hash_g) ^ (conversation->src_ip.s_addr);
     conv_hash_g ^= conversation->dest_ip.s_addr; // conv_hash_g = ((conv_hash_g << 5) + conv_hash_g) ^ (conversation->dest_ip.s_addr);
@@ -176,8 +194,8 @@ int conversation_hash(const conv_s *conversation) {
     conv_hash_g ^= conversation->proto_type;
     return conv_hash_g % MAX_CONVERSATIONS;
 }
-
-void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packet)
+{
     char ip_src_str[INET_ADDRSTRLEN], ip_dst_str[INET_ADDRSTRLEN];
     struct tcphdr *tcp_header;
     struct udphdr *udp_header;
@@ -189,15 +207,15 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
     conversation.dest_ip = ip_header->ip_dst;
     strncpy(ip_src_str, inet_ntoa(conversation.src_ip), INET_ADDRSTRLEN);
     strncpy(ip_dst_str, inet_ntoa(conversation.dest_ip), INET_ADDRSTRLEN);
-    info("packet[%s | %04i | %hhu] (%s)->(%s)", packet, pkthdr->caplen, ip_header->ip_p, ip_src_str, ip_dst_str);
-    printf("------------\n");
-    for(i=0; i<pkthdr->caplen; i++)
-    {
-        /* printf("%c", packet[i]); */
+    if (DEBUG)
+    {    info("packet[%s | %04i | %hhu] (%s)->(%s)", packet, pkthdr->caplen, ip_header->ip_p, ip_src_str, ip_dst_str);
+        printf("------------\n");
+        for(i=0; i<pkthdr->caplen; i++)
+        {
+            /* printf("%c", packet[i]); */
+        }
+        printf("\n------------\n");
     }
-    printf("\n------------\n");
-
-    
     if (ip_header->ip_p == IPPROTO_TCP || ip_header->ip_p == IPPROTO_IP) {
         tcp_header = (struct tcphdr *)(packet + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
         conversation.src_port = ntohs(tcp_header->th_sport);
@@ -218,14 +236,14 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
             conversations_arr[hash] = conversation;
             conversations_arr[hash].packets_from_a_to_b = 1;
             conversations_arr[hash].num_packets = 1;
+            conversations_arr[hash].num_exep = 0;
             conversations_arr[hash].packets_from_b_to_a = 0;
             conversations_arr[hash].proto_type = IPPROTO_TCP;
             init_list(&(conversations_arr[hash].packet_list));
             add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
             // okay("New Conversation: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
         }
-        // info("[HEADER|HASH:%i|ID: %i] %i\n", hash, conversations_arr[hash].conv_id, tcp_header->th_win);
-        // info("Packets from A to B: %d, Packets from B to A: %d", conversations[hash].packets_from_a_to_b, conversations[hash].packets_from_b_to_a);
+        if (DEBUG) info("[HEADER|HASH:%i|ID: %i] %i\n", hash, conversations_arr[hash].conv_id, tcp_header->th_win);
     }
     else if (ip_header->ip_p == IPPROTO_UDP)
     {
@@ -247,13 +265,12 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
             conversations_arr[hash] = conversation;
             conversations_arr[hash].packets_from_a_to_b = 1;
             conversations_arr[hash].num_packets = 1;
+            conversations_arr[hash].num_exep = 0;
             conversations_arr[hash].packets_from_b_to_a = 0;
             conversations_arr[hash].proto_type = IPPROTO_UDP;
             init_list(&(conversations_arr[hash].packet_list));
             add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
-            // okay("New Conversation: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
         }
-        // info("Packets from A to B: %d, Packets from B to A: %d", conversations[hash].packets_from_a_to_b, conversations[hash].packets_from_b_to_a);
     }
 }
 int compare_conversations(const void *a, const void *b)
@@ -262,33 +279,67 @@ int compare_conversations(const void *a, const void *b)
     const conv_s *conv_b = (const conv_s *)b;
     return conv_a->conv_id - conv_b->conv_id;
 }
-void save_to_json(const char *filename) {
-    json_object *root, *conversations_array, *conversation_object;
-    size_t i; FILE * fp;
-    char type[4] = "\0";
-    qsort(conversations_arr, MAX_CONVERSATIONS, sizeof(conv_s), compare_conversations);
+void save_to_json(const char *filename)
+{
+    json_object *root, *conversations_array, *conversation_object, *exeption_arr, *exception;
+    size_t i, exep_index; FILE * fp;
+    int exep_type_switch;
+    char prot_type[4] = "\0";
+    char * exep_type = NULL;
     root = json_object_new_object();
     conversations_array = json_object_new_array();
     json_object_object_add(root, "conversations", conversations_array);
     for (i = 0; i < MAX_CONVERSATIONS; i++) {
         if (conversations_arr[i].src_ip.s_addr != 0) {
             if (conversations_arr[i].proto_type == IPPROTO_TCP)
-                strncpy(type, "TCP", 4);
+                strncpy(prot_type, "TCP", 4);
             else if (conversations_arr[i].proto_type == IPPROTO_UDP)
-                strncpy(type, "UDP", 4);
+                strncpy(prot_type, "UDP", 4);
             // okay("%zu is not empty.", i);
             conversation_object = json_object_new_object();
             json_object_object_add(conversation_object, "conv_id", json_object_new_int(conversations_arr[i].conv_id));
-            json_object_object_add(conversation_object, "conv_type", json_object_new_string(type));
+            json_object_object_add(conversation_object, "conv_type", json_object_new_string(prot_type));
             json_object_object_add(conversation_object, "source_ip", json_object_new_string(inet_ntoa(conversations_arr[i].src_ip)));
             json_object_object_add(conversation_object, "destination_ip", json_object_new_string(inet_ntoa(conversations_arr[i].dest_ip)));
             json_object_object_add(conversation_object, "source_port", json_object_new_int(conversations_arr[i].src_port));
             json_object_object_add(conversation_object, "destination_port", json_object_new_int(conversations_arr[i].dest_port));
+            json_object_object_add(conversation_object, "packets", json_object_new_int(conversations_arr[i].num_packets));
             json_object_object_add(conversation_object, "packets_from_a_to_b", json_object_new_int(conversations_arr[i].packets_from_a_to_b));
             json_object_object_add(conversation_object, "packets_from_b_to_a", json_object_new_int(conversations_arr[i].packets_from_b_to_a));
+            
+            if (conversations_arr[i].num_exep > 0) /* if exceptions exist then add all of them to the conv json obj inside an array  */
+            {
+                printf("\n\t\tconv %i has %i exceptions\n", conversations_arr[i].conv_id, conversations_arr[i].num_exep);
+                exeption_arr = json_object_new_array();
+                for(exep_index = 0; exep_index < conversations_arr[i].num_exep; exep_index++)
+                {
+                    exception = json_object_new_object();
+                    json_object_object_add(exception, "exep_id", json_object_new_int(exep_index));
+                    exep_type_switch = conversations_arr[i].exep_packet_id[exep_index].exep; 
+                    switch (exep_type_switch) {
+                        case ZERO_WINDOW_EXEP:
+                        {
+                            json_object_object_add(exception, "exep_type", json_object_new_string(ZERO_WINDOW_STR));
+                            break;
+                        }
+                        case RESET_EXEP:
+                        {
+                            json_object_object_add(exception, "exep_type", json_object_new_string(RESET_STR));
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+                    json_object_object_add(exception, "packet_index", json_object_new_int(conversations_arr[i].exep_packet_id[exep_index].packet_location)); /* type cause */
+                    json_object_array_add(exeption_arr, exception);
+                }
+                json_object_object_add(conversation_object, "exceptions",exeption_arr);
+            }
             /* add to main array object */
             json_object_array_add(conversations_array, conversation_object);
-            strncpy(type, "", 4);
+            strncpy(prot_type, "", 4);
         }
     }
     fp = fopen(filename, "w"); /* dump the JSON to a file */
@@ -298,7 +349,7 @@ void save_to_json(const char *filename) {
 }
 void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
 {
-    int i;
+    int i, exception_index;
     packet_node_s * temp = NULL;
     packet_type_e p_type;
     for (i = 0; i < MAX_CONVERSATIONS; i++)
@@ -306,23 +357,17 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
         if (conversations_arr[i].src_ip.s_addr!= 0 && conversations_arr[i].proto_type == IPPROTO_TCP)
         {
             temp = conversations_arr[i].packet_list;
+            exception_index = 0;
             while(temp != NULL) 
             {
                 p_type = analyze_packet(temp->packet_data);
-                printf("================================================================\n");
-                okay("packet[%i/%i] of conversation(%i)", temp->p_id + 1, conversations_arr[i].num_packets, conversations_arr[i].conv_id);
+                if (DEBUG)
+                {
+                    printf("================================================================\n");
+                    okay("packet[%i/%i] of conversation(%i)", temp->p_id + 1, conversations_arr[i].num_packets, conversations_arr[i].conv_id);
+                }
                 switch (p_type)
                 {
-                    /* 
-                        ACK_P_TYPE = TH_ACK,
-                        SYN_P_TYPE = TH_SYN,
-                        FIN_P_TYPE = TH_FIN,
-                        RST_P_TYPE = TH_RST,
-                        PSH_P_TYPE = TH_PUSH,
-                        URG_P_TYPE = TH_URG,
-                        ZERO_WINDOW_TYPE = 1111,
-                        ERR_P_TYPE = -1
-                    */
                     case ACK_P_TYPE:
                         info("ACK Packet");
                         break;
@@ -334,12 +379,29 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
                         break;
                     case RST_P_TYPE:
                         info("RESET Packet");
+                        conversations_arr[i].exep_packet_id[exception_index].exep = RESET_EXEP;
+                        conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;
+                        conversations_arr[i].exep_packet_id[exception_index].dest_ip = conversations_arr[i].dest_ip;
+                        conversations_arr[i].exep_packet_id[exception_index].src_ip = conversations_arr[i].src_ip;
+                        conversations_arr[i].num_exep++;
+                        exception_index++;
+                        info("exep index = %i | conversations_arr[i].num_exep = %i", exception_index, conversations_arr[i].num_exep);
                         break;
                     case PSH_P_TYPE:
                         info("PUSH Packet");
                         break;
                     case URG_P_TYPE:
                         info("URG Packet");
+                        break;
+                    case ZERO_WINDOW_TYPE:
+                        info("Zero window packet");
+                        conversations_arr[i].exep_packet_id[exception_index].exep = ZERO_WINDOW_EXEP;
+                        conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;
+                        conversations_arr[i].exep_packet_id[exception_index].dest_ip = conversations_arr[i].dest_ip;
+                        conversations_arr[i].exep_packet_id[exception_index].src_ip = conversations_arr[i].src_ip;
+                        conversations_arr[i].num_exep++;
+                        exception_index++;
+                        info("exep index = %i | conversations_arr[i].num_exep = %i", exception_index, conversations_arr[i].num_exep);
                         break;
                     default:
                         info("Unknown packet type [%i]", p_type);
@@ -349,31 +411,4 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
             }
         }
     }
-}
-int main(int argc, char *argv[]) {
-    char errbuf[PCAP_ERRBUF_SIZE];
-    pcap_t *handle;
-
-    if (argc != 3) {
-        printf("Usage: %s <pcap file> <output json file>\n", argv[0]);
-        return 1;
-    }
-    handle = pcap_open_offline(argv[1], errbuf);
-    if (handle == NULL) {
-        fprintf(stderr, "Error opening pcap file: %s\n", errbuf);
-        return 1;
-    }
-
-    memset(conversations_arr, 0, (sizeof(conv_s) * MAX_CONVERSATIONS));
-    for (int i = 0; i < MAX_CONVERSATIONS; i++) {
-        init_list(&(conversations_arr[i].packet_list));
-    }
-    pcap_loop(handle, 0, packet_handler, NULL);
-    pcap_close(handle);
-    save_to_json(argv[2]);
-    // print_packets(conversations_arr);
-    // print_output_to_file(conversations_arr, argv[1]);
-    analyze_conversations(conversations_arr);
-    free_all(conversations_arr);
-    return 0;
 }
