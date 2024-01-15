@@ -1,5 +1,5 @@
 #include "../includes/conv.h"
-
+#include <netinet/tcp.h>
 /* GLOBALS */
 conv_s conversations_arr[MAX_CONVERSATIONS];
 unsigned int conv_hash_g;
@@ -19,7 +19,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error opening pcap file: %s\n", errbuf);
         return 1;
     }
-
     memset(conversations_arr, 0, (sizeof(conv_s) * MAX_CONVERSATIONS));
     for (int i = 0; i < MAX_CONVERSATIONS; i++) {
         init_list(&(conversations_arr[i].packet_list));
@@ -27,14 +26,14 @@ int main(int argc, char *argv[])
     pcap_loop(handle, 0, packet_handler, NULL);
     pcap_close(handle);
     
+    /* sorts the hash table of conversations by id. e.g. 0->N */
+    qsort(conversations_arr, MAX_CONVERSATIONS, sizeof(conv_s), compare_conversations);
     if (DEBUG)
     {
         print_packets(conversations_arr);
         print_output_to_file(conversations_arr, argv[1]);
     }
-
-    /* sorts the hash table of conversations by id. e.g. 0->N */
-    qsort(conversations_arr, MAX_CONVERSATIONS, sizeof(conv_s), compare_conversations);
+    // print_packets(conversations_arr);
     analyze_conversations(conversations_arr);
     save_to_json(argv[2]);
     free_all(conversations_arr);
@@ -58,7 +57,6 @@ void print_output_to_file(conv_s conversations[MAX_CONVERSATIONS], char * filena
     out_filename[strlen(out_filename) - 2] = 't';
     out_filename[strlen(out_filename) - 1] = '\0';
     tcp_file = fopen(out_filename, "w");
-
     strcpy(out_filename, "udp_");
     strcat(out_filename, filename);
     out_filename[strlen(out_filename) - 4] = 't';
@@ -75,11 +73,9 @@ void print_output_to_file(conv_s conversations[MAX_CONVERSATIONS], char * filena
     /* SOF TCP FILE */
     fprintf(tcp_file, "+---------------------------------------------------------------------------------------------------------------------------------------+\n");
     fprintf(tcp_file, "|\tID\t|\tAddress A\t|\tAddress B\t|\tPort A\t\t|\tPort B\t\t|\tPROTCOL\t\t|\n");
-
     /* SOF UDP FILE */
     fprintf(udp_file, "+---------------------------------------------------------------------------------------------------------------------------------------+\n");
     fprintf(udp_file, "|\tID\t|\tAddress A\t|\tAddress B\t|\tPort A\t\t|\tPort B\t\t|\tPROTCOL\t\t|\n");
-
     for(i = 0; i < MAX_CONVERSATIONS; i++){
         if (conversations_arr[i].src_ip.s_addr != 0)
         {
@@ -109,10 +105,13 @@ void print_output_to_file(conv_s conversations[MAX_CONVERSATIONS], char * filena
     fclose(udp_file);
     free(out_filename);
 }
-int add_packet_to_list(packet_node_s **root, const u_char * original_packet, size_t packet_size, uint32_t id)
+int add_packet_to_list(packet_node_s **root, const u_char * original_packet, size_t packet_size, uint32_t id, uint32_t seq, uint32_t ack, struct in_addr src_ip, struct in_addr dest_ip)
 {
     int flag = 1, index;
     packet_node_s * node = malloc(sizeof(packet_node_s)), *temp = *root;
+    struct tcphdr *tcp_header;
+    struct ip *ip_header;
+    
     if (!node)
     {
         error("failed to alloc a packet_node.");
@@ -120,6 +119,12 @@ int add_packet_to_list(packet_node_s **root, const u_char * original_packet, siz
     }
     else
     {
+        ip_header = (struct ip *)(original_packet + ETH_HEADER_SIZE); // Skip Ethernet header
+        tcp_header = (struct tcphdr *) (original_packet + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
+        node->src_ip = src_ip;
+        node->dest_ip = dest_ip;
+        node->num_seq = tcp_header->th_seq;
+        node->num_ack = tcp_header->th_ack;
         node->p_id = id;
         node->next = NULL;
         node->packet_data = malloc(packet_size);
@@ -145,27 +150,42 @@ void print_packet_list(packet_node_s ** root, int max)
 {
     packet_node_s * temp = *root;
     int i, index;
+    struct ip * ip_header;
+    struct tcphdr * tcp_header;
     while(temp != NULL)
     {
         index = temp->p_id + 1;
+        ip_header = (struct ip *) temp->packet_data;
+        tcp_header = (struct tcphdr *) (temp->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
         printf("----------[%05i/%05i]-----------\n", index, max);
-        for(i=0;i<temp->packet_length;i++)
-            printf("%c", temp->packet_data[i]);
+        info("from %s", inet_ntoa(temp->src_ip));
+        info("to %s", inet_ntoa(temp->dest_ip));
+        info("th_window %hu", tcp_header->th_win);
+        info("th_seq %hu", tcp_header->th_seq);
+        info("th_ack %hu", tcp_header->th_ack);
+        info("th_flags %hu", tcp_header->th_flags);
+        info("struct seq %hu", temp->num_seq);
+        info("struct ack %hu", temp->num_ack);
+        
+        // for(i=0;i<temp->packet_length;i++)
+        //     printf("%c", temp->packet_data[i]);
         printf("\n----------------------------------\n");
         temp = temp->next;
     }
 }
-
 void print_packets(conv_s conversations[MAX_CONVERSATIONS])
 {
     int i;
     for(i = 0; i < MAX_CONVERSATIONS; i++)
     {
-        if (conversations_arr[i].src_ip.s_addr != 0)
+        if (conversations_arr[i].src_ip.s_addr != 0 && conversations_arr[i].proto_type == IPPROTO_TCP)
+        {
+            info("Conversation ID: %i", conversations_arr[i].conv_id);
             print_packet_list(&(conversations_arr[i].packet_list), conversations_arr[i].packets_from_a_to_b+conversations_arr[i].packets_from_b_to_a);
+            printf("--------------------------------------------\n");
+        }
     }
 }
-
 void free_list(packet_node_s **root)
 {
     packet_node_s *temp = *root, *next;
@@ -230,7 +250,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
                 conversations_arr[hash].packets_from_b_to_a++;
             }
             conversations_arr[hash].num_packets++;
-            add_packet_to_list(&(conversations_arr[hash].packet_list),packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
+            add_packet_to_list(&(conversations_arr[hash].packet_list),packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1, ntohs(tcp_header->th_seq), ntohs(tcp_header->th_ack), ip_header->ip_src, ip_header->ip_dst);
         } else {
             conversation.conv_id = conv_id_tcp_g++;
             conversations_arr[hash] = conversation;
@@ -240,7 +260,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
             conversations_arr[hash].packets_from_b_to_a = 0;
             conversations_arr[hash].proto_type = IPPROTO_TCP;
             init_list(&(conversations_arr[hash].packet_list));
-            add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
+            add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1, ntohs(tcp_header->th_seq), ntohs(tcp_header->th_ack), ip_header->ip_src, ip_header->ip_dst);
             // okay("New Conversation: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
         }
         if (DEBUG) info("[HEADER|HASH:%i|ID: %i] %i\n", hash, conversations_arr[hash].conv_id, tcp_header->th_win);
@@ -259,7 +279,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
                 conversations_arr[hash].packets_from_b_to_a++;
             }
             conversations_arr[hash].num_packets++;
-            add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
+            // add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1, -1, -1, -1, -1);
         } else {
             conversation.conv_id = conv_id_udp_g++;
             conversations_arr[hash] = conversation;
@@ -269,7 +289,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
             conversations_arr[hash].packets_from_b_to_a = 0;
             conversations_arr[hash].proto_type = IPPROTO_UDP;
             init_list(&(conversations_arr[hash].packet_list));
-            add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1);
+            // add_packet_to_list(&(conversations_arr[hash].packet_list), packet, pkthdr->caplen, conversations_arr[hash].num_packets - 1, -1, -1, -1, -1);
         }
     }
 }
@@ -306,7 +326,6 @@ void save_to_json(const char *filename)
             json_object_object_add(conversation_object, "packets", json_object_new_int(conversations_arr[i].num_packets));
             json_object_object_add(conversation_object, "packets_from_a_to_b", json_object_new_int(conversations_arr[i].packets_from_a_to_b));
             json_object_object_add(conversation_object, "packets_from_b_to_a", json_object_new_int(conversations_arr[i].packets_from_b_to_a));
-            
             if (conversations_arr[i].num_exep > 0) /* if exceptions exist then add all of them to the conv json obj inside an array  */
             {
                 printf("\n\t\tconv %i has %i exceptions\n", conversations_arr[i].conv_id, conversations_arr[i].num_exep);
@@ -320,6 +339,16 @@ void save_to_json(const char *filename)
                         case ZERO_WINDOW_EXEP:
                         {
                             json_object_object_add(exception, "exep_type", json_object_new_string(ZERO_WINDOW_STR));
+                            break;
+                        }
+                        case DUP_ACK_ATOB_EXEP:
+                        {
+                            json_object_object_add(exception, "exep_type", json_object_new_string(DUP_ACK_ATOB_STR));
+                            break;
+                        }
+                        case DUP_ACK_BTOA_EXEP:
+                        {
+                            json_object_object_add(exception, "exep_type", json_object_new_string(DUP_ACK_BTOA_STR  ));
                             break;
                         }
                         case RESET_EXEP:
@@ -350,65 +379,183 @@ void save_to_json(const char *filename)
 void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
 {
     int i, exception_index;
-    packet_node_s * temp = NULL;
-    packet_type_e p_type;
+    packet_node_s * temp = NULL, *last = NULL, *lastAtoB, *lastBtoA;
+    packet_flags p_type;
+    int tcp_segment_length;
+    struct ip * ip_header;
+    struct tcphdr * tcp_header;
     for (i = 0; i < MAX_CONVERSATIONS; i++)
     {
         if (conversations_arr[i].src_ip.s_addr!= 0 && conversations_arr[i].proto_type == IPPROTO_TCP)
         {
+            if (DEBUG)
+            {
+                okay(" --------- Conversation (%i) ---------", conversations_arr[i].conv_id);
+                printf("(%s->", inet_ntoa(conversations_arr[i].src_ip));
+                printf("%s)\n", inet_ntoa(conversations_arr[i].dest_ip));
+            }
+            printf("(%s->", inet_ntoa(conversations_arr[i].src_ip));
+            printf("%s)\n", inet_ntoa(conversations_arr[i].dest_ip));
             temp = conversations_arr[i].packet_list;
             exception_index = 0;
             while(temp != NULL) 
             {
+                ip_header = (struct ip *)(temp->packet_data + ETH_HEADER_SIZE);
+                tcp_header = (struct tcphdr *)(temp->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
                 p_type = analyze_packet(temp->packet_data);
                 if (DEBUG)
                 {
-                    printf("================================================================\n");
+                    printf("================================================================\n\t\t");
                     okay("packet[%i/%i] of conversation(%i)", temp->p_id + 1, conversations_arr[i].num_packets, conversations_arr[i].conv_id);
+                    if (DEBUG)
+                    {
+                        if (last != NULL) info("(%u <> %u)", temp->num_ack, last->num_ack);
+                        else  info("(%u)", temp->num_ack);
+                    }
                 }
-                switch (p_type)
-                {
-                    case ACK_P_TYPE:
-                        info("ACK Packet");
-                        break;
-                    case SYN_P_TYPE:
-                        info("SYN Packet");
-                        break;
-                    case FIN_P_TYPE:
-                        info("FIN Packet");
-                        break;
-                    case RST_P_TYPE:
-                        info("RESET Packet");
-                        conversations_arr[i].exep_packet_id[exception_index].exep = RESET_EXEP;
-                        conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;
-                        conversations_arr[i].exep_packet_id[exception_index].dest_ip = conversations_arr[i].dest_ip;
-                        conversations_arr[i].exep_packet_id[exception_index].src_ip = conversations_arr[i].src_ip;
-                        conversations_arr[i].num_exep++;
-                        exception_index++;
-                        info("exep index = %i | conversations_arr[i].num_exep = %i", exception_index, conversations_arr[i].num_exep);
-                        break;
-                    case PSH_P_TYPE:
-                        info("PUSH Packet");
-                        break;
-                    case URG_P_TYPE:
-                        info("URG Packet");
-                        break;
-                    case ZERO_WINDOW_TYPE:
-                        info("Zero window packet");
-                        conversations_arr[i].exep_packet_id[exception_index].exep = ZERO_WINDOW_EXEP;
-                        conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;
-                        conversations_arr[i].exep_packet_id[exception_index].dest_ip = conversations_arr[i].dest_ip;
-                        conversations_arr[i].exep_packet_id[exception_index].src_ip = conversations_arr[i].src_ip;
-                        conversations_arr[i].num_exep++;
-                        exception_index++;
-                        info("exep index = %i | conversations_arr[i].num_exep = %i", exception_index, conversations_arr[i].num_exep);
-                        break;
-                    default:
-                        info("Unknown packet type [%i]", p_type);
-                        break;
+                // if (check_keep_alive(temp) == 1)
+                // {
+                //     info("%s%sKEEP ALIVE PACKET%s", BLACK_BG, GREEN_BG, RESET_FG);
+                //     if (temp->src_ip.s_addr == conversations_arr[i].src_ip.s_addr)
+                //         lastAtoB = temp;
+                //     else
+                //         lastBtoA = temp;
+                //     last = temp;
+                //     temp = temp->next;
+                //     continue;
+                // }
+                if (p_type & ACK_FLAG) {
+                    if (DEBUG) info("%s%sACK Packet%s", YELLOW_FG, BLACK_BG, RESET_FG);
+                    tcp_segment_length = ntohs(ip_header->ip_len) - (ip_header->ip_hl << 2) - (tcp_header->th_off << 2);
+                    /* SYN, FIN, and RST are not set. */
+                    if (tcp_segment_length == 0 && !(p_type & (SYN_FLAG | FIN_FLAG | RST_FLAG))) 
+                    {
+                        if (DEBUG) info("!(p_type & (SYN_FLAG | FIN_FLAG | RST_FLAG) = %i\tLen: %i", !(p_type & (SYN_FLAG | FIN_FLAG | RST_FLAG)), tcp_segment_length);
+                        if (lastAtoB != NULL)
+                        {
+                            if (temp->src_ip.s_addr == lastAtoB->src_ip.s_addr)
+                            {
+                                if (check_dup_ack(temp, lastAtoB) && check_keep_alive(lastBtoA) == 0)
+                                {
+                                    info("%s%sDUPACK PACKET A->B{CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id + 1, lastAtoB->p_id + 1, RESET_FG);
+                                    conversations_arr[i].exep_packet_id[exception_index].exep = DUP_ACK_ATOB_EXEP;   
+                                    conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
+                                    conversations_arr[i].num_exep++;
+                                    exception_index++;
+                                }
+                            }
+                        }    
+                        if (lastBtoA!= NULL)
+                        {
+                            if (temp->src_ip.s_addr == lastBtoA->src_ip.s_addr)
+                            {
+                                if (check_dup_ack(temp, lastBtoA) && check_keep_alive(lastAtoB) == 0)
+                                {
+                                    info("%s%sDUPACK PACKET B->A {CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id + 1, lastBtoA->p_id + 1, RESET_FG);
+                                    conversations_arr[i].exep_packet_id[exception_index].exep = DUP_ACK_BTOA_EXEP;   
+                                    conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
+                                    conversations_arr[i].num_exep++;
+                                    exception_index++;
+                                }
+                            }
+                        }
+                    }
                 }
+                if (p_type & SYN_FLAG) {
+                    if (DEBUG) info("SYN Packet");
+                }
+                if (p_type & FIN_FLAG) {
+                    if (DEBUG) info("FIN Packet");
+                }
+                if (p_type & PSH_FLAG) {
+                    if (DEBUG) info("PSH Packet");
+                }
+                if (p_type & RST_FLAG) {
+                    info("%s%sRESET PACKET%s", YELLOW_FG, RED_BG, RESET_FG);
+                    conversations_arr[i].exep_packet_id[exception_index].exep = RESET_EXEP;
+                    conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
+                    conversations_arr[i].num_exep++;
+                    exception_index++;
+                    /* check inside last->packet_data something... */
+                }
+                if (p_type & RETRANS_FLAG) {
+                    if (DEBUG) info("%s%sRETRANSMISSION PACKET [%i]%s", RED_FG, BLACK_BG, p_type, RESET_FG);
+                    conversations_arr[i].exep_packet_id[exception_index].exep = RETRANS_EXEP;
+                    conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
+                    conversations_arr[i].num_exep++;
+                    exception_index++;
+                }
+                if (p_type & URG_FLAG) {
+                    if (DEBUG) info("URG Packet");
+                }
+                if (p_type & ZERO_WINDOW_FLAG) {
+                    info("%s%sZERO WINDOW Packet%s", WHITE_FG, RED_BG, RESET_FG);
+                    conversations_arr[i].exep_packet_id[exception_index].exep = ZERO_WINDOW_EXEP;
+                    conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;
+                    conversations_arr[i].num_exep++;
+                    exception_index++;
+                }
+                if (temp->src_ip.s_addr == conversations_arr[i].src_ip.s_addr)
+                    lastAtoB = temp;
+                else
+                    lastBtoA = temp;
+                last = temp;
                 temp = temp->next;
+            }
+            if (DEBUG) okay(" --------- End Of Conversation (%i) ---------\n", conversations_arr[i].conv_id);
+        }
+    }
+}
+int check_dup_ack(packet_node_s *crnt, packet_node_s * comp)
+{
+    int ret_val = 0;
+    struct ip * crntip = (struct ip *) crnt->packet_data + sizeof(struct ip);
+    struct ip * compip = (struct ip *) comp->packet_data + sizeof(struct ip);
+
+    struct tcphdr * crnt_tcph = (struct tcphdr *) crnt->packet_data + (crntip->ip_hl << 2);
+    struct tcphdr * comp_tcph = (struct tcphdr *) comp->packet_data + (crntip->ip_hl << 2);
+    
+    if (crnt != NULL && comp != NULL)
+    {
+        if (crnt->num_seq != comp->num_seq && crnt->num_ack == comp->num_ack /* && (crnt_tcph->th_win == comp_tcph->th_win) */) ret_val = 1;
+    }
+    return ret_val;
+}
+int check_keep_alive(packet_node_s *p)
+{
+    if (p == NULL) return -1;
+    int ret_val = 0;
+    struct ip *ip_header = (struct ip *)(p->packet_data + ETH_HEADER_SIZE);
+    struct tcphdr *tcp_header = (struct tcphdr *)(p->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
+    int tcp_segment_length = ntohs(ip_header->ip_len) - (ip_header->ip_hl << 2) - (tcp_header->th_off << 2);
+    info("LEN: %i", tcp_segment_length);
+    if (tcp_segment_length <= 1)
+    {
+        if (tcp_header->th_seq + 1 == tcp_header->th_ack) /* check if current sequence number is one byte less than the next expected sequence number */
+        {
+            if ((tcp_header->th_flags & (TH_SYN | TH_FIN | TH_RST)) == 0) /* check for valid flags */
+            {
+                ret_val = 1;
             }
         }
     }
+    return ret_val;
+}
+int check_retransmission(packet_node_s *p, packet_node_s *atob, packet_node_s *btoa)
+{
+    int ret_val = 0;
+    struct ip *iphdr_p;
+    struct ip *iphdr_comp;
+    struct tcphdr *tcphdr_p;
+    struct tcphdr *tcphdr_comp;
+    if ((check_keep_alive(p) == 0) && (atob != NULL) && (btoa!= NULL)) 
+    {
+        /* 
+            [+] This is not a keepalive packet.
+            [-] In the forward direction, the segment length is greater than zero or the SYN or FIN flag is set.
+            [-] The next expected sequence number is greater than the current sequence number.
+        */
+        
+    }
+    return ret_val;
 }

@@ -19,14 +19,20 @@
 #define warn(msg, ...) printf("[!] " msg "\n", ##__VA_ARGS__)
 #define error(msg, ...)printf("[-] " msg "\n", ##__VA_ARGS__)
 
-typedef struct packet_node_s {
-    u_char *packet_data;
-    uint32_t p_id;
-    size_t packet_length;
-    size_t packet_type;
-    size_t packet_exep;
-    struct packet_node_s *next;
-} packet_node_s;
+/* for colored output */
+#define BLACK_FG  "\033[0;30m"
+#define RED_FG    "\033[0;31m"
+#define GREEN_FG  "\033[0;32m"
+#define YELLOW_FG "\033[0;33m"
+#define BLUE_FG   "\033[0;34m"
+#define PURPLE_FG "\033[0;35m"
+#define CYAN_FG   "\033[0;36m"
+#define WHITE_FG  "\033[0;37m"
+#define RESET_FG  "\033[0m"
+#define BLACK_BG  "\033[1;40m"
+#define RED_BG    "\033[1;41m"
+#define GREEN_BG  "\033[1;42m"
+#define YELLOW_BG "\033[1;43m"
 
 typedef struct {
     uint16_t conv_id;
@@ -54,6 +60,6 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
 int compare_conversations(const void *a, const void *b);
 void save_to_json(const char *filename);
 void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS]);
-
 int conversation_hash(const conv_s *conversation);
-int add_packet_to_list(packet_node_s **root, const u_char * original_packet, size_t packet_size, uint32_t id);
+int check_retransmission(packet_node_s *p, packet_node_s *atob, packet_node_s *btoa);
+int add_packet_to_list(packet_node_s **root, const u_char * original_packet, size_t packet_size, uint32_t id, uint32_t seq, uint32_t ack, struct in_addr src_ip, struct in_addr dest_ip);

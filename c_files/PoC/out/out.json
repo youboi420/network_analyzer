@@ -46,7 +46,7 @@
       "exceptions":[
         {
           "exep_id":0,
-          "type":"retransmission",
+          "exep_type":"reset",
           "packet_index":28
         }
       ]
@@ -86,7 +86,7 @@
       "exceptions":[
         {
           "exep_id":0,
-          "type":"zero window",
+          "exep_type":"zero window",
           "packet_index":2
         }
       ]
@@ -111,7 +111,14 @@
       "destination_port":443,
       "packets":7,
       "packets_from_a_to_b":4,
-      "packets_from_b_to_a":3
+      "packets_from_b_to_a":3,
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"duplicate ack b to a",
+          "packet_index":6
+        }
+      ]
     },
     {
       "conv_id":4,
@@ -133,7 +140,14 @@
       "destination_port":443,
       "packets":6,
       "packets_from_a_to_b":4,
-      "packets_from_b_to_a":2
+      "packets_from_b_to_a":2,
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"duplicate ack b to a",
+          "packet_index":4
+        }
+      ]
     },
     {
       "conv_id":5,
