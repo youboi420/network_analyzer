@@ -9,7 +9,24 @@
       "destination_port":443,
       "packets":12,
       "packets_from_a_to_b":6,
-      "packets_from_b_to_a":6
+      "packets_from_b_to_a":6,
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":6
+        },
+        {
+          "exep_id":1,
+          "exep_type":"retransmission",
+          "packet_index":8
+        },
+        {
+          "exep_id":2,
+          "exep_type":"retransmission",
+          "packet_index":10
+        }
+      ]
     },
     {
       "conv_id":0,
@@ -46,6 +63,51 @@
       "exceptions":[
         {
           "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":3
+        },
+        {
+          "exep_id":1,
+          "exep_type":"retransmission",
+          "packet_index":13
+        },
+        {
+          "exep_id":2,
+          "exep_type":"retransmission",
+          "packet_index":14
+        },
+        {
+          "exep_id":3,
+          "exep_type":"retransmission",
+          "packet_index":15
+        },
+        {
+          "exep_id":4,
+          "exep_type":"retransmission",
+          "packet_index":16
+        },
+        {
+          "exep_id":5,
+          "exep_type":"retransmission",
+          "packet_index":21
+        },
+        {
+          "exep_id":6,
+          "exep_type":"retransmission",
+          "packet_index":23
+        },
+        {
+          "exep_id":7,
+          "exep_type":"retransmission",
+          "packet_index":26
+        },
+        {
+          "exep_id":8,
+          "exep_type":"retransmission",
+          "packet_index":27
+        },
+        {
+          "exep_id":9,
           "exep_type":"reset",
           "packet_index":28
         }
@@ -86,6 +148,11 @@
       "exceptions":[
         {
           "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":1
+        },
+        {
+          "exep_id":1,
           "exep_type":"zero window",
           "packet_index":2
         }
@@ -144,6 +211,11 @@
       "exceptions":[
         {
           "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":3
+        },
+        {
+          "exep_id":1,
           "exep_type":"duplicate ack b to a",
           "packet_index":4
         }

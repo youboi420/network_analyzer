@@ -155,7 +155,7 @@ void print_packet_list(packet_node_s ** root, int max)
     while(temp != NULL)
     {
         index = temp->p_id + 1;
-        ip_header = (struct ip *) temp->packet_data;
+        ip_header = (struct ip *) temp->packet_data + ETH_HEADER_SIZE;
         tcp_header = (struct tcphdr *) (temp->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
         printf("----------[%05i/%05i]-----------\n", index, max);
         info("from %s", inet_ntoa(temp->src_ip));
@@ -356,6 +356,9 @@ void save_to_json(const char *filename)
                             json_object_object_add(exception, "exep_type", json_object_new_string(RESET_STR));
                             break;
                         }
+                        case RETRANS_EXEP:
+                            json_object_object_add(exception, "exep_type", json_object_new_string(RETRANS_STR));
+                            break;
                         default:
                         {
                             break;
@@ -437,7 +440,7 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
                             {
                                 if (check_dup_ack(temp, lastAtoB) && check_keep_alive(lastBtoA) == 0)
                                 {
-                                    info("%s%sDUPACK PACKET A->B{CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id + 1, lastAtoB->p_id + 1, RESET_FG);
+                                    info("%s%sDUPACK PACKET A->B{CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id, lastAtoB->p_id, RESET_FG);
                                     conversations_arr[i].exep_packet_id[exception_index].exep = DUP_ACK_ATOB_EXEP;   
                                     conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
                                     conversations_arr[i].num_exep++;
@@ -451,7 +454,7 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
                             {
                                 if (check_dup_ack(temp, lastBtoA) && check_keep_alive(lastAtoB) == 0)
                                 {
-                                    info("%s%sDUPACK PACKET B->A {CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id + 1, lastBtoA->p_id + 1, RESET_FG);
+                                    info("%s%sDUPACK PACKET B->A {CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id, lastBtoA->p_id, RESET_FG);
                                     conversations_arr[i].exep_packet_id[exception_index].exep = DUP_ACK_BTOA_EXEP;   
                                     conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
                                     conversations_arr[i].num_exep++;
@@ -459,6 +462,12 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
                                 }
                             }
                         }
+                    } else if (check_retransmission(temp,lastAtoB, lastBtoA)) {
+                        info("%s%sRETRANSMISSION%s", RED_FG, BLACK_BG, RESET_FG);
+                        conversations_arr[i].exep_packet_id[exception_index].exep = RETRANS_EXEP;   
+                        conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
+                        conversations_arr[i].num_exep++;
+                        exception_index++;
                     }
                 }
                 if (p_type & SYN_FLAG) {
@@ -509,12 +518,10 @@ void analyze_conversations(conv_s conversations_arr[MAX_CONVERSATIONS])
 int check_dup_ack(packet_node_s *crnt, packet_node_s * comp)
 {
     int ret_val = 0;
-    struct ip * crntip = (struct ip *) crnt->packet_data + sizeof(struct ip);
-    struct ip * compip = (struct ip *) comp->packet_data + sizeof(struct ip);
-
+    struct ip * crntip = (struct ip *) crnt->packet_data + ETH_HEADER_SIZE;
+    struct ip * compip = (struct ip *) comp->packet_data + ETH_HEADER_SIZE;
     struct tcphdr * crnt_tcph = (struct tcphdr *) crnt->packet_data + (crntip->ip_hl << 2);
     struct tcphdr * comp_tcph = (struct tcphdr *) comp->packet_data + (crntip->ip_hl << 2);
-    
     if (crnt != NULL && comp != NULL)
     {
         if (crnt->num_seq != comp->num_seq && crnt->num_ack == comp->num_ack /* && (crnt_tcph->th_win == comp_tcph->th_win) */) ret_val = 1;
@@ -528,7 +535,6 @@ int check_keep_alive(packet_node_s *p)
     struct ip *ip_header = (struct ip *)(p->packet_data + ETH_HEADER_SIZE);
     struct tcphdr *tcp_header = (struct tcphdr *)(p->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
     int tcp_segment_length = ntohs(ip_header->ip_len) - (ip_header->ip_hl << 2) - (tcp_header->th_off << 2);
-    info("LEN: %i", tcp_segment_length);
     if (tcp_segment_length <= 1)
     {
         if (tcp_header->th_seq + 1 == tcp_header->th_ack) /* check if current sequence number is one byte less than the next expected sequence number */
@@ -548,14 +554,40 @@ int check_retransmission(packet_node_s *p, packet_node_s *atob, packet_node_s *b
     struct ip *iphdr_comp;
     struct tcphdr *tcphdr_p;
     struct tcphdr *tcphdr_comp;
-    if ((check_keep_alive(p) == 0) && (atob != NULL) && (btoa!= NULL)) 
+    int tcp_segment_length_p, tcp_segment_length_comp;
+    
+    if ((check_keep_alive(p) == 0) && (atob != NULL || btoa!= NULL)) 
     {
-        /* 
+        /*
             [+] This is not a keepalive packet.
-            [-] In the forward direction, the segment length is greater than zero or the SYN or FIN flag is set.
-            [-] The next expected sequence number is greater than the current sequence number.
+            [+] In the forward direction, the segment length is greater than zero or the SYN or FIN flag is set.
+            [+] The next expected sequence number is greater than the current sequence number.
         */
-        
+        iphdr_p = (struct ip *) (p->packet_data + ETH_HEADER_SIZE);
+        tcphdr_p = (struct tcphdr *) (p->packet_data + ETH_HEADER_SIZE + (iphdr_p->ip_hl << 2));
+        if (tcphdr_p->th_ack > tcphdr_p->th_seq)
+        {
+            iphdr_comp = (struct ip *) (atob->packet_data + ETH_HEADER_SIZE);
+            tcphdr_comp = (struct tcphdr *) (atob->packet_data + ETH_HEADER_SIZE + (iphdr_comp->ip_hl << 2));
+            if ( iphdr_p->ip_src.s_addr == iphdr_comp->ip_src.s_addr)
+            {
+                tcp_segment_length_p = ntohs(iphdr_p->ip_len) - (iphdr_p->ip_hl << 2) - (tcphdr_p->th_off << 2);
+                if (tcp_segment_length_p > 0 || (tcphdr_p->th_flags & (TH_SYN | TH_FIN)))
+                {
+                    info("RETRANS A->B [pid:%i]", atob->p_id);
+                    ret_val = 1;
+                }
+            } else {
+                iphdr_comp = (struct ip *) (btoa->packet_data + ETH_HEADER_SIZE);
+                tcphdr_comp = (struct tcphdr *) (btoa->packet_data + ETH_HEADER_SIZE + (iphdr_comp->ip_hl << 2));
+                tcp_segment_length_comp = ntohs(iphdr_comp->ip_len) - (iphdr_comp->ip_hl << 2) - (tcphdr_comp->th_off << 2);
+                if (tcp_segment_length_p > 0 || (tcphdr_p->th_flags & (TH_SYN | TH_FIN)))
+                {
+                    info("RETRANS B->A [pid:%i]", btoa->p_id);
+                    ret_val = 1;
+                }
+            }
+        }
     }
     return ret_val;
 }
