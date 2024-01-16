@@ -228,11 +228,12 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
     strncpy(ip_src_str, inet_ntoa(conversation.src_ip), INET_ADDRSTRLEN);
     strncpy(ip_dst_str, inet_ntoa(conversation.dest_ip), INET_ADDRSTRLEN);
     if (DEBUG)
-    {    info("packet[%s | %04i | %hhu] (%s)->(%s)", packet, pkthdr->caplen, ip_header->ip_p, ip_src_str, ip_dst_str);
+    {   
+        info("packet[%04i | %hhu] (%s)->(%s)", pkthdr->caplen, ip_header->ip_p, ip_src_str, ip_dst_str);
         printf("------------\n");
         for(i=0; i<pkthdr->caplen; i++)
         {
-            /* printf("%c", packet[i]); */
+            printf("%c", packet[i]);
         }
         printf("\n------------\n");
     }
@@ -530,7 +531,7 @@ int check_dup_ack(packet_node_s *crnt, packet_node_s * comp)
 }
 int check_keep_alive(packet_node_s *p)
 {
-    if (p == NULL) return -1;
+    if (p == NULL || p->packet_data) return -1;
     int ret_val = 0;
     struct ip *ip_header = (struct ip *)(p->packet_data + ETH_HEADER_SIZE);
     struct tcphdr *tcp_header = (struct tcphdr *)(p->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
@@ -555,14 +556,8 @@ int check_retransmission(packet_node_s *p, packet_node_s *atob, packet_node_s *b
     struct tcphdr *tcphdr_p;
     struct tcphdr *tcphdr_comp;
     int tcp_segment_length_p, tcp_segment_length_comp;
-    
-    if ((check_keep_alive(p) == 0) && (atob != NULL || btoa!= NULL)) 
+    if ((check_keep_alive(p) == 0) && (atob != NULL || btoa!= NULL) && (atob->packet_data != NULL || btoa->packet_data != NULL)) 
     {
-        /*
-            [+] This is not a keepalive packet.
-            [+] In the forward direction, the segment length is greater than zero or the SYN or FIN flag is set.
-            [+] The next expected sequence number is greater than the current sequence number.
-        */
         iphdr_p = (struct ip *) (p->packet_data + ETH_HEADER_SIZE);
         tcphdr_p = (struct tcphdr *) (p->packet_data + ETH_HEADER_SIZE + (iphdr_p->ip_hl << 2));
         if (tcphdr_p->th_ack > tcphdr_p->th_seq)
