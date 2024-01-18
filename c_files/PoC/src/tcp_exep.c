@@ -19,7 +19,7 @@ packet_flags analyze_packet(u_char * tcp_packet)
         which means a function returns one flag with a possible more than one field on,
         each field indicating something diffrent.
     */
-    if (current_tcp_header->th_win == 0 && !(current_tcp_header->th_flags & TH_RST)) {
+    if (current_tcp_header->th_win == 0 && !(current_tcp_header->th_flags & (TH_RST | TH_FIN | TH_SYN)) ) {
         ret_val |= ZERO_WINDOW_FLAG;
     }
     if (current_tcp_header->th_flags & TH_FIN) {

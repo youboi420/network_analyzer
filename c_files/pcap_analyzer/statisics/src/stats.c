@@ -5,7 +5,7 @@
 char hosts_g[MAX_HOSTS][MAX_HOST_LEN];
 char ports_g[MAX_PORTS][MAX_PORT_LEN];
 ENTRY tcp_conversation_table_g[MAX_TCP_CONVERSATIONS];
-int num_hosts_g = 0, num_ports_g, p_counter_g = 0;
+int num_hosts_g = 0, num_ports_g, all_packets_counter_g = 0;
 
 
 /* Finds the payload of a TCP/IP packet */
@@ -22,9 +22,9 @@ void my_packet_handler(u_char *args, const struct pcap_pkthdr *header, const u_c
     int ip_header_length, tcp_header_length, payload_length, total_headers_size, byte_count = 0;
     uint16_t source_port, dest_port;
     
-    p_counter_g++;
+    all_packets_counter_g++;
     printf("\n");
-    okay("--------------packet [%i/%i]----------------", p_counter_g, MAX_PACKETS);
+    okay("--------------packet [%i/%i]----------------", all_packets_counter_g, MAX_PACKETS);
     eth_header = (struct ether_header *)packet; /* make sure we have an IP packet */
     if (ntohs(eth_header->ether_type) != ETHERTYPE_IP) /* if not continue to next packet */
     {
