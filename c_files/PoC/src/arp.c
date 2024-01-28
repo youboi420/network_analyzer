@@ -62,3 +62,87 @@
 
 //     return 0;
 // }
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pcap.h>
+#include <netinet/if_ether.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
+#include <netinet/in.h>
+#include <netinet/ip_icmp.h>
+
+#define MAX_ARP_ENTRIES 100
+
+// Structure to store ARP entries
+struct ARPEntry {
+    char ip[INET_ADDRSTRLEN];
+    char mac[ETH_ALEN];
+};
+
+struct ARPEntry arpEntries[MAX_ARP_ENTRIES];
+int counter = 0;
+// Function to detect ARP spoofing
+void detectArpSpoofing(const u_char *packet, struct pcap_pkthdr pkthdr) {
+    struct ether_header *ethHeader = (struct ether_header *)packet;
+    printf("INFO: %i\n", counter);
+    counter++;
+    // Check if it's an ARP packet
+    if (ntohs(ethHeader->ether_type) == ETHERTYPE_ARP) {
+        printf("MAC PACKET\n");
+        struct ether_arp *arpHeader = (struct ether_arp *)(packet + sizeof(struct ether_header));
+
+        char srcIP[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, arpHeader->arp_spa, srcIP, INET_ADDRSTRLEN);
+
+        char srcMAC[ETH_ALEN];
+        snprintf(srcMAC, sizeof(srcMAC), "%02x:%02x:%02x:%02x:%02x:%02x", arpHeader->arp_sha[0], arpHeader->arp_sha[1], arpHeader->arp_sha[2], arpHeader->arp_sha[3], arpHeader->arp_sha[4], arpHeader->arp_sha[5]);
+
+        // Check for ARP spoofing
+        for (int i = 0; i < MAX_ARP_ENTRIES; ++i) {
+            if (strcmp(arpEntries[i].ip, srcIP) != 0) {
+                // New entry, store it
+                strcpy(arpEntries[i].ip, srcIP);
+                strcpy(arpEntries[i].mac, srcMAC);
+                break;
+            } else if (strcmp(arpEntries[i].mac, srcMAC) != 0) {
+                // Potential ARP spoofing detected
+                printf("Potential ARP spoofing detected for IP: %s. Old MAC: %s, New MAC: %s\n", arpEntries[i].ip, arpEntries[i].mac, srcMAC);
+                break;
+            }
+        }
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <pcap_file>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    // Open the pcap file
+    pcap_t *handle;
+    char errbuf[PCAP_ERRBUF_SIZE];
+
+    handle = pcap_open_offline(argv[1], errbuf);
+    if (handle == NULL) {
+        fprintf(stderr, "Could not open pcap file '%s': %s\n", argv[1], errbuf);
+        return EXIT_FAILURE;
+    }
+
+    // Loop through packets
+    struct pcap_pkthdr pkthdr;
+    const u_char *packet;
+
+    while ((packet = pcap_next(handle, &pkthdr)) != NULL) {
+        detectArpSpoofing(packet, pkthdr);
+    }
+
+    // Close the pcap file
+    pcap_close(handle);
+
+    return EXIT_SUCCESS;
+}

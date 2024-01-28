@@ -7,7 +7,8 @@
 #define MAX_L2_CONVERSATIONS 50
 #define HASH_L2_CONST 5381
 
-typedef enum arp_type {
+typedef enum arp_type
+{
     ARP_REQ = 10001,
     ARP_REPLAY
 } arp_type;
