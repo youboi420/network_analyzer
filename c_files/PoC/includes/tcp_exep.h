@@ -1,3 +1,4 @@
+#include <bits/types/struct_timeval.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
@@ -9,6 +10,9 @@
 #define RESET_STR "reset"
 #define DUP_ACK_ATOB_STR "duplicate ack a to b"
 #define DUP_ACK_BTOA_STR "duplicate ack b to a"
+
+#ifndef TCP_EXEP_HEADER
+#define TCP_EXEP_HEADER
 typedef enum packet_type_e
 {
     FIN_P_TYPE = TH_FIN,
@@ -19,8 +23,6 @@ typedef enum packet_type_e
     URG_P_TYPE = TH_URG,
     ZERO_WINDOW_TYPE = 1111,
     ERR_P_TYPE = -1
-    // ECE_P_TYPE = TH_ECE,
-    // CWR_P_TYPE = TH_CWR,
 } packet_type_e;
 
 typedef enum packet_exep_e
@@ -37,13 +39,15 @@ typedef enum packet_exep_e
 typedef struct packet_node_s {
     u_char *packet_data;
     uint32_t p_id;
-    size_t packet_length;
+    size_t packet_size;
     size_t packet_type;
     size_t packet_exep;
     uint32_t num_seq;
     uint32_t num_ack;
     struct in_addr src_ip;
     struct in_addr dest_ip;
+    struct timeval time_stamp;
+    double time_stamp_rltv;
     struct packet_node_s *next;
 } packet_node_s;
 
@@ -64,6 +68,7 @@ typedef struct packet_exep_node_s{
     packet_exep_e exep;
     uint32_t packet_location;
 }packet_exep_node_s;
+#endif
 
 packet_exep_e get_packet_exep(u_char * tcp_packet);
 packet_flags analyze_packet(u_char * tcp_packet);

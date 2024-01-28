@@ -16,7 +16,7 @@ init:
 	mkdir $(BUILD)
 
 $(OBJECT):
-	gcc $(SRC) -I $(HEADERS) -o $(BUILD)$(OBJECT) $(LIBS)
+	gcc $(SRC) -I $(HEADERS) -g -o $(BUILD)$(OBJECT) $(LIBS)
 #	gcc $(SRC) -I $(HEADERS) -o $(OBJECT) $(FLAGS)
 
 # clear: $(SRC) $(HEADERS)

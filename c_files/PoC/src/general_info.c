@@ -3,17 +3,19 @@
 #include <arpa/inet.h>
 #include <json-c/json.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <time.h>
 unsigned int host_hash_func(unsigned int addr_hash, struct in_addr addr)
 {
-    addr_hash = HASH_CONST;
+    addr_hash = HASH_L4_CONST;
     addr_hash ^= addr.s_addr;
     return addr_hash % MAX_HOSTS;
 }
 unsigned int port_hash_func(unsigned int port_hash, uint16_t port)
 {
-    port_hash = HASH_CONST;
+    port_hash = HASH_L4_CONST;
     port_hash ^= port;
     return port_hash % MAX_PORTS;
 }
@@ -22,7 +24,6 @@ uint64_t get_file_size(char *file_name)
     struct stat st;
     return (stat(file_name, &st) == 0) ? st.st_size : 0;
 }
-
 void print_general_info(gen_inf_s gis)
 {
     int i, counter;
@@ -46,9 +47,9 @@ void print_general_info(gen_inf_s gis)
     }
     printf("---------------------------------------------------\n");
 }
-char* get_file_name(char* org_file_name)
+char* get_file_name(char* org_file_name, const char* new_extension)
 {
-    const char* new_extension = "_gis.json";
+    // const char* new_extension = "_gis.json";
     char* ret_str = NULL;
     const char* last_dot;
     size_t original_length;
@@ -64,7 +65,6 @@ char* get_file_name(char* org_file_name)
     }
     return ret_str;
 }
-
 void save_gis_to_json(gen_inf_s gis, char * filename)
 {
     json_object *root_obj, *hosts_arr, *ports_arr, *host, *port;
@@ -106,4 +106,43 @@ void save_gis_to_json(gen_inf_s gis, char * filename)
     else fprintf(file_ptr, "%s\n", json_object_to_json_string_ext(root_obj, JSON_C_TO_STRING_PRETTY));
     json_object_put(root_obj);
     if (file_ptr) fclose(file_ptr);
+}
+
+char * get_packet_time_stamp_mt(const struct timeval *timestamp)
+{
+    time_t seconds;
+    struct tm *time_info;
+    char * ret_time_str = NULL;
+    char time_str[DATE_LIMIT];
+
+    if (!timestamp)
+    {
+        return ret_time_str;
+    }
+    seconds = timestamp->tv_sec;
+    time_info = localtime(&seconds);
+    ret_time_str = (char *)malloc(DATE_LIMIT);
+    /* format timestamp as "YYYY-MM-DD HH:MM:SS" */
+    strftime(time_str, sizeof(time_str), "%b %e, %Y %H:%M:%S", time_info);
+    snprintf(ret_time_str, DATE_LIMIT, "%s.%06ld %s", time_str, timestamp->tv_usec, tzname[time_info->tm_isdst]);
+    return ret_time_str;
+}
+
+char * get_packet_time_stamp_js(const struct timeval *timestamp)
+{
+    time_t seconds;
+    struct tm *time_info;
+    char * ret_time_str = NULL;
+    char time_str[DATE_LIMIT];
+
+    if (!timestamp)
+    {
+        return ret_time_str;
+    }
+    seconds = timestamp->tv_sec;
+    time_info = localtime(&seconds);
+    ret_time_str = (char *)malloc(DATE_LIMIT);
+    strftime(time_str, sizeof(time_str), "%Y-%m-%dT%H:%M:%S", time_info);
+    snprintf(ret_time_str, DATE_LIMIT, "%s.%06ld%+03d:%02ld", time_str, timestamp->tv_usec, (int)time_info->tm_gmtoff / 3600, labs((time_info->tm_gmtoff / 60) % 60));    
+    return ret_time_str;
 }
