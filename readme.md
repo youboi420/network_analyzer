@@ -2,6 +2,9 @@
 
 - the project is to create a helpfull tool to automate and shorten the investiagtion of a network pcap record. that includes general info, tcp exceptions, ddos detections, mitm detection, and more.
 
+## Run locally
+clone the repoistory and then follow these step's
+- for windows user's please use this tool using wsl because it uses some linux sys and netinet libs which are built in to linux and are a pain to use normally in window's
 ## installation
 [gcc](https://gcc.gnu.org/install/)
 - use your unix based package manager and install these lib's
@@ -11,7 +14,7 @@ sudo (your-package-manager) install libpcap-dev
 # example: sudo apt install libjson-c-dev 
 # example: sudo apt install libpcap-dev 
 ```
-[make - windows](https://gnuwin32.sourceforge.net/packages/make.htm)
+<!-- [make - windows](https://gnuwin32.sourceforge.net/packages/make.htm) -->
 
 
 installation in unix based system's
