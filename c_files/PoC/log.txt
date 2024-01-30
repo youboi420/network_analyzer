@@ -1,0 +1,201 @@
+-----------------GENERAL INFO-----------------------
+[i] INFO: packet record size:     0.01 MB|num of packet:    167
+------------ HOSTS ------------
+[i] INFO: host (    1): [      224.0.0.2]:[   1]
+[i] INFO: host (    2): [   52.73.162.54]:[   4]
+[i] INFO: host (    3): [ 192.168.211.31]:[   1]
+[i] INFO: host (    4): [ 192.168.211.38]:[   4]
+[i] INFO: host (    5): [    13.32.27.94]:[   4]
+[i] INFO: host (    6): [   45.33.64.214]:[   4]
+[i] INFO: host (    7): [ 192.168.211.34]:[   1]
+[i] INFO: host (    8): [   172.217.22.4]:[   3]
+[i] INFO: host (    9): [ 192.168.211.26]:[   4]
+[i] INFO: host (   10): [   224.77.77.77]:[  14]
+[i] INFO: host (   11): [  172.64.154.86]:[   3]
+[i] INFO: host (   12): [   52.35.150.14]:[   5]
+[i] INFO: host (   13): [239.255.255.250]:[   5]
+[i] INFO: host (   14): [  213.151.35.11]:[   7]
+[i] INFO: host (   15): [    224.0.0.251]:[   4]
+[i] INFO: host (   16): [  172.64.146.98]:[   3]
+[i] INFO: host (   17): [ 192.168.211.75]:[  14]
+[i] INFO: host (   18): [ 172.217.22.110]:[   4]
+[i] INFO: host (   19): [ 34.120.214.181]:[   3]
+[i] INFO: host (   20): [  104.18.41.158]:[   4]
+[i] INFO: host (   21): [ 192.168.211.53]:[  59]
+[i] INFO: host (   22): [  64.233.184.84]:[   4]
+[i] INFO: host (   23): [ 34.110.207.168]:[   3]
+[i] INFO: host (   24): [   140.82.121.3]:[   8]
+------------ PORTS ------------
+[i] INFO: port (    1): [17634]:[   8]
+[i] INFO: port (    2): [27655]:[   5]
+[i] INFO: port (    3): [58588]:[   3]
+[i] INFO: port (    4): [26833]:[   7]
+[i] INFO: port (    5): [ 7389]:[   4]
+[i] INFO: port (    6): [38016]:[   4]
+[i] INFO: port (    7): [37167]:[  28]
+[i] INFO: port (    8): [18645]:[   4]
+[i] INFO: port (    9): [59668]:[   6]
+[i] INFO: port (   10): [ 1222]:[   4]
+[i] INFO: port (   11): [47873]:[  52]
+[i] INFO: port (   12): [37519]:[   4]
+[i] INFO: port (   13): [37562]:[   3]
+[i] INFO: port (   14): [11942]:[   4]
+[i] INFO: port (   15): [52451]:[   3]
+[i] INFO: port (   16): [52902]:[   3]
+[i] INFO: port (   17): [20480]:[   7]
+[i] INFO: port (   18): [62626]:[   4]
+[i] INFO: port (   19): [ 2752]:[   5]
+[i] INFO: port (   20): [23773]:[   3]
+[i] INFO: port (   21): [26597]:[   1]
+---------------------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 7978|conv id: 0| type: 17
+[i] INFO: start: 0.000000 | end: 3.072134
+[i] INFO: avg exma = 1.302027 | exma = 0.260405 
+[i] INFO: called exma
+[+] 0.260405 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 30317|conv id: 0| type: 6
+[i] INFO: start: 1.216633 | end: 14.746945
+[i] INFO: avg exma = 0.517357 | exma = 0.103471 
+[i] INFO: called exma
+[+] 0.103471 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49983|conv id: 1| type: 6
+[i] INFO: start: 8.603841 | end: 8.705265
+[i] INFO: avg exma = 29.578798 | exma = 5.915760 
+[i] INFO: called exma
+[+] 5.915760 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49984|conv id: 1| type: 17
+[i] INFO: start: 0.921844 | end: 19.456060
+[i] INFO: avg exma = 0.755360 | exma = 0.151072 
+[i] INFO: called exma
+[+] 0.151072 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49985|conv id: 2| type: 17
+[+] flaged conv [2] as possible flood
+[i] INFO: start: 1.126303 | end: 1.126303
+[i] INFO: avg exma = inf | exma = inf 
+[i] INFO: called exma
+[+] inf exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49986|conv id: 2| type: 6
+[i] INFO: start: 8.603928 | end: 8.712155
+[i] INFO: avg exma = 36.959354 | exma = 7.391871 
+[i] INFO: called exma
+[+] 7.391871 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49987|conv id: 3| type: 17
+[+] flaged conv [3] as possible flood
+[i] INFO: start: 10.650011 | end: 11.673536
+[i] INFO: avg exma = 1.954031 | exma = 0.390806 
+[i] INFO: called exma
+[+] 0.390806 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49988|conv id: 3| type: 6
+[i] INFO: start: 8.603970 | end: 8.807386
+[i] INFO: avg exma = 19.664137 | exma = 3.932827 
+[i] INFO: called exma
+[+] 3.932827 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49989|conv id: 4| type: 17
+[+] flaged conv [4] as possible flood
+[i] INFO: start: 19.456410 | end: 19.456410
+[i] INFO: avg exma = inf | exma = inf 
+[i] INFO: called exma
+[+] inf exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49990|conv id: 4| type: 6
+[i] INFO: start: 10.605239 | end: 10.753761
+[i] INFO: avg exma = 20.199028 | exma = 4.039806 
+[i] INFO: called exma
+[+] 4.039806 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49991|conv id: 5| type: 6
+[i] INFO: start: 11.061416 | end: 11.162604
+[i] INFO: avg exma = 79.060758 | exma = 15.812152 
+[i] INFO: called exma
+[+] 15.812152 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49992|conv id: 6| type: 6
+[i] INFO: start: 11.605883 | end: 11.691203
+[i] INFO: avg exma = 46.882325 | exma = 9.376465 
+[i] INFO: called exma
+[+] 9.376465 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49993|conv id: 7| type: 6
+[i] INFO: start: 14.607235 | end: 14.746967
+[i] INFO: avg exma = 21.469671 | exma = 4.293934 
+[i] INFO: called exma
+[+] 4.293934 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49994|conv id: 8| type: 6
+[i] INFO: start: 14.607291 | end: 14.746974
+[i] INFO: avg exma = 28.636269 | exma = 5.727254 
+[i] INFO: called exma
+[+] 5.727254 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49995|conv id: 9| type: 6
+[i] INFO: start: 15.607730 | end: 15.682155
+[i] INFO: avg exma = 40.309036 | exma = 8.061807 
+[i] INFO: called exma
+[+] 8.061807 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49996|conv id: 10| type: 6
+[i] INFO: start: 15.607832 | end: 15.771154
+[i] INFO: avg exma = 24.491495 | exma = 4.898299 
+[i] INFO: called exma
+[+] 4.898299 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49997|conv id: 11| type: 6
+[i] INFO: start: 15.607882 | end: 15.682176
+[i] INFO: avg exma = 40.380111 | exma = 8.076022 
+[i] INFO: called exma
+[+] 8.076022 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49998|conv id: 12| type: 6
+[i] INFO: start: 17.608725 | end: 17.818394
+[i] INFO: avg exma = 19.077689 | exma = 3.815538 
+[i] INFO: called exma
+[+] 3.815538 exma value
+[i] INFO: -------------------------------------
+[i] INFO: -------------------------------------
+[i] INFO: index: 49999|conv id: 13| type: 6
+[i] INFO: start: 19.592978 | end: 19.786816
+[i] INFO: avg exma = 25.794736 | exma = 5.158947 
+[i] INFO: called exma
+[+] 5.158947 exma value
+[i] INFO: -------------------------------------
+[i] INFO: Called mitm detection convs: 3
+[i] INFO: +1 malloc
+[i] INFO: +1 malloc
+[i] INFO: +1 malloc
+[i] INFO: mitm_temp = 0x32102740
+[i] INFO: VICTIM: 192.168.1.1
+[i] INFO: freed
+[i] INFO: VICTIM: 192.168.1.2
+[i] INFO: freed
+[i] INFO: VICTIM: 192.168.1.2
+[i] INFO: freed
+[i] INFO:    1) potential...[   2]		checking this convo
+[i] INFO: mitm_temp = (nil)
+[i] INFO: mitm_temp = (nil)
+[+] completed...

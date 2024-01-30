@@ -1,0 +1,27 @@
+check if the same mac addr is used
+for example:
+	if (a sends b arp req with mac (MAC) then a send c arp req with mac (MAC))
+		then flag it as suspicious 
+		acctual code to check for this:
+			```
+				/*
+					check using search_params(conv_s conv, search_e search , search_ret_e * ret_type, void * optional_a, void * optional_b, void * optional_c);
+					create a new case
+				*/
+				search_params(conv_s conv, search_e search , search_ret_e * ret_type, void * optional_a, void * optional_b, void * optional_c)
+				{
+					/* existing code*/
+					switch (search)
+					{
+						/* existing code*/
+						case search_e_mac:
+							/*
+								check if none of the ptr's are null then check if the given mac addres and ip is sending anyone else a message. if yes return FLAGED_MITM 
+							*/
+							
+							break;
+					}
+				}
+			```
+	otherwise
+		okay("normal")	
