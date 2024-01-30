@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+
 unsigned int host_hash_func(unsigned int addr_hash, struct in_addr addr)
 {
     addr_hash = HASH_L4_CONST;
@@ -53,6 +54,7 @@ char* get_file_name(char* org_file_name, const char* new_extension)
     char* ret_str = NULL;
     const char* last_dot;
     size_t original_length;
+    if (!new_extension) return NULL;
     last_dot = strrchr(org_file_name, '.');
 
     if (last_dot != NULL) {
@@ -122,7 +124,6 @@ char * get_packet_time_stamp_mt(const struct timeval *timestamp)
     seconds = timestamp->tv_sec;
     time_info = localtime(&seconds);
     ret_time_str = (char *)malloc(DATE_LIMIT);
-    /* format timestamp as "YYYY-MM-DD HH:MM:SS" */
     strftime(time_str, sizeof(time_str), "%b %e, %Y %H:%M:%S", time_info);
     snprintf(ret_time_str, DATE_LIMIT, "%s.%06ld %s", time_str, timestamp->tv_usec, tzname[time_info->tm_isdst]);
     return ret_time_str;
@@ -142,6 +143,7 @@ char * get_packet_time_stamp_js(const struct timeval *timestamp)
     seconds = timestamp->tv_sec;
     time_info = localtime(&seconds);
     ret_time_str = (char *)malloc(DATE_LIMIT);
+    /* format timestamp as "YYYY-MM-DD HH:MM:SS" */
     strftime(time_str, sizeof(time_str), "%Y-%m-%dT%H:%M:%S", time_info);
     snprintf(ret_time_str, DATE_LIMIT, "%s.%06ld%+03d:%02ld", time_str, timestamp->tv_usec, (int)time_info->tm_gmtoff / 3600, labs((time_info->tm_gmtoff / 60) % 60));    
     return ret_time_str;

@@ -3,8 +3,6 @@
 #include "../includes/ddos.h"
 #include "../includes/mitm.h"
 #include "../includes/general_info.h"
-#include <netinet/ether.h>
-#include <netinet/in.h>
 /*-------------------------GLOBALS---------------------- */
                     /* GLOBAL TABELS */
 arp_conv arp_conversations_table_g[MAX_L2_CONVERSATIONS];
@@ -31,7 +29,8 @@ int main(int argc, char *argv[])
     pcap_record_file = argv[1];
     main_output_file = argv[2];
 
-    if (invalid_files(pcap_record_file, main_output_file))
+    filename = get_file_name(main_output_file, GLOBAL_L4_EXT);
+    if (invalid_files(pcap_record_file, filename))
     {
         error("input files are invalid");
         exit(EXIT_FAILURE);
@@ -52,7 +51,7 @@ int main(int argc, char *argv[])
     if (handle == NULL)
     {
         fprintf(stderr, "Error opening pcap file: %s\n", errbuf);
-        return 1;
+        return EXIT_FAILURE;
     }
     pcap_loop(handle, 0, packet_handler, NULL);
     pcap_close(handle);
@@ -68,42 +67,33 @@ int main(int argc, char *argv[])
     }
     
     analyze_conversations(conversations_table_g);
-    analyze_ddos(conversations_table_g, "char *filename", conv_id_tcp_g + conv_id_udp_g);
-    save_convs_to_json(main_output_file);
+    
+    free(filename);
+    filename = get_file_name(main_output_file, GLOBAL_L4_EXT);
+    save_L4_convs_to_json(filename);
+
+    free(filename);
+    filename = get_file_name(main_output_file, GLOBAL_L2_EXT);
+    save_L2_convs_to_json(arp_conversations_table_g, filename);
     print_general_info(general_info_g);
+
+    free(filename);
     filename = get_file_name(main_output_file, GLOBAL_INFO_EXT);
     save_gis_to_json(general_info_g, filename);
 
-    int op_2 = 0;
-    for (int j = 0; j < MAX_L2_CONVERSATIONS; j++) {
-        if (arp_conversations_table_g[j].src_ip.s_addr != 0)
-        {
-            info("---------------------------");
-            okay("CONV: %4i|PACKETS: %4i|A->B: %4i|B->A: %4i|", arp_conversations_table_g[j].cid, arp_conversations_table_g[j].num_p, arp_conversations_table_g[j].num_atob, arp_conversations_table_g[j].num_btoa);
-            arp_packet_node_s * arp_temp = arp_conversations_table_g[j].p_list;
-            printf("from %s =>", ether_ntoa(&arp_conversations_table_g[j].src_mac));
-            printf(" %s\n"     , ether_ntoa(&arp_conversations_table_g[j].dest_mac));
-            while (arp_temp != NULL)
-            {
-                if (arp_temp->p_type == ARP_REPLAY) op_2++;
-            //     info("packet: %i|TYPE: %i", arp_temp->p_id, arp_temp->p_type);
-            //     for(int k = 0; k < arp_temp->p_size; k++)
-            //     {
-            //         printf("%c", arp_temp->arp_packet_data[k]);
-            //     }
-            //     printf("\n");
-                arp_temp = arp_temp->next;
-            }
-            info("---------------------------");
-        }
-    }
-    info("number of arp replayes: %i", op_2);
-    
+    free(filename);
+    filename = get_file_name(main_output_file, GLOBAL_DDOS_EXT);
+    analyze_ddos(conversations_table_g, filename, conv_id_tcp_g + conv_id_udp_g);
+
+
+    free(filename);
+    filename = get_file_name(main_output_file, GLOBAL_MITM_EXT);
+    analyze_mitm(arp_conversations_table_g, filename, arp_id);
     free_all_lists();
     
     if (filename) free(filename);
     okay("completed...");
-    return 0;
+    return EXIT_SUCCESS;
 }
 void init_list(packet_node_s ** root)
 {
@@ -342,13 +332,14 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
         src_mac = (struct ether_addr *)eth_header->ether_shost;
         dest_mac = (struct ether_addr *)eth_header->ether_dhost;
         arp_hash = get_arp_hash(*src_mac, *dest_mac);
-        type_arp_op = ((arp_packet[6] << 8) | arp_packet[7]) == 1 ? ARP_REQ : ARP_REPLAY;
+        type_arp_op = ((arp_packet[6] << 8) | arp_packet[7]) == 1 ? ARP_TYPE_REQUEST : ARP_TYPE_REPLAY;
         memcpy(&src_ip, arp_packet + 14, sizeof(struct in_addr));
         memcpy(&dest_ip, arp_packet + 24, sizeof(struct in_addr));
 
         if ((memcmp(&arp_conversations_table_g[arp_hash].src_mac, src_mac, sizeof(struct ether_addr)) == 0 && memcmp(&arp_conversations_table_g[arp_hash].dest_mac, dest_mac, sizeof(struct ether_addr)) == 0) || 
             (memcmp(&arp_conversations_table_g[arp_hash].src_mac, dest_mac, sizeof(struct ether_addr)) == 0 && memcmp(&arp_conversations_table_g[arp_hash].dest_mac, src_mac, sizeof(struct ether_addr)) == 0)
         )
+        
         {   /* conv exist's, enter the packet here */
             /* 
                 ! the add to arp list causes a somewhat constant size of 114 bytes (2 records...) leak please fix :|
@@ -438,17 +429,18 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
                 if (conversations_table_g[conv_hash].num_packets != 0)
                 {
                     if (DEBUG) info("cell %i is not available|conversations_arr[hash].num_packets = %i", conv_hash, conversations_table_g[conv_hash].num_packets);
+                    free_l4_list(&conversations_table_g[conv_hash].packet_list);
                 }
-                    conversation.conv_id = conv_id_tcp_g++;
-                    conversations_table_g[conv_hash] = conversation;
-                    conversations_table_g[conv_hash].packets_from_a_to_b = 1;
-                    conversations_table_g[conv_hash].num_packets = 1;
-                    conversations_table_g[conv_hash].num_exep = 0;
-                    conversations_table_g[conv_hash].packets_from_b_to_a = 0;
-                    conversations_table_g[conv_hash].proto_type = IPPROTO_TCP;
-                    init_list(&(conversations_table_g[conv_hash].packet_list));
-                    /* handle not inserted... */add_packet_to_list(&(conversations_table_g[conv_hash].packet_list), packet, pkthdr->caplen, conversations_table_g[conv_hash].num_packets - 1, ntohs(tcp_header->th_seq), ntohs(tcp_header->th_ack), ip_header->ip_src, ip_header->ip_dst, pkthdr->ts, relative_time);
-                    // okay("New Conversation: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
+                conversation.conv_id = conv_id_tcp_g++;
+                conversations_table_g[conv_hash] = conversation;
+                conversations_table_g[conv_hash].packets_from_a_to_b = 1;
+                conversations_table_g[conv_hash].num_packets = 1;
+                conversations_table_g[conv_hash].num_exep = 0;
+                conversations_table_g[conv_hash].packets_from_b_to_a = 0;
+                conversations_table_g[conv_hash].proto_type = IPPROTO_TCP;
+                init_list(&(conversations_table_g[conv_hash].packet_list));
+                /* handle not inserted... */add_packet_to_list(&(conversations_table_g[conv_hash].packet_list), packet, pkthdr->caplen, conversations_table_g[conv_hash].num_packets - 1, ntohs(tcp_header->th_seq), ntohs(tcp_header->th_ack), ip_header->ip_src, ip_header->ip_dst, pkthdr->ts, relative_time);
+                // okay("New Conversation: Source IP: %s, Destination IP: %s, Source Port: %u, Destination Port: %u", ip_src_str, ip_dst_str, conversation.src_port, conversation.dest_port);
             }
             if (DEBUG) info("[HEADER|HASH:%i|ID: %i] %i\n", conv_hash, conversations_table_g[conv_hash].conv_id, tcp_header->th_win);
         }
@@ -478,6 +470,11 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char
                 conversations_table_g[conv_hash].num_packets++;
                 /* handle not inserted... */add_packet_to_list(&(conversations_table_g[conv_hash].packet_list),packet, pkthdr->caplen, conversations_table_g[conv_hash].num_packets - 1, -1, -1, ip_header->ip_src, ip_header->ip_dst, pkthdr->ts, relative_time);
             } else {
+                if (conversations_table_g[conv_hash].num_packets != 0)
+                {
+                    if (DEBUG) info("cell %i is not available|conversations_arr[hash].num_packets = %i", conv_hash, conversations_table_g[conv_hash].num_packets);
+                    free_l4_list(&conversations_table_g[conv_hash].packet_list);
+                }
                 conversation.conv_id = conv_id_udp_g++;
                 conversations_table_g[conv_hash] = conversation;
                 conversations_table_g[conv_hash].packets_from_a_to_b = 1;
@@ -497,7 +494,7 @@ int compare_L4_conversations(const void *a, const void *b)
     const conv_s *conv_b = (const conv_s *)b;
     return conv_a->conv_id - conv_b->conv_id;
 }
-void save_convs_to_json(const char *filename)
+void save_L4_convs_to_json(const char *filename)
 {
     json_object *root, *conversations_array, *conversation_object, *exeption_arr, *exception, *packets_arr, *packet_info, *conv_count_json;
     packet_node_s *temp;
@@ -505,10 +502,11 @@ void save_convs_to_json(const char *filename)
     int exep_type_switch;
     char prot_type[4] = "\0";
     char * exep_type = NULL, *ts_date;
+    
     root = json_object_new_object();
     conversations_array = json_object_new_array();
     json_object_object_add(root, "conv_count",json_object_new_int(conv_id_tcp_g+conv_id_udp_g));
-    json_object_object_add(root, "conversations", conversations_array);
+    json_object_object_add(root, "l4_conversations", conversations_array);
     for (i = 0; i < MAX_L4_CONVERSATIONS; i++) {
         if (conversations_table_g[i].src_ip.s_addr != 0) {
             if (conversations_table_g[i].proto_type == IPPROTO_TCP)
@@ -604,9 +602,23 @@ void save_convs_to_json(const char *filename)
             strncpy(prot_type, "", 4);
         }
     }
-    fp = fopen(filename, "w"); /* dump the JSON to a file */
-    fprintf(fp, "%s\n", json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY));
-    fclose(fp);
+    if (filename != NULL)
+    {
+        fp = fopen(filename, "w"); /* dump the JSON to a file */
+        if (fp != NULL)
+        {
+            fprintf(fp, "%s\n", json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY));
+            fclose(fp);
+        }
+        else
+        {
+            error("save_L4_convs_to_json: given file pointer is null");
+        }
+    }
+    else
+    {
+        error("given file name is null");
+    }
     json_object_put(root);
 }
 void analyze_conversations(conv_s conversations_arr[MAX_L4_CONVERSATIONS])
@@ -912,6 +924,8 @@ void * search_params(conv_s conv, search_e search , search_ret_e * ret_type, voi
                 if (temp->packet_size < p->packet_size) p = temp;
                 temp = temp->next;
             }
+            void_ret_val = copy_packet(p);
+            optional_c = void_ret_val;
             *ret_type = search_ret_e_p_ptr_min;
             break;
         case search_e_max_size:
@@ -923,6 +937,7 @@ void * search_params(conv_s conv, search_e search , search_ret_e * ret_type, voi
                 temp = temp->next;
             }
             void_ret_val = copy_packet(p);
+            optional_c = void_ret_val;
             *ret_type = search_ret_e_p_ptr_max;
             break;
         case search_e_between:

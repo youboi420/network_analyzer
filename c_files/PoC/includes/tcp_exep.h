@@ -36,7 +36,8 @@ typedef enum packet_exep_e
     RESET_EXEP,
 } packet_exep_e;
 
-typedef struct packet_node_s {
+typedef struct packet_node_s
+{
     u_char *packet_data;
     uint32_t p_id;
     size_t packet_size;
@@ -63,14 +64,15 @@ typedef enum
 } packet_flags;
 
 
-typedef struct packet_exep_node_s{
+typedef struct packet_exep_node_s
+{
     struct in_addr src_ip, dest_ip;
     packet_exep_e exep;
     uint32_t packet_location;
 }packet_exep_node_s;
-#endif
 
 packet_exep_e get_packet_exep(u_char * tcp_packet);
 packet_flags analyze_packet(u_char * tcp_packet);
 int check_dup_ack(packet_node_s *crnt, packet_node_s * comp);
 int check_keep_alive(packet_node_s *p);
+#endif

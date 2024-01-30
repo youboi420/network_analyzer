@@ -1,0 +1,82 @@
+{
+  "L2_coversations":[
+    {
+      "conv_id":0,
+      "src_mac":"0:31:92:92:69:97",
+      "dest_mac":"ff:ff:ff:ff:ff:ff",
+      "packets":3,
+      "packets_from_a_to_b":3,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:29.240656 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:29.240656+02:00",
+          "time_stamp_raw_sec":1704829529,
+          "time_stamp_raw_usec":240656,
+          "time_stamp_rltv":10.752947000000001,
+          "type":"ARP REQUEST"
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:33.746510 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:33.746510+02:00",
+          "time_stamp_raw_sec":1704829533,
+          "time_stamp_raw_usec":746510,
+          "time_stamp_rltv":14.9969,
+          "type":"ARP REQUEST"
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.354230 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.354230+02:00",
+          "time_stamp_raw_sec":1704829538,
+          "time_stamp_raw_usec":354230,
+          "time_stamp_rltv":20.181194000000001,
+          "type":"ARP REQUEST"
+        }
+      ]
+    },
+    {
+      "conv_id":1,
+      "src_mac":"10:6f:d9:57:c3:4b",
+      "dest_mac":"ff:ff:ff:ff:ff:ff",
+      "packets":1,
+      "packets_from_a_to_b":1,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:31.809157 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:31.809157+02:00",
+          "time_stamp_raw_sec":1704829531,
+          "time_stamp_raw_usec":809157,
+          "time_stamp_rltv":12.698358000000001,
+          "type":"ARP REQUEST"
+        }
+      ]
+    },
+    {
+      "conv_id":2,
+      "src_mac":"0:31:92:92:69:97",
+      "dest_mac":"10:6f:d9:57:c3:4b",
+      "packets":2,
+      "packets_from_a_to_b":1,
+      "packets_from_b_to_a":1,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:31.909470 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:31.909470+02:00",
+          "time_stamp_raw_sec":1704829531,
+          "time_stamp_raw_usec":909470,
+          "time_stamp_rltv":13.926679999999999,
+          "type":"ARP RESPONSE"
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.354237 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.354237+02:00",
+          "time_stamp_raw_sec":1704829538,
+          "time_stamp_raw_usec":354237,
+          "time_stamp_rltv":20.181194000000001,
+          "type":"ARP RESPONSE"
+        }
+      ]
+    }
+  ]
+}

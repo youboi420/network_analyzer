@@ -19,12 +19,14 @@ if (check_error(flag))
 
 */
 
-typedef struct p_list {
+typedef struct p_list
+{
     u_char * packet;
     struct p_list *next;
 }p_list;
 
-typedef struct INFO_ETH {
+typedef struct INFO_ETH
+{
     uint16_t id;
     uint8_t mac_a[ETH_ALEN], mac_b[ETH_ALEN]; 
     uint16_t packets_num, packets_A_to_B, packets_B_to_A;

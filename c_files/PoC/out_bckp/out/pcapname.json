@@ -1,0 +1,720 @@
+{
+  "conversations":[
+    {
+      "conv_id":0,
+      "conv_type":"UDP",
+      "source_ip":"192.168.68.115",
+      "destination_ip":"224.0.0.251",
+      "source_port":5353,
+      "destination_port":5353,
+      "packets":2,
+      "packets_from_a_to_b":2,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:17.977085 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:17.977085+02:00",
+          "time_stamp_useconds":977085,
+          "time_stamp_raw":1704829517
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:37.945104 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:37.945104+02:00",
+          "time_stamp_useconds":945104,
+          "time_stamp_raw":1704829537
+        }
+      ]
+    },
+    {
+      "conv_id":0,
+      "conv_type":"TCP",
+      "source_ip":"192.168.68.128",
+      "destination_ip":"20.189.173.5",
+      "source_port":56428,
+      "destination_port":443,
+      "packets":12,
+      "packets_from_a_to_b":6,
+      "packets_from_b_to_a":6,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.787267 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.787267+02:00",
+          "time_stamp_useconds":787267,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.787307 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.787307+02:00",
+          "time_stamp_useconds":787307,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.787310 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.787310+02:00",
+          "time_stamp_useconds":787310,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.871120 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.871120+02:00",
+          "time_stamp_useconds":871120,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.873664 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.873664+02:00",
+          "time_stamp_useconds":873664,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.874910 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.874910+02:00",
+          "time_stamp_useconds":874910,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.175337 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.175337+02:00",
+          "time_stamp_useconds":175337,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.216526 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.216526+02:00",
+          "time_stamp_useconds":216526,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.380191 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.380191+02:00",
+          "time_stamp_useconds":380191,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.380224 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.380224+02:00",
+          "time_stamp_useconds":380224,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.382281 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.382281+02:00",
+          "time_stamp_useconds":382281,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.394358 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.394358+02:00",
+          "time_stamp_useconds":394358,
+          "time_stamp_raw":1704829522
+        }
+      ],
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":10
+        }
+      ]
+    },
+    {
+      "conv_id":1,
+      "conv_type":"TCP",
+      "source_ip":"192.168.68.128",
+      "destination_ip":"51.116.253.170",
+      "source_port":36882,
+      "destination_port":443,
+      "packets":29,
+      "packets_from_a_to_b":14,
+      "packets_from_b_to_a":15,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.871545 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.871545+02:00",
+          "time_stamp_useconds":871545,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.885072 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.885072+02:00",
+          "time_stamp_useconds":885072,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.885089 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.885089+02:00",
+          "time_stamp_useconds":885089,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.885293 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.885293+02:00",
+          "time_stamp_useconds":885293,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.905420 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.905420+02:00",
+          "time_stamp_useconds":905420,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.185019 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.185019+02:00",
+          "time_stamp_useconds":185019,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.185031 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.185031+02:00",
+          "time_stamp_useconds":185031,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.185672 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.185672+02:00",
+          "time_stamp_useconds":185672,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.199701 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.199701+02:00",
+          "time_stamp_useconds":199701,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.380191 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.380191+02:00",
+          "time_stamp_useconds":380191,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.380191 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.380191+02:00",
+          "time_stamp_useconds":380191,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.380191 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.380191+02:00",
+          "time_stamp_useconds":380191,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.380247 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.380247+02:00",
+          "time_stamp_useconds":380247,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.382683 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.382683+02:00",
+          "time_stamp_useconds":382683,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.382688 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.382688+02:00",
+          "time_stamp_useconds":382688,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.382690 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.382690+02:00",
+          "time_stamp_useconds":382690,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.382691 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.382691+02:00",
+          "time_stamp_useconds":382691,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.401017 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.401017+02:00",
+          "time_stamp_useconds":401017,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.402106 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.402106+02:00",
+          "time_stamp_useconds":402106,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.403221 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.403221+02:00",
+          "time_stamp_useconds":403221,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.403221 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.403221+02:00",
+          "time_stamp_useconds":403221,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.585705 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.585705+02:00",
+          "time_stamp_useconds":585705,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.628525 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.628525+02:00",
+          "time_stamp_useconds":628525,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.687917 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.687917+02:00",
+          "time_stamp_useconds":687917,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.687917 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.687917+02:00",
+          "time_stamp_useconds":687917,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.687935 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.687935+02:00",
+          "time_stamp_useconds":687935,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.688345 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.688345+02:00",
+          "time_stamp_useconds":688345,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.688377 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.688377+02:00",
+          "time_stamp_useconds":688377,
+          "time_stamp_raw":1704829522
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:22.703824 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:22.703824+02:00",
+          "time_stamp_useconds":703824,
+          "time_stamp_raw":1704829522
+        }
+      ],
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":3
+        },
+        {
+          "exep_id":1,
+          "exep_type":"retransmission",
+          "packet_index":13
+        },
+        {
+          "exep_id":2,
+          "exep_type":"retransmission",
+          "packet_index":14
+        },
+        {
+          "exep_id":3,
+          "exep_type":"retransmission",
+          "packet_index":15
+        },
+        {
+          "exep_id":4,
+          "exep_type":"retransmission",
+          "packet_index":16
+        },
+        {
+          "exep_id":5,
+          "exep_type":"retransmission",
+          "packet_index":26
+        },
+        {
+          "exep_id":6,
+          "exep_type":"retransmission",
+          "packet_index":27
+        },
+        {
+          "exep_id":7,
+          "exep_type":"reset",
+          "packet_index":28
+        }
+      ]
+    },
+    {
+      "conv_id":1,
+      "conv_type":"UDP",
+      "source_ip":"192.168.68.128",
+      "destination_ip":"8.8.8.8",
+      "source_port":39429,
+      "destination_port":53,
+      "packets":4,
+      "packets_from_a_to_b":2,
+      "packets_from_b_to_a":2,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.757468 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.757468+02:00",
+          "time_stamp_useconds":757468,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.757492 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.757492+02:00",
+          "time_stamp_useconds":757492,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.871120 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.871120+02:00",
+          "time_stamp_useconds":871120,
+          "time_stamp_raw":1704829521
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:21.871120 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:21.871120+02:00",
+          "time_stamp_useconds":871120,
+          "time_stamp_raw":1704829521
+        }
+      ]
+    },
+    {
+      "conv_id":2,
+      "conv_type":"UDP",
+      "source_ip":"192.168.68.137",
+      "destination_ip":"239.255.255.250",
+      "source_port":54637,
+      "destination_port":1900,
+      "packets":6,
+      "packets_from_a_to_b":6,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:23.916684 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:23.916684+02:00",
+          "time_stamp_useconds":916684,
+          "time_stamp_raw":1704829523
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:23.918599 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:23.918599+02:00",
+          "time_stamp_useconds":918599,
+          "time_stamp_raw":1704829523
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:24.020183 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:24.020183+02:00",
+          "time_stamp_useconds":20183,
+          "time_stamp_raw":1704829524
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:33.849716 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:33.849716+02:00",
+          "time_stamp_useconds":849716,
+          "time_stamp_raw":1704829533
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:33.952276 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:33.952276+02:00",
+          "time_stamp_useconds":952276,
+          "time_stamp_raw":1704829533
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:34.055393 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:34.055393+02:00",
+          "time_stamp_useconds":55393,
+          "time_stamp_raw":1704829534
+        }
+      ]
+    },
+    {
+      "conv_id":2,
+      "conv_type":"TCP",
+      "source_ip":"192.168.68.128",
+      "destination_ip":"95.100.205.52",
+      "source_port":35642,
+      "destination_port":80,
+      "packets":2,
+      "packets_from_a_to_b":1,
+      "packets_from_b_to_a":1,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:24.580522 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:24.580522+02:00",
+          "time_stamp_useconds":580522,
+          "time_stamp_raw":1704829524
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:24.641047 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:24.641047+02:00",
+          "time_stamp_useconds":641047,
+          "time_stamp_raw":1704829524
+        }
+      ]
+    },
+    {
+      "conv_id":3,
+      "conv_type":"UDP",
+      "source_ip":"192.168.68.137",
+      "destination_ip":"224.0.0.251",
+      "source_port":5353,
+      "destination_port":5353,
+      "packets":3,
+      "packets_from_a_to_b":3,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:27.091589 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:27.091589+02:00",
+          "time_stamp_useconds":91589,
+          "time_stamp_raw":1704829527
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:28.115849 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:28.115849+02:00",
+          "time_stamp_useconds":115849,
+          "time_stamp_raw":1704829528
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.764087 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.764087+02:00",
+          "time_stamp_useconds":764087,
+          "time_stamp_raw":1704829538
+        }
+      ]
+    },
+    {
+      "conv_id":3,
+      "conv_type":"TCP",
+      "source_ip":"192.168.1.1",
+      "destination_ip":"192.168.1.2",
+      "source_port":20,
+      "destination_port":80,
+      "packets":3,
+      "packets_from_a_to_b":2,
+      "packets_from_b_to_a":1,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:31.929649 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:31.929649+02:00",
+          "time_stamp_useconds":929649,
+          "time_stamp_raw":1704829531
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:32.973985 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:32.973985+02:00",
+          "time_stamp_useconds":973985,
+          "time_stamp_raw":1704829532
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:34.021953 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:34.021953+02:00",
+          "time_stamp_useconds":21953,
+          "time_stamp_raw":1704829534
+        }
+      ],
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":1
+        },
+        {
+          "exep_id":1,
+          "exep_type":"zero window",
+          "packet_index":2
+        }
+      ]
+    },
+    {
+      "conv_id":4,
+      "conv_type":"TCP",
+      "source_ip":"192.168.68.128",
+      "destination_ip":"34.110.207.168",
+      "source_port":42652,
+      "destination_port":443,
+      "packets":7,
+      "packets_from_a_to_b":4,
+      "packets_from_b_to_a":3,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:37.994614 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:37.994614+02:00",
+          "time_stamp_useconds":994614,
+          "time_stamp_raw":1704829537
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:37.994785 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:37.994785+02:00",
+          "time_stamp_useconds":994785,
+          "time_stamp_raw":1704829537
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.080548 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.080548+02:00",
+          "time_stamp_useconds":80548,
+          "time_stamp_raw":1704829538
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.152324 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.152324+02:00",
+          "time_stamp_useconds":152324,
+          "time_stamp_raw":1704829538
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.152324 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.152324+02:00",
+          "time_stamp_useconds":152324,
+          "time_stamp_raw":1704829538
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.152387 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.152387+02:00",
+          "time_stamp_useconds":152387,
+          "time_stamp_raw":1704829538
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.158279 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.158279+02:00",
+          "time_stamp_useconds":158279,
+          "time_stamp_raw":1704829538
+        }
+      ],
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"duplicate ack b to a",
+          "packet_index":6
+        }
+      ]
+    },
+    {
+      "conv_id":4,
+      "conv_type":"UDP",
+      "source_ip":"192.168.68.118",
+      "destination_ip":"224.0.0.251",
+      "source_port":5353,
+      "destination_port":5353,
+      "packets":5,
+      "packets_from_a_to_b":5,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:27.705962 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:27.705962+02:00",
+          "time_stamp_useconds":705962,
+          "time_stamp_raw":1704829527
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:28.730032 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:28.730032+02:00",
+          "time_stamp_useconds":730032,
+          "time_stamp_raw":1704829528
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:30.163302 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:30.163302+02:00",
+          "time_stamp_useconds":163302,
+          "time_stamp_raw":1704829530
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:30.675443 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:30.675443+02:00",
+          "time_stamp_useconds":675443,
+          "time_stamp_raw":1704829530
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:34.669438 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:34.669438+02:00",
+          "time_stamp_useconds":669438,
+          "time_stamp_raw":1704829534
+        }
+      ]
+    },
+    {
+      "conv_id":5,
+      "conv_type":"TCP",
+      "source_ip":"192.168.68.128",
+      "destination_ip":"34.117.237.239",
+      "source_port":46270,
+      "destination_port":443,
+      "packets":6,
+      "packets_from_a_to_b":4,
+      "packets_from_b_to_a":2,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.994968 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.994968+02:00",
+          "time_stamp_useconds":994968,
+          "time_stamp_raw":1704829538
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:38.995134 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:38.995134+02:00",
+          "time_stamp_useconds":995134,
+          "time_stamp_raw":1704829538
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:39.060539 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:39.060539+02:00",
+          "time_stamp_useconds":60539,
+          "time_stamp_raw":1704829539
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:39.079137 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:39.079137+02:00",
+          "time_stamp_useconds":79137,
+          "time_stamp_raw":1704829539
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:39.079138 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:39.079138+02:00",
+          "time_stamp_useconds":79138,
+          "time_stamp_raw":1704829539
+        },
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:39.079157 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:39.079157+02:00",
+          "time_stamp_useconds":79157,
+          "time_stamp_raw":1704829539
+        }
+      ],
+      "exceptions":[
+        {
+          "exep_id":0,
+          "exep_type":"retransmission",
+          "packet_index":3
+        },
+        {
+          "exep_id":1,
+          "exep_type":"duplicate ack b to a",
+          "packet_index":4
+        }
+      ]
+    },
+    {
+      "conv_id":5,
+      "conv_type":"UDP",
+      "source_ip":"192.168.68.1",
+      "destination_ip":"239.255.255.250",
+      "source_port":40242,
+      "destination_port":1900,
+      "packets":1,
+      "packets_from_a_to_b":1,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jan  9, 2024 21:45:32.111161 IST",
+          "time_stamp_date_js":"2024-01-09T21:45:32.111161+02:00",
+          "time_stamp_useconds":111161,
+          "time_stamp_raw":1704829532
+        }
+      ]
+    }
+  ]
+}
