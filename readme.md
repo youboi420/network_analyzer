@@ -4,7 +4,7 @@
 
 ## Run locally
 clone the repoistory and then follow these step's
-- for windows user's please use this tool using wsl(https://learn.microsoft.com/en-us/windows/wsl/install) because it uses some linux sys and netinet libs which are built in to linux and it won't work native in window's
+- for windows user's please use this tool using [wsl](https://learn.microsoft.com/en-us/windows/wsl/install) because it uses some linux sys and netinet libs which are built in to linux and it won't work native in window's
 ## installation
 [gcc](https://gcc.gnu.org/install/)
 
