@@ -1,15 +1,28 @@
-import mysql from "mysql";
+import { connection, connectToDatabase } from './db_service.js'
 
-const DB_HOST = process.env.DB_HOST
-const DB_USER = process.env.DB_USER
-const DB_UPWD = process.env.DB_UPWD
-const DB_DBS = process.env.DB_DBS
+const create_json_report_query = `
+CREATE TABLE IF NOT EXISTS json_reports (
+  report_id INT NOT NULL AUTO_INCREMENT,
+  owner_username VARCHAR(50) NOT NULL,
+  owner_id INT NOT NULL,
+  creation_date DATETIME DEFAULT NOW(),
+  path VARCHAR(256) NOT NULL,
+  PRIMARY KEY (report_id),
+  FOREIGN KEY (owner_id) REFERENCES users(id)
+)`
 
-const connection = mysql.createConnection({
-  host: DB_HOST,
-  user: DB_USER,
-  password: DB_UPWD,
-  database: DB_DBS,
-});
+function create_json_report_table() {
+  return new Promise((resolve, reject) => {
+    connection.query(create_json_report_query, (err, results) => {
+      if (err) {
+        console.log("error creating json reports table: ", err)
+        reject(err)
+      } else {
+        console.log("created table")
+        resolve()
+      }
+    })
+  })
+}
 
-const create_report = ``
+export { create_json_report_table }

@@ -1,7 +1,7 @@
 import os from 'node:os'
 import fs from 'fs'
 
-const get_local_ip = () => {
+function get_local_ip() {
 	const interfaces = os.networkInterfaces()
 	for (const interface_name in interfaces) {
 		const interfaceInfo = interfaces[interface_name]

@@ -25,7 +25,7 @@ installation in unix based system's
 sudo apt install make
 ```
 ## Current Usage (for main alg...)
-Iv'e created some pcap files, to scan the program on. there's a pcap_files folder which conatains the pcap files, with ddos scan's tcp exceptions. if you want you can install (wireshark)[https://www.wireshark.org/] and record your own PCAP files.
+Iv'e created some pcap files, to scan the program on. there's a pcap_files folder which conatains the pcap files, with ddos scan's tcp exceptions. if you want you can install [wireshark](https://www.wireshark.org/) and record your own PCAP files.
 
 go to the PoC directory and run the following commands
 ```sh
