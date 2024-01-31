@@ -32,8 +32,8 @@ void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, u
     {
         if (conversations[index].src_ip.s_addr != 0)
         {
-            info("-------------------------------------");
-            info("index: %i|conv id: %i| type: %i", index, conversations[index].conv_id, conversations[index].proto_type);
+            if (DEBUG) info("-------------------------------------");
+            if (DEBUG) info("index: %i|conv id: %i| type: %i", index, conversations[index].conv_id, conversations[index].proto_type);
             if (detect_flood(conversations[index]))
             {
                 if (DEBUG) okay("flaged conv [%i] as possible flood", conversations[index].conv_id);
@@ -62,12 +62,12 @@ void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, u
                     b = temp->time_stamp_rltv;
                     temp = NULL;
                 }
-                info("start: %f | end: %f", a, b);
+                if (DEBUG) info("start: %f | end: %f", a, b);
                 exma_ptr = search_params(conversations[index], search_e_exma, &ret, &a, &b, &ema);
-                info("called exma");
+                if (DEBUG) info("called exma");
                 if (exma_ptr && ret == search_ret_e_exma)
                 {
-                    okay("%f exma value", *exma_ptr);
+                    if (DEBUG) okay("%f exma value", *exma_ptr);
                     if (*exma_ptr  > ema_threshold && conversations[index].num_packets > DDOS_PACKET_LIMIT)
                     {
                         info("!!! need to write to ddos report json file !!!");
@@ -76,7 +76,7 @@ void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, u
                     free(exma_ptr);
                 }
             }
-            info("-------------------------------------");
+            if (DEBUG) info("-------------------------------------");
         }
     }
     if ((count_flood >= conv_count/2) && (conv_count != 1) )

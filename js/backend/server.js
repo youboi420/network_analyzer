@@ -17,8 +17,12 @@ app.get("/", (req, res) => {
 	res.json("hello");
 });
 
+app.listen(8800, () => {
+	console.log("Connected to backend.");
+});
+
 // app.get("/books", (req, res) => {
-// 	const q = "SELECT * FROM books";
+	// 	const q = "SELECT * FROM books";
 // 	db.query(q, (err, data) => {
 // 		if (err) {
 // 			console.log(err);
@@ -69,8 +73,4 @@ app.get("/", (req, res) => {
 // 		if (err) return res.send(err);
 // 		return res.json(data);
 // 	});
-// });
-
-// app.listen(8800, () => {
-// 	console.log("Connected to backend.");
 // });

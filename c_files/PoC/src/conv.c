@@ -180,7 +180,6 @@ int add_packet_to_list(packet_node_s **root, const u_char * original_packet, siz
         node->dest_ip = dest_ip;
         node->num_seq = seq;
         node->num_ack = ack;
-        /*
         if (ip_header->ip_p == IPPROTO_TCP)
         {
             tcp_header = (struct tcphdr *) (original_packet + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
@@ -190,7 +189,6 @@ int add_packet_to_list(packet_node_s **root, const u_char * original_packet, siz
             node->num_seq = -1;
             node->num_ack = -1;
         }
-        */
         if (DEBUG) printf("------------------------\n");
         if (DEBUG) info("(seq)\tnode: %u | param: %u", node->num_seq, seq);
         if (DEBUG) info("(ack)\tnode: %u | param: %u", node->num_ack, ack);
@@ -672,7 +670,7 @@ void analyze_conversations(conv_s conversations_arr[MAX_L4_CONVERSATIONS])
                             {
                                 if (check_dup_ack(temp, lastAtoB) && check_keep_alive(lastBtoA) != 1)
                                 {
-                                    /* if (DEBUG) */ info("%s%sDUPACK PACKET A->B{CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id, lastAtoB->p_id, RESET_FG);
+                                    if (DEBUG) info("%s%sDUPACK PACKET A->B{CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id, lastAtoB->p_id, RESET_FG);
                                     conversations_arr[i].exep_packet_id[exception_index].exep = DUP_ACK_ATOB_EXEP;   
                                     conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
                                     conversations_arr[i].num_exep++;
@@ -686,7 +684,7 @@ void analyze_conversations(conv_s conversations_arr[MAX_L4_CONVERSATIONS])
                             {
                                 if (check_dup_ack(temp, lastBtoA) && check_keep_alive(lastAtoB) != 1)
                                 {
-                                    /* if (DEBUG) */ info("%s%sDUPACK PACKET B->A {CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id, lastBtoA->p_id, RESET_FG);
+                                    if (DEBUG) info("%s%sDUPACK PACKET B->A {CURRENT: %i|LAST: %i}%s", RED_FG, BLACK_BG, temp->p_id, lastBtoA->p_id, RESET_FG);
                                     conversations_arr[i].exep_packet_id[exception_index].exep = DUP_ACK_BTOA_EXEP;   
                                     conversations_arr[i].exep_packet_id[exception_index].packet_location = temp->p_id;   
                                     conversations_arr[i].num_exep++;
@@ -907,7 +905,7 @@ void * search_params(conv_s conv, search_e search , search_ret_e * ret_type, voi
                 ex_ma = calculate_ema(avg_packets_per_time, prev_ema, ex_ma_alpha);
                 ema_value = (double *)malloc(sizeof(double));
                 *ema_value = ex_ma;
-                info("avg exma = %f | exma = %f ", avg_packets_per_time, ex_ma);
+                /* info("avg exma = %f | exma = %f ", avg_packets_per_time, ex_ma); */
                 void_ret_val = ema_value;
                 *ret_type = search_ret_e_exma;
             }

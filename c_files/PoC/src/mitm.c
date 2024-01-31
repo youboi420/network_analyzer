@@ -247,7 +247,7 @@ void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint
     attacks_arr = json_object_new_array();
     json_object_object_add(root, "attacks", attacks_arr);
     
-    info("Called mitm detection convs: %i", conv_count);
+    if (DEBUG) info("Called mitm detection convs: %i", conv_count);
     for(replay_count = 0, index = 0; index < MAX_L2_CONVERSATIONS; index++)
     {
         /* check for conv */
@@ -290,7 +290,7 @@ void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint
             }
             if (replay_count >= (l2_convs[index].num_p/2))
             {
-                info("conv: %i", l2_convs[index].cid);
+                if (DEBUG) info("conv: %i", l2_convs[index].cid);
                 if (arp_pois.list != NULL) /* to check if there's an acctuall attack... */
                 {
                     write_flag = 1;
