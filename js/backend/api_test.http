@@ -1,0 +1,41 @@
+
+### IP ADDRESS: 192.168.68.128 
+### GET ALL
+GET http://192.168.68.128:8081/sql_api/all_users
+
+### GET ONE
+GET http://192.168.68.128:8081/sql_api/user?un=ID
+
+### PUT
+PUT http://192.168.68.128:8081/sql_api/user/:id
+Content-Type: application/json
+
+{
+    
+}
+
+### DELETE
+DELETE http://192.168.68.128:8081/sql_api/user/:id
+Content-Type: application/json
+
+{
+    
+}
+
+###POST CREATE USER
+POST http://192.168.68.128:8081/sql_api/user
+Content-Type: application/json
+
+{
+	"un": "",
+	"password": ""
+}
+
+###POST CHECK USER
+POST http://192.168.68.128:8081/login
+Content-Type: application/json
+
+{
+	"un": "user5",
+	"password": "testpass2"
+}

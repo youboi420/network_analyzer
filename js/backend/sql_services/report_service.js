@@ -1,4 +1,4 @@
-import { connection, connectToDatabase } from './db_service.js'
+import { connection, connect_to_db } from './db_service.js'
 
 const create_json_report_query = `
 CREATE TABLE IF NOT EXISTS json_reports (
@@ -11,14 +11,14 @@ CREATE TABLE IF NOT EXISTS json_reports (
   FOREIGN KEY (owner_id) REFERENCES users(id)
 )`
 
-function create_json_report_table() {
+const create_json_report_table = () => {
   return new Promise((resolve, reject) => {
     connection.query(create_json_report_query, (err, results) => {
       if (err) {
         console.log("error creating json reports table: ", err)
         reject(err)
       } else {
-        console.log("created table")
+        console.log(results.affectedRows !== 0 ? "created table json reports" : "table json reports already exist's")
         resolve()
       }
     })

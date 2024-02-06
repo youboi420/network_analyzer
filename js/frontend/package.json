@@ -1,8 +1,22 @@
 {
+  "resolve": {
+    "fallback": {
+      "fs": false,
+      "path": false,
+      "os": false
+    }
+  },
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^5.15.7",
+    "@mui/material": "^5.15.7",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.14",
+    "@mui/x-data-grid": "^6.19.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -11,13 +25,16 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
+    "react-toastify": "^10.0.4",
+    "styled-components": "^6.1.8",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "conf_react_env": "node ./scripts/react_config_env.js"
   },
   "eslintConfig": {
     "extends": [

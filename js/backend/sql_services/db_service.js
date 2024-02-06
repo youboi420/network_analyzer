@@ -1,7 +1,7 @@
-import mysql from "mysql2";
-import dotenv from "dotenv";
+import mysql from "mysql2"
+import dotenv from "dotenv"
 
-dotenv.config();
+dotenv.config()
 
 const DB_HOST = process.env.DB_HOST
 const DB_USER = process.env.DB_USER
@@ -20,7 +20,7 @@ function connect_to_db() {
     connection.connect((err) => {
       if (err) {
         console.error('Error connecting to MySQL:', err)
-        reject(err);
+        reject(err)
       } else {
         console.log('Connected to MySQL')
         resolve()

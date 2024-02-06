@@ -1,0 +1,8 @@
+.body {
+    background-color: lightblue;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    background-color: red;
+}
