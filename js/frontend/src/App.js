@@ -5,12 +5,14 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import UserManagePage from './pages/UserManagePage';
 import NoPage from './pages/NoPage';
+import AnaylzePage from './pages/AnaylzePage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
     <div>
       <BrowserRouter>
-        <AppBar position="static">
+        <AppBar position="static" style={{backgroundColor: '#006093'}}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} >
             Network Analyzer - yair elad
@@ -29,8 +31,10 @@ function App() {
         </AppBar>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/analyze" element={<AnaylzePage/>}/>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/users" element={<UserManagePage />} />
+          <Route path="/signup" element={<RegisterPage />}/>
           <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>

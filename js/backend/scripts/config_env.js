@@ -74,6 +74,7 @@ DB_UPWD=${UPWD}
 DB_PORT=${PORT}
 DB_DBS=${DB_DBS}
 SQL_API_PATH=${SQL_API_PATH}
+JWT_SECRET=82304893209482n30c928n4098230n9c4n8230948cn02983m4c293m0482
 ############# END ENV FILE #############`
 
 if (process.argv.length >= 3) {

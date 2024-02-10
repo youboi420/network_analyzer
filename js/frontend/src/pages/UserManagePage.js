@@ -18,6 +18,7 @@ const UserManagePage = () => {
   const [editData, setEditData] = useState({})
   const [editDialogOpen, setEditDialogOpen] = useState(false, false)
   const [createDialogOpen, setCreateDialogOpen] = useState(false, false)
+  
 
   const handleDelete = async (userId) => {
     try {
@@ -71,8 +72,12 @@ const UserManagePage = () => {
 
   return (
     <div>
-      <DataGrid rows={rows} columns={columns} onRowSelectionModelChange={handleSelectionChange} />
-      <Stack spacing={2} direction="row" alignContent='center' justifyContent='center'>
+      {/* {
+        (selectedRow[0] !== undefined) &&
+        <div style={{ direction: "row", alignContent:'center', justifyContent: 'center', marginTop: "10px", backdropFilter: "blur(3px)"}}> { selectedRow + ""} </div>
+      } */}
+      <DataGrid rows={rows} columns={columns} onRowDoubleClick={ (row) => { setEditData(row.row); setEditDialogOpen(true); }} onRowSelectionModelChange={handleSelectionChange} style={{backdropFilter: "blur(300px)", fontWeight: "bold"}} />
+      <Stack spacing={2} direction="row" alignContent='center' justifyContent='center' style={{marginTop: "10px"}}>
         <Button onClick={ () => handleDelete(selectedRow[0]) } color='error' variant='contained' startIcon={<DeleteIcon/>}> delete </Button>
         <Button onClick={ handleEdit } color='info' variant='contained' startIcon={<EditNote/>} > UPDATE </Button>
         <Button onClick={ handleCreate } color='success' variant='contained' startIcon={<AddIcon/>}> CREATE </Button>

@@ -3,22 +3,18 @@ import { connection } from "./db_service.js"
 const create_user_table_query = `
 CREATE TABLE IF NOT EXISTS users (
   id INT NOT NULL AUTO_INCREMENT,
-  username VARCHAR(50) NOT NULL,
-  password VARCHAR(50) NOT NULL,
+  username VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   isadmin BOOLEAN NOT NULL,
   PRIMARY KEY (id)
-)
-`
+)`
+
 const undef_err_msg = "one or more of the given parameters is undefined"
 const not_user_msg  = "no such user"
-
 const insert_user_query = `INSERT INTO users (username, password, isadmin) VALUES (?, ?, ?)`
-
 const update_user_query = `UPDATE users SET username = ?, password = ?, isadmin = ? where id = ?`
-
 const delete_user_query = `DELETE FROM users WHERE username = ? and password = ?`
 const delete_user_by_id_query = `DELETE FROM users WHERE id = ?`
-
 const get_user_valid_query = `SELECT * FROM users WHERE username = ? and password = ?`
 const get_all_users_query = `SELECT * FROM users`
 const get_user_by_un_query = `SELECT * FROM users WHERE username = ?`
@@ -97,6 +93,7 @@ const create_user = (un, pw, isadmin) => {
           reject(err)
           return
         } else {
+          console.log("Huh?")
           resolve({success: true, message: "created user"})
           return
         }
@@ -174,7 +171,8 @@ const validate_user = (un, password) => {
           if (err) {
             reject({ success: false, message: err })
           } else {
-            resolve({ success: true, valid: true })
+            if (res.length === 1) resolve({ success: true, valid: true, user: res[0], message: "Hello valid"})
+            else resolve({ success: true, valid: false})
           }
         })
       } else {

@@ -1,0 +1,152 @@
+import express from 'express'
+import * as users_service from '../services/sql_services/users_service.js'
+import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
+import jwt from 'jsonwebtoken'
+
+/* config's and server consts */
+const DEBUG = false
+const sql_api_path = process.env.SQL_API_PATH
+dotenv.config()
+const SEC_KEY = process.env.JWT_SECRET
+
+const usersRouter = express.Router()
+usersRouter.use(cookieParser())
+
+usersRouter.get(`${sql_api_path}/all_users`, async (req, res) => {
+  if (DEBUG) console.log(`GET /${sql_api_path}/all_users`)
+  var users = await users_service.get_all_users()
+  res.json(users)
+})
+
+/* get a specific user */
+usersRouter.get(`${sql_api_path}/user/:id`, async (req, res) => {
+  const { id } = req.params
+  if (DEBUG) console.log(`GET ${sql_api_path}/user`)
+  if (DEBUG) console.log("id = " + id)
+  if (!id) {
+    return res.status(400).json({ error: "/(id) is required", valid: false })
+  }
+  const user = await users_service.get_user_by_id(id)
+  if (user.valid === true) {
+    res.json({ message: "user found", valid: true, ...user})
+  } else {
+    return res.status(404).json({ error: "user not found", valid: false, u: user })
+  }
+})
+
+/* validate user by username */
+usersRouter.get(`${sql_api_path}/user`, async (req, res) => {
+  const { un } = req.query
+  if (DEBUG) console.log(`GET ${sql_api_path}/user`)
+  if (DEBUG) console.log(req.query)
+  if (DEBUG) console.log("un = " + un)
+  if (!un) {
+    return res.status(400).json({ error: "un=(username) is required", valid: false })
+  }
+  const user = await users_service.get_user_by_un(un)
+  if (user.valid === true) {
+    res.json({ message: "user found", valid: true, u: user})
+  } else {
+    return res.status(404).json({ error: "user not found", valid: false, u: user })
+  }
+})
+
+/* delete a user by_id from table... */
+usersRouter.delete(`${sql_api_path}/user/:id`, async(req, res) => {
+  console.log("DELETE REQ")
+  const { id } = req.params
+  try {
+    const del_user = await users_service.delete_user_by_id(id)
+    if (del_user.success === true) res.status(200).send("user deleted successfully")
+  } catch (exception) {
+    // console.log(exception)
+    if (exception.code === 404) {
+      res.status(404).send("user not found")
+    } else {
+      res.status(500).send("server error")
+    }
+  }
+})
+
+usersRouter.get(`${sql_api_path}/verify`, async (req, res) => {
+  try {
+    const decodedToken = jwt.decode(req.cookies.jwt, SEC_KEY);
+    console.log(decodedToken);
+    res.json({ decodedToken });
+  } catch (error) {
+    console.error('Error verifying JWT cookie:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/* validate a user */
+/* should be in auth router later */
+usersRouter.post(`${sql_api_path}/login`,  async(req, res) => {
+  const { un, password } = req.body
+  console.log("POST REQUEST!");
+  try {
+    /* check in db is valid... if so {success: true, valid: true} */
+    const db_res = await users_service.validate_user(un, password)
+    if (db_res.valid === true){
+      const user = db_res.user
+      console.log(user)
+      const user_token = jwt.sign({ id: user.id, isadmin: user.isadmin }, SEC_KEY, { expiresIn: '90d' })
+      res.cookie('jwt', user_token, { httpOnly: true, maxAge: (90 * 24 * 60 * 60 * 1000) });
+      res.status(200).send({success: true, valid: true})
+    } else {
+      res.status(200).send({success: true, valid: false})
+    }
+    /* if not valid return {success: true, valid: false} */
+  } catch (error) {
+    /* return {success: false, valid: false} */
+    if (error.code === 404) {
+      res.status(error.code).send("user not exists")
+    } else {
+      console.log(error);
+      res.status(500).send("server error")
+    }
+  }
+})
+
+/* create a user */
+usersRouter.post(`${sql_api_path}/user`, async (req, res) => {
+  const { un, password, isadmin } = req.body
+  console.log(`un = ${un}|pw = ${password}|admin = ${isadmin}`)
+  try {
+    const new_user = await users_service.create_user(un, password, isadmin)
+    if (new_user.success === true) {
+      res.status(200).send("user added succesfully")
+    } else {
+      res.status(409).send("user already exist's")
+    }
+  } catch (exception) {
+    if (exception.code === 409) {
+      res.status(exception.code).send("user already exists")
+    } else {
+      res.status(500).send("server error")
+    }
+  }
+})
+
+/* update a user */
+usersRouter.put(`${sql_api_path}/user/:id`, async (req, res) => {
+  const { id } = req.params
+  console.log(req.body)
+  const { un, password, isadmin } = req.body
+  console.log(`un = ${un}|pw = ${password}|admin = ${isadmin}`)
+  try {
+    const updated_user = await users_service.update_user_new_data(id, un, password, isadmin)
+    if (updated_user.success === true) {
+      res.status(200).send("user updated succesfully")
+    }
+  } catch (exception) {
+    if (exception.code === 404) {
+      res.status(exception.code).send("user not exists")
+    } else {
+      res.status(500).send("server error")
+    }
+  }
+})
+
+export default usersRouter

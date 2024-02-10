@@ -38,7 +38,7 @@ const notify = (text, type) => {
     case NOTIFY_TYPES.error:
       toast.error(text, {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,

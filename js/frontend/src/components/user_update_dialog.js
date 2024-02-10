@@ -3,8 +3,9 @@ import { Dialog, DialogTitle, DialogContent, TextField, Button, IconButton, Stac
 import CloseIcon from '@mui/icons-material/Close'
 import EditNote from '@mui/icons-material/EditNote'
 import { updateUser } from '../services/user_service'
+import { hashPassword } from '../services/hashPassword'
 
-const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userObj, onSuccess, onFailed}) => {
+const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userObj, onSuccess, onFailed }) => {
   const [newUsername, setNewUsername] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [newIsAdmin, setNewIsAdmin] = useState('')
@@ -21,7 +22,8 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
   const handleUpdate = async () => {
     try {
       if (isUsernameValid(newUsername) && isPasswordValid(newPassword) && isAdminValid(newIsAdmin) && userObj.id !== undefined) {
-        await updateUser(userObj.id, newUsername, newPassword, newIsAdmin)
+        const hashed_pass = await hashPassword(newPassword)
+        await updateUser(userObj.id, newUsername, hashed_pass, newIsAdmin)
         fetchDataAndSetRows() /* reload data */
         onSuccess()
         onClose()
@@ -66,75 +68,69 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
   return (
     <div>
 
-    <Dialog open={isOpen} onClose={handleClose} onAbort={handleClose} maxWidth='sm' >
-      <DialogTitle>
-        Update User
-        <IconButton
-          edge="end"
-          color="inherit"
-          onClick={handleClose}
-          aria-label="close"
-          sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent>
-        <Stack>
-          <TextField
-            disabled={true}
-            label="id"
-            value={userObj === undefined ? "NaN" : userObj.id}
-            sx={{ marginBottom: 1, marginTop: 1 }}
+      <Dialog open={isOpen} onClose={handleClose} onAbort={handleClose} maxWidth='sm' style={{ backdropFilter: "blur(1px)" }}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+          Update User
+          <IconButton sx={{ ml: 'auto' }} onClick={handleClose}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Stack>
+            <TextField
+              disabled={true}
+              label="id"
+              value={userObj === undefined ? "NaN" : userObj.id}
+              sx={{ marginBottom: 1, marginTop: 1 }}
             />
-          <TextField
-            sx={{ marginBottom: 1, marginTop: 1/* , borderLeft: 10, borderColor: "transparent" */ }}
-            label="New Username"
-            value={newUsername}
-            onChange={(e) => {
-              setNewUsername(e.target.value)
-              setUsernameError(isUsernameValid(e.target.value) ? '' : userErrMsg)
-            }}
-            error={!!usernameError}
-            helperText={usernameError}
-            />
-          <TextField
-            sx={{ marginBottom: 1, marginTop: 1 }}
-            label="New Password"
-            value={newPassword}
-            onChange={(e) => {
-              setNewPassword(e.target.value)
-              setPasswordError(isPasswordValid(e.target.value) ? '' : passErrMsg)
-            }}
-            type="text"
-            error={!!passwordError} /* covert to boolean */
-            helperText={passwordError}
-            />
-          <FormControl sx={{ marginBottom: 1, marginTop: 1, width: '100%' }}>
-            <InputLabel>Admin</InputLabel>
-            <Select
-              label="Admin"
-              value={newIsAdmin}
-              fullWidth
+            <TextField
+              sx={{ marginBottom: 1, marginTop: 1/* , borderLeft: 10, borderColor: "transparent" */ }}
+              label="New Username"
+              value={newUsername}
               onChange={(e) => {
-                setNewIsAdmin(e.target.value)
-                setAdminError(isAdminValid(e.target.value) ? '' : adminErrMsg)
+                setNewUsername(e.target.value)
+                setUsernameError(isUsernameValid(e.target.value) ? '' : userErrMsg)
               }}
-              error={!!adminError}
+              error={!!usernameError}
+              helperText={usernameError}
+            />
+            <TextField
+              sx={{ marginBottom: 1, marginTop: 1 }}
+              label="New Password"
+              value={newPassword}
+              onChange={(e) => {
+                setNewPassword(e.target.value)
+                setPasswordError(isPasswordValid(e.target.value) ? '' : passErrMsg)
+              }}
+              type="password"
+              error={!!passwordError} /* covert to boolean */
+              helperText={passwordError}
+            />
+            <FormControl sx={{ marginBottom: 1, marginTop: 1, width: '100%' }}>
+              <InputLabel>Admin</InputLabel>
+              <Select
+                label="Admin"
+                value={newIsAdmin}
+                fullWidth
+                onChange={(e) => {
+                  setNewIsAdmin(e.target.value)
+                  setAdminError(isAdminValid(e.target.value) ? '' : adminErrMsg)
+                }}
+                error={!!adminError}
               >
-              <MenuItem value="1">yes</MenuItem>
-              <MenuItem value="0">no</MenuItem>
-            </Select>
-            <FormHelperText>{adminError}</FormHelperText>
-          </FormControl>
-        </Stack>
-        <br/>
-        <Stack>
-          <Button onClick={handleUpdate} color='info' variant='outlined' startIcon={<EditNote/>} >UPDATE</Button>
-        </Stack>
-      </DialogContent>
-    </Dialog>
-  </div>
+                <MenuItem value="1">yes</MenuItem>
+                <MenuItem value="0">no</MenuItem>
+              </Select>
+              <FormHelperText>{adminError}</FormHelperText>
+            </FormControl>
+          </Stack>
+          <br />
+          <Stack>
+            <Button onClick={handleUpdate} color='info' variant='outlined' startIcon={<EditNote />} >UPDATE</Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
+    </div>
   )
 }
 
