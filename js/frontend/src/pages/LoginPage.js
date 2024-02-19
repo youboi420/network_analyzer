@@ -15,14 +15,18 @@ import LoginPageStyle from '../Style/LoginPage.module.css'
 import { notify, NOTIFY_TYPES } from '../services/notify_service'
 import * as user_service from '../services/user_service'
 import { hashPassword } from '../services/hashPassword'
+import { Navigate, useNavigate } from 'react-router-dom'
+import * as utils_service from '../services/utils_service'
+
 
 const defaultTheme = createTheme()
 
-export default function LoginPage() {
+export default function LoginPage({ isValidUser }) {
   const [username, setUsername] = React.useState('')
   const [password_value, setPassword] = React.useState('')
   const [usernameError, setUsernameError] = React.useState('')
   const [passwordError, setPasswordError] = React.useState('')
+  let navigate = useNavigate();
 
   const handleUsernameChange = (event) => {
     const value = event.target.value
@@ -42,16 +46,16 @@ export default function LoginPage() {
   const verifyCookieOnLoad = async () => {
     try {
       const verificationResult = await user_service.verifyUserCookie();
-      if (verificationResult) {
-        notify("JWT cookie verified successfully Should redirect", NOTIFY_TYPES.warn)
+      if (verificationResult.valid === true) {
+        notify("Youre already logged in...", NOTIFY_TYPES.success)
+        navigate('/analyze')
       } else {
-        console.log('JWT cookie verification failed');
+        console.log('no JWT cookie present');
       }
     } catch (error) {
       console.error('Error verifying JWT cookie:', error);
     }
   };
-  
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -71,13 +75,15 @@ export default function LoginPage() {
     try {
       const res = await user_service.login(user.un, user.password)
       if (res.data.valid === true) {
+        navigate('/profile');
+        utils_service.refreshPage()
         notify(`conncted going to "/home"`, NOTIFY_TYPES.success)
       } else {
         notify("Incorrect password", NOTIFY_TYPES.error)
         setPasswordError("Incorrect password")
       }
     } catch (error) {
-      if (error.message === user_service.DB_ERROR_CODES.nouser){
+      if (error.message === user_service.DB_ERROR_CODES.nouser) {
         notify("user not found", NOTIFY_TYPES.error)
         setUsernameError("Username not found")
       }
@@ -87,67 +93,75 @@ export default function LoginPage() {
   window.onload = () => {
     verifyCookieOnLoad()
   }
+  if (!isValidUser)
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '85vh' }} >
+        <ThemeProvider theme={defaultTheme}>
+          <Container component="main" maxWidth="xs" style={{ justifyContent: 'center' }} className={LoginPageStyle.body}>
+            <CssBaseline />
+            <Box sx={{ margin: -10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backdropFilter: "blur(10000px)", borderRadius: "4%", borderStyle: 'dashed', borderColor: "white" }}>
+              <Avatar sx={{ m: 1, bgcolor: '#1976d2' }}>
+                <UserIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5" color={"white"}>
+                Login to your account
+              </Typography>
+              <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3, px: 4 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="username"
+                      label="Username"
+                      name="username"
+                      autoComplete="username"
+                      value={username}
+                      onChange={handleUsernameChange}
+                      error={!!usernameError}
+                      helperText={usernameError}
+                      InputLabelProps={{ style: { color: "black"/* '#314852' */ } }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="password"
+                      label="Password"
+                      type="password"
+                      id="password"
+                      autoComplete="new-password"
+                      value={password_value}
+                      onChange={handlePasswordChange}
+                      error={!!passwordError}
+                      helperText={passwordError}
+                      InputLabelProps={{ style: { color: "black"/* '#314852' */ } }}
+                    />
+                  </Grid>
+                </Grid>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Login
+                </Button>
+                <Grid container justifyContent="flex-end">
+                  <Grid item>
+                    <Link href="/signup" variant="body2" style={{ color: '#314852', padding: '1px' }}>
+                      <Typography style={{ font: 'message-box' }}>Don't have an account? - Sign up here</Typography>
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Box>
+          </Container>
+        </ThemeProvider>
+      </div>
+    )
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs" style={{ justifyContent: 'center' }} className={LoginPageStyle.body}>
-        <CssBaseline />
-        <Box sx={{ margin: -10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh',}}>
-          <Avatar sx={{ m: 1, bgcolor: '#1976d2' }}>
-            <UserIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Login to your account
-          </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="username"
-                  label="Username"
-                  name="username"
-                  autoComplete="username"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  error={!!usernameError}
-                  helperText={usernameError}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  value={password_value}
-                  onChange={handlePasswordChange}
-                  error={!!passwordError}
-                  helperText={passwordError}
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Login
-            </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/signup" variant="body2">
-                  Don't have an account? - Sign up here
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+    <Navigate to={'/analyze'}/>
   )
 }

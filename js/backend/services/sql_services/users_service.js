@@ -3,7 +3,7 @@ import { connection } from "./db_service.js"
 const create_user_table_query = `
 CREATE TABLE IF NOT EXISTS users (
   id INT NOT NULL AUTO_INCREMENT,
-  username VARCHAR(255) NOT NULL,
+  username VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   isadmin BOOLEAN NOT NULL,
   PRIMARY KEY (id)
@@ -93,8 +93,8 @@ const create_user = (un, pw, isadmin) => {
           reject(err)
           return
         } else {
-          console.log("Huh?")
-          resolve({success: true, message: "created user"})
+          console.log(res);
+          resolve({success: true, message: "created user", id: res.insertId})
           return
         }
       })

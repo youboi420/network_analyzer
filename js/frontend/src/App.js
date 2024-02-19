@@ -1,102 +1,66 @@
-import * as React from 'react';
-import { BrowserRouter, Routes, Route, Link as RouterLink } from 'react-router-dom';
-import { AppBar, Toolbar, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import UserManagePage from './pages/UserManagePage';
 import NoPage from './pages/NoPage';
 import AnaylzePage from './pages/AnaylzePage';
-import RegisterPage from './pages/RegisterPage';
+import SignUpPage from './pages/SignUpPage';
+
+import LogoutPage from './pages/LogoutPage';
+import NavbarComp from './components/NavbarComp';
+
+import * as user_service from './services/user_service';
+import { Box, LinearProgress } from '@mui/material';
+import LandingPage from './pages/LandingPage';
 
 function App() {
+  const [isValidUser, setIsValidUser] = useState(false);
+  const [usersData, setIsValidData] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
+  const title = "Analyze app - yair elad"
+  const fetchValidUser = async () => {
+    try {
+      const isValidUserResponse = await user_service.verifyUserCookie();
+      setIsValidUser(isValidUserResponse.valid);
+      setIsValidData(isValidUserResponse)
+    } catch (error) {
+      console.error('Error fetching valid user:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    document.title = title
+    fetchValidUser();
+  }, []);
+
+
+  if (isLoading) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <LinearProgress style={{height: "20px"}} />
+      </Box>
+    )
+  }
+
   return (
-    <div>
-      <BrowserRouter>
-        <AppBar position="static" style={{backgroundColor: '#006093'}}>
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} >
-            Network Analyzer - yair elad
-            </Typography>
-            <RouterLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-              Home
-            </RouterLink>
-            {/* once i figure out how to control the access of a page then ill render based on the role */}
-            {/* <RouterLink to="/login" style={{ textDecoration: 'none', color: 'inherit', marginLeft: '20px' }}>
-              Login
-            </RouterLink>
-            <RouterLink to="/users" style={{ textDecoration: 'none', color: 'inherit', marginLeft: '20px' }}>
-              Users
-            </RouterLink> */}
-          </Toolbar>
-        </AppBar>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/analyze" element={<AnaylzePage/>}/>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/users" element={<UserManagePage />} />
-          <Route path="/signup" element={<RegisterPage />}/>
-          <Route path="*" element={<NoPage />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <NavbarComp isValidUser={isValidUser} userData={usersData}/>
+      <Routes>
+        {/* Routes protected by user validity */}
+        <Route path="/profile" element={<LandingPage    /> } />
+        <Route path="/logout"  element={<LogoutPage     /> } />
+        <Route path="/login"   element={<LoginPage      isValidUser={isValidUser}/> } />
+        <Route index           element={<HomePage       isValidUser={isValidUser}/> } />
+        <Route path="/users"   element={<UserManagePage isValidUser={isValidUser} userData={usersData} /> } />
+        <Route path="/signup"  element={<SignUpPage     isValidUser={isValidUser}/> } />
+        <Route path="/analyze" element={<AnaylzePage    isValidUser={isValidUser} userData={usersData} /> } />
+        <Route path="*"        element={<NoPage         isValidUser={isValidUser}/> } />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
 export default App;
-
-
-// import * as React from 'react';
-// import { BrowserRouter, Routes, Route, Link as RouterLink } from 'react-router-dom';
-// import { AppBar, Toolbar, Typography, Container } from '@mui/material';
-// import HomePage from './pages/HomePage';
-// import LoginPage from './pages/LoginPage';
-// import UserManagePage from './pages/UserManagePage';
-// import NoPage from './pages/NoPage';
-
-// function App() {
-//   return (
-//     <div>
-//       <BrowserRouter>
-//         <AppBar position="static" style={{"position": "fixed", "top": 0, "left": 0, "width": "100%", "zIndex": "1000" }}>
-//           <Toolbar>
-//             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-//               Network Analyzer - yair elad
-//             </Typography>
-//             <RouterLink to="/" style={{ "textDecoration": 'none', color: 'inherit' }}>
-//               Home
-//             </RouterLink>
-            
-//             <RouterLink to="/login" style={{ textDecoration: 'none', color: 'inherit', marginLeft: '20px' }}>
-//               Login
-//             </RouterLink>
-            
-//             <RouterLink to="/users" style={{ textDecoration: 'none', color: 'inherit', marginLeft: '20px' }}>
-//               Users
-//             </RouterLink>
-//           </Toolbar>
-//         </AppBar>
-//           <Routes>
-//             <Route path="/" element={<HomePage />} />
-//             <Route path="/login" element={<LoginPage />} />
-//             <Route path="/users" element={<UserManagePage />} />
-//             <Route path="*" element={<NoPage />} />
-//           </Routes>
-//       </BrowserRouter>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-// /* 
-
-//           <AppBar position="static" >
-//           <Container maxWidth="xl">
-//             <button>click 1</button>
-//             <button>click 2</button>
-//             <button>click 3</button>
-//             <button>click 4</button>
-//           </Container>
-//           </AppBar>
-// */

@@ -29,7 +29,7 @@ const notify = (text, type) => {
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
-        draggable: false,
+        draggable: true,
         progress: undefined,
         theme: "colored",
         transition: Slide,

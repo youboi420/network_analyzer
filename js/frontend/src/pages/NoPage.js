@@ -2,7 +2,13 @@ import { IconButton, Stack } from '@mui/material';
 import React from 'react';
 import NTErrorImage from '../Images/network-error.png'
 import HomeIcon from '@mui/icons-material/Home'
-function NoPage() {
+import { Navigate } from 'react-router-dom';
+function NoPage({isValidUser}) {
+  if (!isValidUser) {
+    return (
+      <Navigate to={'/login'}/>
+    )
+  }
   return (
     <div >
       <Stack spacing={2} alignItems="center">

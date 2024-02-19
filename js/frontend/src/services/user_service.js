@@ -1,6 +1,4 @@
 import axios from 'axios'
-import { NOTIFY_TYPES, notify } from './notify_service'
-
 /* 
   3,4,6
   עצמיים ודטרמננטים ירד
@@ -17,9 +15,14 @@ axios.defaults.withCredentials = true;
 const sql_api_path = '/sql_api'
 const LOCAL_IP = process.env.REACT_APP_LOCAL_IP_ADDRESS
 const SER_PORT = process.env.REACT_APP_SER_PORT
-const USERS_URL = `http://${LOCAL_IP}:${SER_PORT}/users`
-const USERS_URL_TEST = `http://${LOCAL_IP}:${SER_PORT}/example`
-const USERS_URL_VERIFY = `http://${LOCAL_IP}:${SER_PORT}/users${sql_api_path}/verify`
+const BASE_URL = `http://${LOCAL_IP}:${SER_PORT}`
+const USERS_URL = `${BASE_URL}/users`
+const AUTH_URL = `${BASE_URL}/auth`
+const USERS_URL_PROFILE = `${AUTH_URL}/profile`
+const USERS_URL_VERIFY = `${AUTH_URL}/verify`
+const USERS_URL_LOGIN = `${AUTH_URL}/login`
+const USERS_URL_LOGOUT = `${AUTH_URL}/clear-cookie`
+/* AUTH_URL */
 export const DB_ERROR_CODES =
 {
   nouser: "user not exists",
@@ -27,34 +30,37 @@ export const DB_ERROR_CODES =
 }
 /* USERS_URL_EXEC */
 
+export const getUserData = async () => {
+  try {
+    const response = await axios.get(`${USERS_URL_PROFILE}`)
+    return response.data
+  } catch (error) {
+    return {valid: false}
+  }
+}
+export const clearCookie = async () => {
+  try {
+    console.log("Logging out", USERS_URL_LOGOUT);
+    const response = await axios.get(`${USERS_URL_LOGOUT}`)
+    return response
+  } catch (error) {
+    return {valid: false}
+  }
+}
+
 export const verifyUserCookie = async () => {
   try {
-    console.log(USERS_URL_VERIFY);
     const response = await axios.get(`${USERS_URL_VERIFY}`)
+    return response.data
   } catch (error) {
-    
+    return {valid: false}
   }
 }
 
-export const getCookie = async () => {
-  try {
-    const response = await axios.get(`${USERS_URL_TEST}`)
-    console.log(response.data); // Log the response data
-  } catch (error) {
-    notify("ERROR SETTING COOKIE", NOTIFY_TYPES.error)
-    throw error
-  }
+export const getJsonData = async () => {
+  return await axios.get(`${BASE_URL}/files/json_data`)
 }
 
-// export const getCookie = async () => {
-//   try {
-//     const response = await fetch(`${USERS_URL_EXEC}`)
-//     console.log(response);
-//   } catch (error) {
-//     notify("ERROR SETTING COOKIE", NOTIFY_TYPES.error)
-//     throw error
-//   }
-// }
 export const createUser = async (newUsername, newPassword, newIsAdmin) => {
   try {
     const response = await axios.post(`${USERS_URL}${sql_api_path}/user`, {
@@ -99,13 +105,8 @@ export const updateUser = async (userId, newUsername, newPassword, newIsAdmin) =
 }
 export const getAllUsers = async () => {
   try {
-    const response = await fetch(`${USERS_URL}${sql_api_path}/all_users`)
-    console.log(response)
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`)
-    }
-    const data = await response.json()
-    return data
+    const response = await axios.get(`${USERS_URL}${sql_api_path}/all_users`)
+    return response.data
   } catch (error) {
     console.error('Error fetching user data:', error)
     throw error
@@ -121,7 +122,7 @@ export const deleteUser = async (userId) => {
 }
 export const login = async (un, password) => {
   try {
-    const res = await axios.post(`${USERS_URL}${sql_api_path}/login`, {un: un, password: password})
+    const res = await axios.post(`${USERS_URL_LOGIN}`, {un: un, password: password})
     return res
   } catch (error) {
     if (error.response) {
@@ -131,5 +132,14 @@ export const login = async (un, password) => {
       else throw new Error('Failed to create user')
     }
     throw error
+  }
+}
+
+export const signup = async (un, password) => {
+  try {
+    const res = await axios.post(`${AUTH_URL}/signup`, {un: un, password: password})
+    return res
+  } catch (error) {
+    throw new Error('Failed to create user')
   }
 }
