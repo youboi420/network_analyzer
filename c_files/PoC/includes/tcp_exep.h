@@ -1,6 +1,7 @@
 #include <bits/types/struct_timeval.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <stdlib.h>
 
 #define MAX_EXEP 1024
 
@@ -70,6 +71,14 @@ typedef struct packet_exep_node_s
     packet_exep_e exep;
     uint32_t packet_location;
 }packet_exep_node_s;
+
+typedef enum ret_val
+{
+    FAILED = EXIT_FAILURE,
+    with_l2l4 = 1 << 1,
+    with_ddos = 1 << 2,
+    with_mitm = 1 << 3
+} ret_val;
 
 packet_exep_e get_packet_exep(u_char * tcp_packet);
 packet_flags analyze_packet(u_char * tcp_packet);

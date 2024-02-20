@@ -153,7 +153,7 @@ int compare_macs(struct ether_addr a, struct ether_addr b);
 
 void save_L2_convs_to_json(arp_conv convs[MAX_L2_CONVERSATIONS], const char *filename);
 
-void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint32_t conv_count);
+void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint32_t conv_count, ret_val * MAIN_RET_VAL);
 
 /**
  * @brief compares the id of the conversations for qsort function

@@ -18,7 +18,7 @@ function App() {
   const [isValidUser, setIsValidUser] = useState(false);
   const [usersData, setIsValidData] = useState({})
   const [isLoading, setIsLoading] = useState(true)
-  const title = "Analyze app - yair elad"
+  const title = "Analyze app © Y-E "
   const fetchValidUser = async () => {
     try {
       const isValidUserResponse = await user_service.verifyUserCookie();

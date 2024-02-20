@@ -36,10 +36,6 @@ authRouter.get(`/profile`, async (req, res) => {
   }
 })
 
-const sleep = (milliseconds) => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
 authRouter.get(`/verify`, async (req, res) => {
   const jwtCookie = req.cookies.jwt
   try {
@@ -100,13 +96,16 @@ authRouter.post(`/login`, async (req, res) => {
 
 authRouter.post(`/signup`, async (req, res) => {
   const { un, password } = req.body
-  console.log("POST REQUEST!");
   try {
     /* check in db is valid... if so {success: true, valid: true} */
     const db_create_res = await users_service.create_user(un, password, 0) /* 0 for false */
-    files_service.create_folder_for_new_user(db_create_res.id)
-    if (db_create_res.success !== true) res.status(500).send("server error")
+    if (db_create_res.success !== true) {
+      console.log("oh...");
+      res.status(500).send("server error")
+    }
     const db_res = await users_service.validate_user(un, password)
+    files_service.create_folder_for_new_user(db_create_res.id)
+    console.log("here?");
     if (db_res.valid === true) {
       const user = db_res.user
       console.log(user)
@@ -119,10 +118,9 @@ authRouter.post(`/signup`, async (req, res) => {
     /* if not valid return {success: true, valid: false} */
   } catch (error) {
     /* return {success: false, valid: false} */
-    if (error.code === 404) {
-      res.status(error.code).send("user not exists")
+    if (error.code === 409) {
+      res.status(error.code).send("duplicate user")
     } else {
-      console.log(error);
       res.status(500).send("server error")
     }
   }

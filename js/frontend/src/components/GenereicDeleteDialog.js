@@ -13,14 +13,14 @@ const GenereicDeleteDialog = ({ isOpen = false, callBackFunction, onClose, userI
   const deleteMsg = <div></div>
   
   return (
-    <Dialog open={isOpen} onClose={onClose} style={{backdropFilter: "blur(1px)"}}>
+    <Dialog open={isOpen} onClose={onClose} style={{backdropFilter: "blur(0.5px)"}}>
       <DialogTitle>Confirm Deletion</DialogTitle>
       <DialogContent>
         Are you sure you want to delete this {deletionType}?
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} startIcon={ <CloseIcon/> }>Cancel</Button>
-        <Button onClick={handleConfirm} color="error" startIcon={ <DeleteIcon/> }>Delete</Button>
+        <Button onClick={onClose} startIcon={ <CloseIcon/> } >Cancel</Button>
+        <Button onClick={handleConfirm} color="error" startIcon={ <DeleteIcon /> }>Delete</Button>
       </DialogActions>
     </Dialog>
   )

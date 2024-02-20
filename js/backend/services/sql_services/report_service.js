@@ -8,16 +8,23 @@ const delete_report_by_id_query = `DELETE FROM json_reports WHERE report_id = ?`
 const delete_all_reports_by_id_query = `DELETE FROM json_reports WHERE owner_id = ?`
 const get_all_reports_query = `SELECT * FROM json_reports`
 const get_all_reports_by_id_query = `SELECT * FROM json_reports WHERE owner_id = ?`
-
+const get_next_id_query = `
+SELECT AUTO_INCREMENT
+FROM information_schema.TABLES
+WHERE TABLE_SCHEMA = 'project_schm'
+AND TABLE_NAME = 'json_reports'
+`
 const create_json_report_query = `
 CREATE TABLE IF NOT EXISTS json_reports (
   report_id INT NOT NULL AUTO_INCREMENT,
   owner_id INT NOT NULL,
+  pcap_file_id INT NOT NULL,
   creation_date DATETIME DEFAULT NOW(),
   path VARCHAR(255) NOT NULL UNIQUE,
   filename VARCHAR(255) NOT NULL UNIQUE,
   PRIMARY KEY (report_id),
-  FOREIGN KEY (owner_id) REFERENCES users(id)
+  FOREIGN KEY (owner_id) REFERENCES users(id),
+  FOREIGN KEY (pcap_file_id) REFERENCES pcap_files(file_id)
 )`
 
 /* 
@@ -66,6 +73,22 @@ const get_reports_by_id = (id) => {
   })
 }
 
+const get_next_id = () => {
+  return new Promise((resolve, reject) => {
+    connection.query(get_next_id_query, (err, res) => {
+      if (err) {
+        reject(-1)
+      } else {
+        if (res.length > 0) {
+          resolve(res[0].AUTO_INCREMENT)
+        } else {
+          reject(-1)
+        }
+      }
+    })
+  })
+}
+
 // const create_json_report
 
-export { create_json_report_table, get_reports_by_id }
+export { create_json_report_table, get_reports_by_id, get_next_id }

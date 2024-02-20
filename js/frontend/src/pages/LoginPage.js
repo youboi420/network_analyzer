@@ -148,7 +148,7 @@ export default function LoginPage({ isValidUser }) {
                 >
                   Login
                 </Button>
-                <Grid container justifyContent="flex-end">
+                <Grid container justifyContent="center">
                   <Grid item>
                     <Link href="/signup" variant="body2" style={{ color: '#314852', padding: '1px' }}>
                       <Typography style={{ font: 'message-box' }}>Don't have an account? - Sign up here</Typography>

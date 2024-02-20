@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, TextField, Button, IconButton, Stack, Select, MenuItem, FormControl, InputLabel, FormHelperText } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, TextField, Button, IconButton, Stack, Select, MenuItem, FormControl, InputLabel, FormHelperText, Alert } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import EditNote from '@mui/icons-material/EditNote'
 import { updateUser } from '../services/user_service'
 import { hashPassword } from '../services/hashPassword'
 
 const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userObj, onSuccess, onFailed }) => {
+  const [duplicateUsernameError, setDuplicateUsernameError] = useState('')
   const [newUsername, setNewUsername] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [newIsAdmin, setNewIsAdmin] = useState('')
@@ -35,8 +36,12 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
         setAdminError(isAdminValid(newIsAdmin) ? '' : adminErrMsg)
       }
     } catch (error) {
-      console.error('Error updating user:', error)
-      onFailed()
+      if (error.response.status === 409) {
+        setDuplicateUsernameError("duplicate username")
+      } else {
+        console.error('Error updating user:', error)
+        onFailed()
+      }
     }
   }
 
@@ -126,7 +131,11 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
               <FormHelperText>{adminError}</FormHelperText>
             </FormControl>
           </Stack>
-          <br />
+          {duplicateUsernameError && (
+            <Alert severity="error" sx={{ marginTop: 0, marginBottom: 2 }}>
+              {duplicateUsernameError}
+            </Alert>
+          )}
           <Stack>
             <Button onClick={handleUpdate} color='info' variant='outlined' startIcon={<EditNote />} >UPDATE</Button>
           </Stack>

@@ -13,6 +13,8 @@ uint16_t conv_id_tcp_g = 0, conv_id_udp_g = 0, arp_id = 0;
 uint32_t conv_hash_g, host_hash_g, port_hash_g, num_hosts_g = 0, num_ports_g, num_packets_g = 0;
 const double ex_ma_alpha = 0.2; /* exp weight */
 
+ret_val MAIN_RETURN_VALUE = FAILED;
+
 int main(int argc, char *argv[])
 {
     char errbuf[PCAP_ERRBUF_SIZE], *pcap_record_file,* main_output_file;
@@ -33,7 +35,7 @@ int main(int argc, char *argv[])
     if (invalid_files(pcap_record_file, filename))
     {
         error("input files are invalid");
-        exit(EXIT_FAILURE);
+        exit(MAIN_RETURN_VALUE);
     }
     
     /* get file size -  prepare and init the tables/datastructures */
@@ -51,8 +53,10 @@ int main(int argc, char *argv[])
     if (handle == NULL)
     {
         fprintf(stderr, "Error opening pcap file: %s\n", errbuf);
-        return EXIT_FAILURE;
+        return MAIN_RETURN_VALUE;
     }
+    /* because it didnt exit untill here... */
+    MAIN_RETURN_VALUE = with_l2l4;
     pcap_loop(handle, 0, packet_handler, NULL);
     pcap_close(handle);
     general_info_g.num_packets = num_packets_g;
@@ -75,7 +79,7 @@ int main(int argc, char *argv[])
     free(filename);
     filename = get_file_name(main_output_file, GLOBAL_L2_EXT);
     save_L2_convs_to_json(arp_conversations_table_g, filename);
-    print_general_info(general_info_g);
+    // print_general_info(general_info_g);
 
     free(filename);
     filename = get_file_name(main_output_file, GLOBAL_INFO_EXT);
@@ -83,17 +87,15 @@ int main(int argc, char *argv[])
 
     free(filename);
     filename = get_file_name(main_output_file, GLOBAL_DDOS_EXT);
-    analyze_ddos(conversations_table_g, filename, conv_id_tcp_g + conv_id_udp_g);
-
+    analyze_ddos(conversations_table_g, filename, conv_id_tcp_g + conv_id_udp_g, &MAIN_RETURN_VALUE);
 
     free(filename);
     filename = get_file_name(main_output_file, GLOBAL_MITM_EXT);
-    analyze_mitm(arp_conversations_table_g, filename, arp_id);
+    analyze_mitm(arp_conversations_table_g, filename, arp_id, &MAIN_RETURN_VALUE);
     free_all_lists();
     
     if (filename) free(filename);
-    okay("completed...");
-    return EXIT_SUCCESS;
+    return MAIN_RETURN_VALUE;
 }
 void init_list(packet_node_s ** root)
 {
@@ -786,7 +788,7 @@ int check_retransmission(packet_node_s *p, packet_node_s *atob, packet_node_s *b
     struct tcphdr *tcphdr_comp;
     int tcp_segment_length_p, tcp_segment_length_comp;
     int ka = check_keep_alive(p);
-    if ((ka != 1) && (atob != NULL || btoa!= NULL) /* && (atob->packet_data != NULL || btoa->packet_data != NULL) */) 
+    if ((ka != 1) && (atob != NULL && btoa != NULL) /* && (atob->packet_data != NULL || btoa->packet_data != NULL) */) 
     {
         iphdr_p = (struct ip *) (p->packet_data + ETH_HEADER_SIZE);
         tcphdr_p = (struct tcphdr *) (p->packet_data + ETH_HEADER_SIZE + (iphdr_p->ip_hl << 2));

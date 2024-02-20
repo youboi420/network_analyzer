@@ -46,8 +46,8 @@ const initialize_server = async () => {
   try {
     await db_service.connect_to_db()
     await users_service.create_users_table()
-    await reports_service.create_json_report_table()
     await pcap_files_service.create_pcap_table()
+    await reports_service.create_json_report_table()
     app.listen(port, local_ip, () => {
       console.log(`Server is running on http://${local_ip}:${port}`)
     })

@@ -224,7 +224,7 @@ void free_mitm_list(mitm_node_s **root)
     }
 }
 
-void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint32_t conv_count)
+void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint32_t conv_count, ret_val * MAIN_RET_VAL)
 {
     // דני טאובר
     json_object *root, *attacks_arr, *attack_obj, *vict_arr, *vict_obj;
@@ -345,6 +345,7 @@ void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint
             fp = fopen(filename, "w"); /* dump the JSON to a file */
         if (fp != NULL && write_flag)
         {
+            (*MAIN_RET_VAL) |= with_mitm;
             fprintf(fp, "%s\n", json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY));
             fclose(fp);
         }

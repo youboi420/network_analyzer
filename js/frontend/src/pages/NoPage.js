@@ -1,6 +1,6 @@
 import { IconButton, Stack } from '@mui/material';
 import React from 'react';
-import NTErrorImage from '../Images/network-error.png'
+import NTErrorImage from '../components/NoPageSvgComp'
 import HomeIcon from '@mui/icons-material/Home'
 import { Navigate } from 'react-router-dom';
 function NoPage({isValidUser}) {
@@ -12,10 +12,11 @@ function NoPage({isValidUser}) {
   return (
     <div >
       <Stack spacing={2} alignItems="center">
-        <img src={NTErrorImage} alt='nopagefound'/>
+        {/* <img src={NTErrorImage} alt='nopagefound'/> */}
+        <NTErrorImage/>
         <h1>Page Not Found</h1>
         <p>Sorry, the page you are looking for does not exist.</p>
-        <IconButton href='/' color='primary' variant='contained'><HomeIcon/> page</IconButton>
+        <IconButton href='/' color='primary' variant='contained'>Take me <HomeIcon/></IconButton>
       </Stack>
     </div>
   );

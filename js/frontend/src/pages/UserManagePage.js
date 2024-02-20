@@ -6,6 +6,7 @@ import EditNote from '@mui/icons-material/EditNote'
 import { DataGrid } from '@mui/x-data-grid'
 import { Button, Stack } from '@mui/material'
 import { getAllUsers, deleteUser } from '../services/user_service'
+import AnalyzePageStyle from '../Style/AnalyzePage.module.css';
 
 /* my comps */
 import UserUpdateDialog from '../components/UserUpdateDialog'
@@ -66,35 +67,45 @@ const UserManagePage = ({ isValidUser, userData }) => {
   }
   useEffect(() => {
     document.title = "user manager page"
-    if ( userData.isadmin ) 
+    if (userData.isadmin)
       fetchDataAndSetRows()
-    else 
+    else
       console.log("Youre not an admin")
   }, []);
 
   const columns = [
-    { field: 'id', headerName: 'UID', width: 250 },
-    { field: 'username', headerName: 'Username', width: 250 },
-    { field: 'isadmin', headerName: 'Admin', width: 250 },
+    { field: 'id', headerName: 'UID', headerAlign: 'center', align: 'center', width: 250 },
+    { field: 'username', headerName: 'Username', headerAlign: 'center', align: 'center', width: 250 },
+    {
+      field: 'isadmin', headerName: 'Admin', headerAlign: 'center', align: 'center', width: 250, renderCell: (params) => {
+        return <span className={AnalyzePageStyle.files_grid} style={{ borderRadius: '12px', width: "20%", backgroundColor: params.value === 1 ? "#77DD76" : "#FF6962", textAlign: 'center' }}> {params.value === 1 ? "Yes" : "No"} </span>
+      }
+    },
+    { field: 'file_count', headerName: 'Files', headerAlign: 'center', align: 'center', width: 250 },
+    { field: 'analyzed_file_count', headerName: 'Analyzed', headerAlign: 'center', align: 'center', width: 250 },
+
   ]
 
   if (isValidUser && userData.isadmin)
     return (
       <div>
-        <DataGrid rows={rows} columns={columns} onRowDoubleClick={(row) => { setEditData(row.row); setEditDialogOpen(true); }} onRowSelectionModelChange={handleSelectionChange} style={{ backdropFilter: "blur(300px)", fontWeight: "bold" }} />
-        <Stack spacing={2} direction="row" alignContent='center' justifyContent='center' style={{ marginTop: "10px" }}>
-          <Button onClick={() => { 
-            setDeleteId(selectedRow[0]);
-            if (selectedRow[0] !== undefined) {
-              setDeleteDialogOpen(true) 
-            } else {
-              notify("please select a user to delete", NOTIFY_TYPES.warn)
-            }
-          }} color='error' variant='contained' startIcon={<DeleteIcon />}> delete </Button>
-          <Button onClick={handleEdit} color='info' variant='contained' startIcon={<EditNote />} > UPDATE </Button>
-          <Button onClick={handleCreate} color='success' variant='contained' startIcon={<AddIcon />}> CREATE </Button>
-        </Stack>
-
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", }}>
+          <DataGrid rows={rows} columns={columns} onRowDoubleClick={(row) => { setEditData(row.row); setEditDialogOpen(true); }} onRowSelectionModelChange={handleSelectionChange} style={{ backdropFilter: "blur(300px)", fontWeight: "bold"}} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", }}>
+          <Stack spacing={2} direction="row" alignContent='center' justifyContent='center' style={{ marginTop: "10px", marginBottom: "10px", paddingTop: "20px", paddingBottom: "20px", paddingRight: "15px", paddingLeft: "15px", backdropFilter: "blur(100px)", width: "20%", borderRadius: '12px', borderStyle: 'dashed' }}>
+            <Button onClick={() => {
+              setDeleteId(selectedRow[0]);
+              if (selectedRow[0] !== undefined) {
+                setDeleteDialogOpen(true)
+              } else {
+                notify("please select a user to delete", NOTIFY_TYPES.warn)
+              }
+            }} color='error' variant='contained' startIcon={<DeleteIcon />}> delete </Button>
+            <Button onClick={handleEdit} color='info' variant='contained' startIcon={<EditNote />} > UPDATE </Button>
+            <Button onClick={handleCreate} color='success' variant='contained' startIcon={<AddIcon />}> CREATE </Button>
+          </Stack>
+        </div>
         {
           editDialogOpen &&
           <UserUpdateDialog isOpen={editDialogOpen} fetchDataAndSetRows={fetchDataAndSetRows} onClose={() => { setEditDialogOpen(false); setSelectedRow({}) }} userObj={editData} onSuccess={() => { notify("UPDATE: Success", NOTIFY_TYPES.success) }} onFailed={() => { notify("UPDATE: Failed", NOTIFY_TYPES.error) }} />
@@ -111,13 +122,13 @@ const UserManagePage = ({ isValidUser, userData }) => {
         } */}
 
         {
-          deleteDialogOpen && 
+          deleteDialogOpen &&
           <GenereicDeleteDialog isOpen={deleteDialogOpen} onClose={() => { setDeleteDialogOpen(false); setSelectedRow({}) }} callBackFunction={() => handleDelete(deleteId)} deletionType="user" />
         }
 
       </div>
     )
-  
+
   else if (isValidUser) {
     return (
       <div>

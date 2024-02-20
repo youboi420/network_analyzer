@@ -16,7 +16,12 @@ const update_user_query = `UPDATE users SET username = ?, password = ?, isadmin 
 const delete_user_query = `DELETE FROM users WHERE username = ? and password = ?`
 const delete_user_by_id_query = `DELETE FROM users WHERE id = ?`
 const get_user_valid_query = `SELECT * FROM users WHERE username = ? and password = ?`
-const get_all_users_query = `SELECT * FROM users`
+// const get_all_users_query = `SELECT * FROM users`
+const get_all_users_query = `
+SELECT users.*, COUNT(pcap_files.file_id) AS file_count, COUNT(CASE WHEN pcap_files.analyzed = TRUE THEN 1 END) AS analyzed_file_count
+FROM users
+LEFT JOIN pcap_files ON users.id = pcap_files.owner_id
+GROUP BY users.id`
 const get_user_by_un_query = `SELECT * FROM users WHERE username = ?`
 const get_user_by_id_query = `SELECT * FROM users WHERE id = ?`
 
@@ -44,8 +49,9 @@ const get_user_by_un = (un) => {
           reject(err)
         } else {
           if (res.length > 0) {
-            console.log("user found: " + un)
-            resolve({ valid: true})
+            console.log("user found: " + un + " : " + res[0].id)
+
+            resolve({ valid: true, id: res[0].id })
           } else {
             console.log("user not found: " + un)
             resolve({ valid: false })
@@ -182,20 +188,24 @@ const validate_user = (un, password) => {
   })
 }
 
-const update_user_new_data = (id, un, upwd, isadmin) => {
+const update_user_new_data = (user_id, un, upwd, isadmin) => {
   return new Promise(async (resolve, reject) => {
-    if (id === undefined || un === undefined || upwd === undefined || isadmin === undefined) {
+    if (user_id === undefined || un === undefined || upwd === undefined || isadmin === undefined) {
       reject({success: false, message: undef_err_msg})
     } else {
-      const check = await get_user_by_id(id)
+      const check = await get_user_by_id(user_id)
       if (check.valid === true) {
-        connection.query(update_user_query, [un, upwd, isadmin, id], (err, res) => {
+        const dup = await get_user_by_un(un)
+        if (dup.valid === true && Number(user_id) !== Number(dup.id) ) {
+          reject({success: false, message: 'dup'})
+        }
+        connection.query(update_user_query, [un, upwd, isadmin, user_id], (err, res) => {
           if (err) {
             console.log("update failed")
             console.log(err)
             reject({success: false, message: err})
           } else {
-            console.info(`user: ${id} updated`)
+            console.info(`user: ${user_id} updated`)
             resolve({success: true})
           }
         })

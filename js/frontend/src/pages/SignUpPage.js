@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Container, Grid, TextField, Link, Typography, ThemeProvider } from '@mui/material'
+import { Avatar, Box, Button, Container, Grid, TextField, Link, Typography, Alert } from '@mui/material'
 import React from 'react'
 import RegisterPageStyle from '../Style/LoginPage.module.css'
 import UserIcon from '@mui/icons-material/Person'
@@ -16,6 +16,7 @@ function SignUpPage({ isValidUser }) {
   const [usernameError, setUsernameError] = React.useState('')
   const [passwordError, setPasswordError] = React.useState('')
   const [passwordErrorMiss, setPasswordErrorMiss] = React.useState('')
+  const [formError, setFormError] = React.useState('')
   let navigate = useNavigate();
   const isUsernameValid = (username) => /^[a-zA-Z][a-zA-Z0-9]{0,250}$/.test(username)
   const isPasswordValid = (password) => password.length >= 6 && /^.{0,250}$/.test(password)
@@ -44,6 +45,7 @@ function SignUpPage({ isValidUser }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (username === '' || password === '' || repeat_password === '') {
+      setFormError("One or more fields are empty...")
       notify("One or more fields are empty...", NOTIFY_TYPES.error)
       return
     }
@@ -72,7 +74,13 @@ function SignUpPage({ isValidUser }) {
         notify("What?" + res, NOTIFY_TYPES.info)
       }
     } catch (error) {
-      notify("server error", NOTIFY_TYPES.error)
+      console.log(error);
+      if (error.message === user_service.DB_ERROR_CODES.dup) {
+        setFormError("Username is taken")
+        notify("USERNAME TAKEN", NOTIFY_TYPES.short_error)
+      } else {
+        notify("server error ", NOTIFY_TYPES.error)
+      }
     }
   
   }
@@ -145,9 +153,14 @@ function SignUpPage({ isValidUser }) {
                 >
                   Sign up
                 </Button>
-                <Grid container justifyContent="flex-end">
+            {formError && (
+              <Alert severity="error" sx={{ marginTop: 2 }}>
+                {formError}
+              </Alert>
+            )}
+                <Grid container justifyContent="center">
                   <Grid item style={{ padding: '10px' }}>
-                    <Link href="/login" variant="body2" style={{ paddingBottom: '10px' }}>
+                    <Link href="/login"  variant="body2" style={{ color: '#314852', paddingBottom: '10px'}}>
                       Already have an account? - Sign in here
                     </Link>
                   </Grid>

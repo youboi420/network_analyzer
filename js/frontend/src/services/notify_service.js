@@ -4,7 +4,8 @@ const NOTIFY_TYPES = {
   info: 1,
   success: 2,
   error: 3,
-  warn: 4
+  warn: 4,
+  short_error: 5
 }
 
 const notify = (text, type) => {
@@ -52,6 +53,20 @@ const notify = (text, type) => {
       toast.warn(text, {
         position: "top-center",
         autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      })
+      break
+      /* short_error */
+    case NOTIFY_TYPES.short_error:
+      toast.error(text, {
+        position: "top-center",
+        autoClose: 1500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,

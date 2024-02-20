@@ -5,10 +5,9 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import React from 'react';
 import { NOTIFY_TYPES, notify } from '../services/notify_service';
 import axios from 'axios';
-
 const UploadComp = ( {userAnalyzeDataCallback} ) => {
   const [file, setFile] = React.useState(null);
-  const [loading, setLoading] = React.useState(false); // State for managing loading
+  const [loading, setLoading] = React.useState(false);
   const PADDING_C = 15;
   
   const fileNotSelected = (
@@ -20,7 +19,7 @@ const UploadComp = ( {userAnalyzeDataCallback} ) => {
 
   const fileSelected = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-      <span>Selected file: {file?.name}</span>
+      <span>Picked: {file?.name}</span>
       <CheckIcon style={{ marginLeft: '5px' }} />
     </div>
   );
@@ -45,7 +44,7 @@ const UploadComp = ( {userAnalyzeDataCallback} ) => {
     }
     
     try {
-      setLoading(true); // Set loading to true when starting upload
+      setLoading(true);
       const formData = new FormData();
       formData.append('file', file);
       const UPLOAD_URL = "http://" + process.env.REACT_APP_LOCAL_IP_ADDRESS + ":" + process.env.REACT_APP_SER_PORT + "/files/upload"
@@ -71,19 +70,19 @@ const UploadComp = ( {userAnalyzeDataCallback} ) => {
         notify("Error uploading file", NOTIFY_TYPES.error);
       }
     } finally {
-      setLoading(false); // Set loading to false when upload is complete
+      setLoading(false);
     }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', borderRadius: "7px" }}>
-        {loading && <CircularProgress style={{marginTop: '10px'}} />} {/* Render loading circle if loading state is true */}
+        {loading && <CircularProgress style={{marginTop: '10px'}} />}
         {
           !loading &&
           <label htmlFor="fileInput">
             <Input type='file' name='file' color='primary' inputProps={{ accept: '.pcap' }} onChange={handleFileChange} id="fileInput" style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1 }} />
-            <div style={{ color: 'white', backgroundColor: '#1976d2', borderColor: 'transparent', borderRadius: '8px', borderStyle: 'solid', paddingTop: PADDING_C, paddingBottom: PADDING_C, paddingRight: PADDING_C, paddingLeft: PADDING_C, cursor: 'pointer', fontFamily: 'monospace', fontSize: '16px', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.25)', width: "400px" }}>
+            <div style={{ color: 'white', backgroundColor: '#1976d2', borderColor: 'transparent', borderRadius: '8px', borderStyle: 'solid', paddingTop: PADDING_C, paddingBottom: PADDING_C, paddingRight: PADDING_C, paddingLeft: PADDING_C, cursor: 'pointer', fontFamily: 'inherit', fontSize: '20px', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.25)', width: "400px" }}>
               {file?.name === undefined ? fileNotSelected : fileSelected}
             </div>
           </label>

@@ -40,7 +40,6 @@ export const getUserData = async () => {
 }
 export const clearCookie = async () => {
   try {
-    console.log("Logging out", USERS_URL_LOGOUT);
     const response = await axios.get(`${USERS_URL_LOGOUT}`)
     return response
   } catch (error) {
@@ -68,17 +67,13 @@ export const createUser = async (newUsername, newPassword, newIsAdmin) => {
       password: newPassword,
       isadmin: newIsAdmin
     })
-
     if (response.status === 200) {
-      console.log("user created succesfully")
     } else {
-      console.error('Failed to update user:', response.data)
       throw new Error('Failed to create user')
     }
   } catch (error) {
     if (error.response) {
       if (error.response.status === 409) {
-
         throw new Error(DB_ERROR_CODES.dup)
       }
       else throw new Error('Failed to create user')
@@ -140,6 +135,12 @@ export const signup = async (un, password) => {
     const res = await axios.post(`${AUTH_URL}/signup`, {un: un, password: password})
     return res
   } catch (error) {
-    throw new Error('Failed to create user')
+    if (error.response) {
+      if (error.response.status === 409) {
+        throw new Error(DB_ERROR_CODES.dup)
+      }
+      else throw new Error('Failed to create user')
+    }
+    throw error
   }
 }

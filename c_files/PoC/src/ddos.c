@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <json-c/json.h>
 
-void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, uint32_t conv_count)
+#define MIN_CONVS 1
+
+void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, uint32_t conv_count, ret_val * MAIN_RET_VAL)
 {
     int count_flood = 0, index, write_flag = 0;
     double a = 2.0, b = 10.0, ema = 0.0;
@@ -79,7 +81,7 @@ void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, u
             if (DEBUG) info("-------------------------------------");
         }
     }
-    if ((count_flood >= conv_count/2) && (conv_count != 1) )
+    if ((count_flood >= conv_count/2) && ( conv_count > MIN_CONVS ) )
     {
         if (!filename) error("given file name is null");
         else
@@ -110,6 +112,7 @@ void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, u
                     fp = fopen(filename, "w"); /* dump the JSON to a file */
                     if (fp != NULL && write_flag)
                     {
+                        (*MAIN_RET_VAL) |= with_ddos;
                         fprintf(fp, "%s\n", json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY));
                         fclose(fp);
                     }

@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@100;200;300;400;500;600;700&family=Major+Mono+Display&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+.info_panel {
+    font-family: "IBM Plex Sans Hebrew", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.file_info {
+    font-family: "IBM Plex Sans Hebrew", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.files_grid {
+    font-family: "IBM Plex Sans Hebrew", sans-serif;
+    font-weight: bold;
+    font-style: normal;
+}

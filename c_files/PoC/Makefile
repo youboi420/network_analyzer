@@ -17,6 +17,8 @@ init:
 
 $(OBJECT):
 	gcc $(SRC) -I $(HEADERS) -g -o $(BUILD)$(OBJECT) $(LIBS)
+	cp $(BUILD)$(OBJECT) ../../js/backend/bin/build
+#	copy the file into the backend server's binary folder
 #	gcc $(SRC) -I $(HEADERS) -o $(OBJECT) $(FLAGS)
 
 # clear: $(SRC) $(HEADERS)

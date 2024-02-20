@@ -30,7 +30,7 @@ typedef struct ddos_addr_ll{
 double calculate_avg_packets_per_time(conv_s conv, double start_time, double end_time);
 double calculate_ema(double current_value, double previous_ema, double alpha);
 
-void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, uint32_t conv_count);
+void analyze_ddos(conv_s conversations[MAX_L4_CONVERSATIONS], char * filename, uint32_t conv_count, ret_val * MAIN_RET_VAL);
 int detect_flood(conv_s convo);
 int add_to_ddos_ll(ddos_addr_ll **root, struct in_addr atkr_addr, uint32_t src_port);
 void free_ddos_list(ddos_addr_ll **root);

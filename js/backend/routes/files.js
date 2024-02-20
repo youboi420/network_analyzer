@@ -15,8 +15,8 @@ const filesRoute = express.Router()
 const SEC_KEY = process.env.JWT_SECRET
 
 const storage = multer.diskStorage({  
-  destination: function(req, file, cb) {
-    const userCookie = cookie_service.decodeCookie(req.cookies)
+  destination: async function(req, file, cb) {
+    const userCookie = await cookie_service.decodeCookie(req.cookies)
     const userID = userCookie?.decoded?.id
     let userFolderPath = './bin/users/'
     if ( userID !== undefined ) {
@@ -33,10 +33,6 @@ const storage = multer.diskStorage({
           } catch (error) {
             console.log("this is the error:",error);
             if (error.message === 'dup') {
-              const sleep = (milliseconds) => {
-                return new Promise(resolve => setTimeout(resolve, milliseconds))
-              }
-              await sleep(4)
               cb(null, "-duplicate")
               return
             }
@@ -57,8 +53,8 @@ const storage = multer.diskStorage({
       cb(null, "-")
     }
   },
-  filename: function(req, file, cb) {
-    const userCookie = cookie_service.decodeCookie(req.cookies)
+  filename: async function(req, file, cb) {
+    const userCookie = await cookie_service.decodeCookie(req.cookies)
     console.log("filename --------> ",userCookie);
     cb(null, file.originalname)
   }
@@ -93,6 +89,16 @@ filesRoute.get('/all', async (req, res) => {
 })
 
 filesRoute.get('/my_files', async (req, res) => {
+  const sleep = (milliseconds) => {
+    return new Promise(resolve => {
+      setTimeout( () => {
+        console.log("aint no way");
+        resolve();
+      }, milliseconds);
+    });
+  }
+  // await sleep(3 * 1000)
+  
   const jwtCookie = req.cookies.jwt
   try {
     const decodedToken = jwt.decode(jwtCookie, SEC_KEY);
@@ -104,7 +110,6 @@ filesRoute.get('/my_files', async (req, res) => {
       } else {
         if (user_res.valid === true) {
           user_res = user_res.user
-          console.log("id is", cookie_id);
           const my_files = await pcap_files_service.get_all_files_by_userid(cookie_id)
           if (my_files.success === true) {
             res.json(my_files.files)
@@ -136,7 +141,6 @@ filesRoute.post('/upload', upload.single('file'), async (req, res) => {
       res.status(403).send( {success: false, message: "invalid file type"} )
     } else {
       if ( !req.file.path.startsWith('-') ) {
-        console.log("Should insert to json_reposrts => " + filename + "@" + filepath + " ownded by: " + user_id);
         res.status(200).send( {success: true } )
       } else {
         res.status(403).send( {success: false } )
