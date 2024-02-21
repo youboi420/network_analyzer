@@ -1,4 +1,4 @@
-#!bin/bash
+#! bin/bash
 ##################################################
 # this is a automated script to reconifgure both #
 # the backend and the front end to the current   #

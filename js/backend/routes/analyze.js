@@ -3,10 +3,12 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import jwt from 'jsonwebtoken'
 import { getUserByCookie } from './auth.js'
+
 import * as analyze_service from '../services/analyze_services/analyze_service.js'
 import * as files_service from '../services/files_service/file_service.js'
 import * as cookie_service from '../services/cookie_services/cookie_service.js'
 import * as pcap_files_service from '../services/sql_services/pcap_files_service.js'
+import * as users_service from '../services/sql_services/users_service.js'
 import * as reports_service from '../services/sql_services/report_service.js'
 
 /* config's and server consts */
@@ -18,17 +20,32 @@ const analyzeRoute = express.Router()
 analyzeRoute.use(cookieParser())
 
 analyzeRoute.get('/:id', async (req, res) => {
+  const jwtCookie = req.cookies.jwt
+  jwt.verify(jwtCookie, SEC_KEY, (err) => {
+    console.log(jwtCookie);
+    if (err) {
+      console.log("...");
+      res.status(403).json({ valid: false })
+    }
+  })
+
+  const decodedCookie = await cookie_service.decodeCookie(req.cookies)
+  const uid = decodedCookie.decoded?.id
+  const is_valid = await users_service.get_user_by_id(uid)
+  if (is_valid.valid !== true) {
+    res.status(403).json({ valid: false })
+  }
   try {
     /* regex to validate a filename... and then create a command using regex to get the <pcap-filename>.json */
     const command = 'default'
     const file_id = req.params.id
     const decodeCookie = await cookie_service.decodeCookie(req.cookies)
     const user_id = decodeCookie.decoded?.id
+    
     try {
       const file_path_promise = pcap_files_service.get_path_by_fileid(file_id)
       const file_path = await file_path_promise
-      const next_id = await reports_service.get_next_id()
-
+      const next_id = await reports_service.get_next_id_and_inc()
       if (Number(next_id) === -1) {
         res.status(500).send({
           message: "getting next id. not analyzed"
@@ -46,12 +63,21 @@ analyzeRoute.get('/:id', async (req, res) => {
           message: "file already analyzed... need to select all the reports with owner file id of " + file_id
         })
       } else {
-        const analyze_file = await analyze_service.analyze_file(report_folder_path, file_path)
-        res.status(200).send({
-          analyze_file: analyze_file,
-          report_path: report_folder_path,
-          file_path: file_path,
-        })
+        const analyze_file = await analyze_service.analyze_file( report_folder_path, file_path, user_id, file_id )
+        if (analyze_file.success === true) {
+          const updated = await pcap_files_service.update_set_file_is_analyzed(file_id)
+          res.status(200).send({
+            updated: updated,
+            analyze_file: analyze_file,
+            report_path: report_folder_path,
+            file_path: file_path,
+          })
+        } else {
+          res.status(500).send({
+            message: "internal server error analyze failed.",
+            err: error,
+          })
+        }
       }
     } catch (error) {
       console.log(error);
@@ -62,7 +88,7 @@ analyzeRoute.get('/:id', async (req, res) => {
     }
   } catch (error) {
     console.log("Error...", error);
-    res.status(502).send()
+    res.status(500).send()
   }
 })
 

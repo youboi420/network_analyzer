@@ -6,7 +6,7 @@ import LandingStyle from '../Style/LandingPage.module.css';
 import AnalyzePageStyle from '../Style/AnalyzePage.module.css';
 import * as analyze_service from '../services/analyze_service'
 import GenereicDeleteDialog from './GenereicDeleteDialog';
-function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack }) {
+function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeLoading }) {
   const ANALYZE_L4 = "Analyze L4"
   const ATTACKS = "Analyze attacks"
   const [analyzeL4Mode, setAnalyzeL4Mode] = useState("both");
@@ -68,6 +68,7 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack }) {
     try {
       if (file_id !== undefined) {
         if (data.analyzed !== 1) {
+          analyzeLoading()
           const res = await analyze_service.analyze(file_id)
           notify(`FILE: ${data.filename} is now analyzed!`, NOTIFY_TYPES.success);
           fetchDataCallBack()

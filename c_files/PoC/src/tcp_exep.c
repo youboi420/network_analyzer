@@ -2,11 +2,11 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
-packet_exep_e get_packet_exep(u_char * tcp_packet)
+/* packet_exep_e get_packet_exep(u_char * tcp_packet)
 {
     int ret_val = NORMAL_EXEP;
     return ret_val;
-}
+} */
 packet_flags analyze_packet(u_char * tcp_packet)
 {
     packet_flags ret_val = NO_FLAGS;

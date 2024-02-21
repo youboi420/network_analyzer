@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Box, CircularProgress, LinearProgress, Stack } from '@mui/material';
+import { Backdrop, Box, CircularProgress, LinearProgress, Stack } from '@mui/material';
 import * as analyze_service from '../services/analyze_service';
 import { NOTIFY_TYPES, notify } from '../services/notify_service';
 import UploadComp from '../components/UploadComp';
@@ -24,6 +24,7 @@ const AnalyzePage = ({ isValidUser, userData }) => {
   const [rows, setRows] = React.useState([])
   const [selectedRow, setSelectedRow] = React.useState({})
   const [gridLoading, setGridLoading] = React.useState(false);  
+  const [isAnalyzeLoading, setIsAnalyzeLoading] = React.useState(false)
   const const_width = 300
   const const_end_str = 42
 
@@ -92,8 +93,14 @@ const AnalyzePage = ({ isValidUser, userData }) => {
   }
   
   const fetchDataCallBack = async () => {
+    setIsAnalyzeLoading(false)
     setSelectedRow({})
     fetchFilesData()
+  }
+
+  const analyzeLoading = () => {
+    setIsAnalyzeLoading(true)
+    notify("LOADING...", NOTIFY_TYPES.info)
   }
 
   React.useEffect(() => {
@@ -105,6 +112,16 @@ const AnalyzePage = ({ isValidUser, userData }) => {
   if (isValidUser) {
     return (
       <div style={{ display: 'flex', height: '100%' }} className={AnalyzePageStyle.info_panel}>
+        {
+          isAnalyzeLoading &&
+          <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isAnalyzeLoading}
+          onClick={() => {setIsAnalyzeLoading(false)}}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        }
         <Box style={{ width: '40%' }} sx={{ mr: -1, color: 'black' }}>
           <Stack direction={'column'} height={"93vh"}>
             <Box sx={{ mt: "10px", mx: "10px", p: 2, backdropFilter: "blur(100px)", borderRadius: "12px", fontSize: "20px", borderStyle: 'solid', borderWidth: 'medium', borderColor: 'white' }}>
@@ -138,7 +155,7 @@ const AnalyzePage = ({ isValidUser, userData }) => {
           </Stack>
         </Box>
         <Box sx={{ color: 'black', mt: "10px", mx: "10px", p: 4, backdropFilter: "blur(100px)", borderRadius: "12px", borderStyle: 'solid', borderWidth: 'medium', borderColor: 'white' }} style={{ flex: 1, backdropFilter: "blur(100px)" }}>
-          <AnalyzePanelComp  data={selectedRow} fetchDataCallBack={fetchDataCallBack} resetDataFallBack={fallBack} />
+          <AnalyzePanelComp  data={selectedRow} fetchDataCallBack={fetchDataCallBack} resetDataFallBack={fallBack} analyzeLoading={analyzeLoading}/>
         </Box>
       </div>
     )

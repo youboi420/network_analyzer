@@ -226,7 +226,6 @@ void free_mitm_list(mitm_node_s **root)
 
 void analyze_mitm(arp_conv l2_convs[MAX_L2_CONVERSATIONS], char * filename, uint32_t conv_count, ret_val * MAIN_RET_VAL)
 {
-    // דני טאובר
     json_object *root, *attacks_arr, *attack_obj, *vict_arr, *vict_obj;
     int replay_count, replay_count_inner, index, index_inner, v_c, flag, write_flag = 0;
     arp_packet_node_s *temp = NULL, *temp_inner = NULL;

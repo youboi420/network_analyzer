@@ -5,6 +5,11 @@ import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
+/**
+ * checks if the cookie is valid and if so if the user in the cookie is and admin 
+ * @param {JwtCookie} cookie 
+ * @returns valid: ( true if user is an admin false if not ) code: ( 200, 401, 401, 404, 500 ) 
+ */
 const isAdminMiddleware = async (cookie) => {
   const jwtCookie = cookie
   try {

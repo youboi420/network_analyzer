@@ -25,6 +25,10 @@ GROUP BY users.id`
 const get_user_by_un_query = `SELECT * FROM users WHERE username = ?`
 const get_user_by_id_query = `SELECT * FROM users WHERE id = ?`
 
+/**
+ * creates the user's table
+ * @returns 
+ */
 const create_users_table = () => {
   return new Promise((resolve, reject) => {
     connection.query(create_user_table_query, (err, results) => {
@@ -38,19 +42,24 @@ const create_users_table = () => {
     })
   })
 }
+
+/**
+ * gets the user(un)
+ * @param {String} un 
+ * @returns valid: (true | false), [optional] message: {undef_err_msg | error}
+ */
 const get_user_by_un = (un) => {
   return new Promise((resolve, reject) => {
     if (un === undefined) {
-      reject(undef_err_msg)
+      reject({valid: false, message: undef_err_msg})
     } else {
       connection.query(get_user_by_un_query, [un], (err, res) => {
         if (err) {
           console.error("error querying user by credentials:", err)
-          reject(err)
+          reject({valied: false, message: err})
         } else {
           if (res.length > 0) {
             console.log("user found: " + un + " : " + res[0].id)
-
             resolve({ valid: true, id: res[0].id })
           } else {
             console.log("user not found: " + un)
@@ -62,15 +71,20 @@ const get_user_by_un = (un) => {
   })
 }
 
+/**
+ * get's the user record with (id)
+ * @param {Number} id 
+ * @returns err or the {valid: true, user: res[0]} or {valid: false}
+ */
 const get_user_by_id = (id) => {
   return new Promise((resolve, reject) => {
     if (id === undefined) {
-      reject(undef_err_msg)
+      reject({valid: false, message: undef_err_msg})
     } else {
       connection.query(get_user_by_id_query, [id], (err, res) => {
         if (err) {
           console.error("error querying user by credentials:", err)
-          reject(err)
+          reject({valid: false, message: err})
         } else {
           if (res.length > 0) {
             console.log("user found: " + id)
@@ -85,6 +99,13 @@ const get_user_by_id = (id) => {
   })
 }
 
+/**
+ * creates a new user with un, pw, isadmin 
+ * @param {String} un 
+ * @param {String} pw 
+ * @param {Number} isadmin 
+ * @returns success: (true | false), [optional] message: {duplicate user | create_user | error}, [on success] id: InsertedId 
+ */
 const create_user = (un, pw, isadmin) => {
   return new Promise(async (resolve, reject) => {
     if (un !== undefined && pw !== undefined && isadmin !== undefined) {
@@ -95,8 +116,7 @@ const create_user = (un, pw, isadmin) => {
       }
       connection.query(insert_user_query, [un, pw, isadmin], (err, res) => {
         if (err) {
-          // console.error('error creating user:', err)
-          reject(err)
+          reject({success: false, message: err})
           return
         } else {
           console.log(res);
@@ -105,12 +125,19 @@ const create_user = (un, pw, isadmin) => {
         }
       })
     } else {
-      reject("one or more of the given fields are " + undefined)
+      reject({success: false, message: "one or more of the given fields are " + undefined})
       return
     }
   })
 }
 
+/**
+ * deletes the user by (un, pw) if (isadmin)
+ * @param {String} un
+ * @param {String} pw
+ * @param {Number} isadmin 
+ * @returns res or error
+ */
 const delete_user = (un, pw, isadmin) => {
   if (isadmin) {
     if (un !== undefined && pw !== undefined) {
@@ -141,6 +168,11 @@ const delete_user = (un, pw, isadmin) => {
   }
 }
 
+/**
+ * deletes the user(id)
+ * @param {Number} id 
+ * @returns success: (true | false), message: {undef_err_msg | not_user_msg | res}, [optional] code: (200, 404)
+ */
 const delete_user_by_id = (id) => {
   return new Promise ( async (resolve, reject) => {
     if (id === undefined) {
@@ -151,7 +183,7 @@ const delete_user_by_id = (id) => {
       if (check.valid === true) {
         connection.query(delete_user_by_id_query, [id], (err, res) => {
           if (err) {
-            reject({success: false, message: not_user_msg, code: 409})
+            reject({success: false, message: not_user_msg, code: 404})
             return
           } else {
             resolve({success: true, code: 200 ,message: res})
@@ -166,6 +198,12 @@ const delete_user_by_id = (id) => {
   })
 }
 
+/**
+ * valites a user by un and password
+ * @param {String} un 
+ * @param {String} password 
+ * @returns success: (true if succesfull else false), [optional]valid: {true | false}, [optional] message: {undef_err_msg | err}, [optional] user: res[0] 
+ */
 const validate_user = (un, password) => {
   return new Promise( async(resolve, reject) => {
     if (un === undefined || password === undefined) {
@@ -177,7 +215,7 @@ const validate_user = (un, password) => {
           if (err) {
             reject({ success: false, message: err })
           } else {
-            if (res.length === 1) resolve({ success: true, valid: true, user: res[0], message: "Hello valid"})
+            if (res.length === 1) resolve({ success: true, valid: true, user: res[0]})
             else resolve({ success: true, valid: false})
           }
         })
@@ -188,6 +226,14 @@ const validate_user = (un, password) => {
   })
 }
 
+/**
+ * update user data, with given new un, upwd, isadmin.
+ * @param {Number} user_id 
+ * @param {String} un 
+ * @param {String} upwd 
+ * @param {Number} isadmin 
+ * @returns success: (true if succesfull else false), [optional] message: {undef_err_msg | err | dup}
+ */
 const update_user_new_data = (user_id, un, upwd, isadmin) => {
   return new Promise(async (resolve, reject) => {
     if (user_id === undefined || un === undefined || upwd === undefined || isadmin === undefined) {
@@ -216,6 +262,10 @@ const update_user_new_data = (user_id, un, upwd, isadmin) => {
   })
 }
 
+/**
+ * get all the users from the db
+ * @returns all the users if succesfull else the error
+ */
 const get_all_users = () => {
   return new Promise((resolve, reject) => {
     connection.query(get_all_users_query, (err, res) => {

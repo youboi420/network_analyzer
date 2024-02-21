@@ -26,7 +26,6 @@ const storage = multer.diskStorage({
         } else {
           /* need to check pcap_files_service for unique path */
           userFolderPath = path.join(userFolderPath, String(userID), '/pcap')
-          console.log("this is the uploaded dir", userFolderPath);
           let ret
           try {
             ret = await pcap_files_service.create_file(userID, "./" + userFolderPath.toString() + "/" + file.originalname, file.originalname)
@@ -55,7 +54,6 @@ const storage = multer.diskStorage({
   },
   filename: async function(req, file, cb) {
     const userCookie = await cookie_service.decodeCookie(req.cookies)
-    console.log("filename --------> ",userCookie);
     cb(null, file.originalname)
   }
 })

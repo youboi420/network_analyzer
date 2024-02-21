@@ -109,7 +109,6 @@ void save_gis_to_json(gen_inf_s gis, char * filename)
     json_object_put(root_obj);
     if (file_ptr) fclose(file_ptr);
 }
-
 char * get_packet_time_stamp_mt(const struct timeval *timestamp)
 {
     time_t seconds;
@@ -128,7 +127,6 @@ char * get_packet_time_stamp_mt(const struct timeval *timestamp)
     snprintf(ret_time_str, DATE_LIMIT, "%s.%06ld %s", time_str, timestamp->tv_usec, tzname[time_info->tm_isdst]);
     return ret_time_str;
 }
-
 char * get_packet_time_stamp_js(const struct timeval *timestamp)
 {
     time_t seconds;

@@ -219,7 +219,7 @@ int add_packet_to_list(packet_node_s **root, const u_char * original_packet, siz
     }
     return flag;
 }
-void print_packet_list(packet_node_s ** root, int max)
+void print_packet_list(packet_node_s ** root, int packet_count)
 {
     packet_node_s * temp = *root;
     int i, index;
@@ -234,7 +234,7 @@ void print_packet_list(packet_node_s ** root, int max)
         }
         index = temp->p_id + 1;
         ip_header = (struct ip *) temp->packet_data + ETH_HEADER_SIZE;
-        printf("----------[%05i/%05i]-----------\n", index, max);
+        printf("----------[%05i/%05i]-----------\n", index, packet_count);
         okay("seconds: %li| nano seconds: %li", temp->time_stamp.tv_sec, temp->time_stamp.tv_usec);
         if (ip_header->ip_p == IPPROTO_TCP || ip_header->ip_p == IPPROTO_IP){
             tcp_header = (struct tcphdr *) (temp->packet_data + ETH_HEADER_SIZE + (ip_header->ip_hl << 2));
@@ -877,7 +877,7 @@ void * search_params(conv_s conv, search_e search , search_ret_e * ret_type, voi
                 while(temp != NULL)
                 {
                     if (DEBUG) info("p_id: %i %f < %f < %f", temp->p_id, start_time, temp->time_stamp_rltv, end_time);
-                    if (    
+                    if (
                         /* seconds is between min and max seconds  */
                         ( temp->time_stamp_rltv <= end_time && temp->time_stamp_rltv >= start_time )
                     )

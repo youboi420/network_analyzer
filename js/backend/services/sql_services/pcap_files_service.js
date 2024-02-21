@@ -11,7 +11,7 @@ const check_file_exists_by_path_query = `SELECT * FROM pcap_files WHERE path = ?
 const update_file_analyzed_by_id_query = `UPDATE pcap_files SET analyzed = 1 WHERE file_id = ?`
 const get_file_analyzed_query = `SELECT * FROM pcap_files WHERE file_id = ? and analyzed = 1`
 const get_path_by_fileid_query = `SELECT path FROM pcap_files where file_id = ?`
-const get_all_query = `SELECT * FROM pcap_files`
+const get_all_files_query = `SELECT * FROM pcap_files`
 
 const create_pcap_files_table_query = `
 CREATE TABLE IF NOT EXISTS pcap_files (
@@ -34,6 +34,10 @@ CREATE TABLE IF NOT EXISTS pcap_files (
  */
 
 
+/**
+ * creates the pcap files table
+ * @returns void
+ */
 const create_pcap_table = () => {
   return new Promise((resolve, reject) => {
     connection.query(create_pcap_files_table_query, (err, results) => {
@@ -48,6 +52,11 @@ const create_pcap_table = () => {
   })
 }
 
+/**
+ * check's if the file exists or not (using the given path)
+ * @param {String} file_path 
+ * @returns success: (true if file exists else false), [optional] message: {dup}
+ */
 const check_file_exists_by_path = (file_path) => {
   return new Promise((resolve, reject) => {
     if (file_path === undefined) {
@@ -68,10 +77,13 @@ const check_file_exists_by_path = (file_path) => {
   })
 }
 
-/* 
-need to used:
-  1) in files /upload after creating the file...
-*/
+/**
+ * creates the file record in the db
+ * @param {Number} owner_id 
+ * @param {String} path 
+ * @param {String} filename 
+ * @returns success: (true if file created else false), [optional] message: {ER_DUP_ENTRY | error | failed | dup}
+ */
 const create_file = (owner_id, path, filename) => {
   return new Promise( async (resolve, reject) => {
     if (owner_id === undefined || path === undefined || filename === undefined) {
@@ -83,7 +95,7 @@ const create_file = (owner_id, path, filename) => {
       } else {
         connection.query(insert_file_query, [owner_id, path, filename, 0], (err, res) => {
           if (err) {
-            if (err.code === 'ER_DUP_ENTRY') {
+            if (err.code === 'ER_DUP_ENTRY') { /* already counterd by the upper case if fileExists */
               reject({success: false, message: 'ER_DUP_ENTRY'})
             } else {
               reject({success: false, message: err})
@@ -101,6 +113,11 @@ const create_file = (owner_id, path, filename) => {
   })
 }
 
+/**
+ * get if the file is analyzed
+ * @param {Number} file_id 
+ * @returns success: (true if file is analyzed else false), [optional] message: {no_file_msg | undef_err_msg | error}
+ */
 const get_file_analyzed = (file_id) => {
   return new Promise((resolve, reject) => {
     if (file_id === undefined) {
@@ -115,7 +132,7 @@ const get_file_analyzed = (file_id) => {
             console.log("got file pcap file -------> file: ", file_id);
             resolve({ success: true })
           } else {
-            console.log("didn't get file pcap file -------> file: ", file_id);
+            console.log("didn't get file pcap file -------> not analyzed file: ", file_id);
             resolve({ success: false, message: no_file_msg})
           }
         }
@@ -123,6 +140,12 @@ const get_file_analyzed = (file_id) => {
     }
   })
 }
+
+/**
+ * updates the file id to be set to analyzed = true
+ * @param {Number} file_id 
+ * @returns success: (true if file exists else false), [optional] message: {undef_err_msg | error | failed}, [optional] res: res
+ */
 const update_set_file_is_analyzed = (file_id) => {
   return new Promise( async (resolve, reject) => {
     if (file_id === undefined) {
@@ -150,10 +173,11 @@ const update_set_file_is_analyzed = (file_id) => {
   })
 }
 
-/* 
-need to used:
-  1) in users user/:id delete
-*/
+/**
+ * delete's a file of user(id) from the db
+ * @param {Number} user_id 
+ * @returns success: (true if file deleted exists else false), [optional] message: {undef_err_msg | error}
+ */
 const delete_file_by_file_id = (file_id) => {
   return new Promise((resolve, reject) => {
     if (file_id === undefined) {
@@ -167,7 +191,7 @@ const delete_file_by_file_id = (file_id) => {
           if (res.affectedRows > 0) {
             resolve({ success: true })
           } else {
-            resolve({ success: false, message: no_file_msg})
+            resolve({ success: false, message: no_file_msg + " delete by id"})
           }
         }
       })
@@ -175,10 +199,11 @@ const delete_file_by_file_id = (file_id) => {
   })
 }
 
-/* 
-need to used:
-  1) in users user/:id delete
-*/
+/**
+ * delete's all the files of user(id) from the db
+ * @param {Number} user_id 
+ * @returns success: (true if files deleted exists else false), [optional] message: {undef_err_msg | error}
+ */
 const delete_all_files_by_user_id = (user_id) => {
   return new Promise((resolve, reject) => {
     if (user_id === undefined) {
@@ -202,9 +227,10 @@ const delete_all_files_by_user_id = (user_id) => {
   })
 }
 
-/* 
-  need to be used:
-    1) in files /file/:id but need's to be checked if the cookie is valid and its id and the res[0].owner_id are equal
+/**
+ * private function to get if the file record exist's by file id
+ * @param {Number} file_id 
+ * @returns success: (true if file exists else false), [optional] message: {undef_err_msg | error}
  */
 const get_file_by_fileid = (file_id) => {
   return new Promise((resolve, reject) => {
@@ -222,7 +248,7 @@ const get_file_by_fileid = (file_id) => {
           } else {
             console.log(res);
             console.log("didn't get file pcap file -------> file: ", file_id);
-            resolve({ success: false, message: no_file_msg})
+            resolve({ success: false, message: no_file_msg + " file by file id"})
           }
         }
       })
@@ -230,9 +256,10 @@ const get_file_by_fileid = (file_id) => {
   })
 }
 
-/* 
-  need to be used:
-  1) in files /all_info
+/**
+ * get's a list of all the files from the db
+ * @param {Number} user_id 
+ * @returns success: (true if files else false), [optional] files: array of files, [optional] message: {undef_err_msg | error}
  */
 const get_all_files_by_userid = (user_id) => {
   return new Promise((resolve, reject) => {
@@ -257,6 +284,11 @@ const get_all_files_by_userid = (user_id) => {
   })
 }
 
+/**
+ * get's the file from the db
+ * @param {String} file_id 
+ * @returns success: (true if file exists else false), [optional] message: {no such file}
+ */
 const get_path_by_fileid = (file_id) => {
   return new Promise((resolve, reject) => {
     connection.query(get_path_by_fileid_query, [file_id], (err, res) => {
@@ -266,16 +298,20 @@ const get_path_by_fileid = (file_id) => {
         if (res.length > 0) {
           resolve({success: true, r: res[0]})
         } else {
-          reject({success: false, message: "no such file"})
+          reject({success: false, message: no_file_msg + " path by id"})
         }
       }
     })
   })
 }
 
+/**
+ * get's all the files from the db
+ * @returns success: (true if files exists else false), [optional] message: {error}
+ */
 export const get_all = () => {
   return new Promise((resolve, reject) => {
-    connection.query(get_all_query, (err, res) => {
+    connection.query(get_all_files_query, (err, res) => {
       if (err) {
         reject({success: false, message: err})
       } else {
