@@ -22,9 +22,8 @@ analyzeRoute.use(cookieParser())
 analyzeRoute.get('/:id', async (req, res) => {
   const jwtCookie = req.cookies.jwt
   jwt.verify(jwtCookie, SEC_KEY, (err) => {
-    console.log(jwtCookie);
     if (err) {
-      console.log("...");
+      console.log("...")
       res.status(403).json({ valid: false })
     }
   })
@@ -80,14 +79,14 @@ analyzeRoute.get('/:id', async (req, res) => {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
       res.status(500).send({
         message: "internal server error :_(",
         err: error,
       })
     }
   } catch (error) {
-    console.log("Error...", error);
+    console.log("Error...", error)
     res.status(500).send()
   }
 })

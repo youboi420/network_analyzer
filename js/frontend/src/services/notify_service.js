@@ -12,53 +12,49 @@ const notify = (text, type) => {
   switch (type){
     case NOTIFY_TYPES.info:
       toast.info(text, {
-        position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
-        theme: "colored",
         transition: Slide,
       })
       break
     case NOTIFY_TYPES.success:
       toast.success(text, {
         position: "top-center",
+        theme: "colored",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
         progress: undefined,
-        theme: "colored",
         transition: Slide,
       })
       break
     case NOTIFY_TYPES.error:
       toast.error(text, {
         position: "top-center",
+        theme: "colored",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
-        theme: "colored",
         transition: Slide,
       })
       break
     case NOTIFY_TYPES.warn:
       toast.warn(text, {
-        position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
-        theme: "colored",
         transition: Slide,
       })
       break
@@ -66,13 +62,13 @@ const notify = (text, type) => {
     case NOTIFY_TYPES.short_error:
       toast.error(text, {
         position: "top-center",
+        theme: "colored",
         autoClose: 1500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
-        theme: "colored",
         transition: Slide,
       })
       break

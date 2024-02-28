@@ -5,6 +5,7 @@ import isAdminMiddleware from '../middleware/isAdmin.js'
 
 import * as files_service from '../services/files_service/file_service.js'
 import * as pcap_files_service from '../services/sql_services/pcap_files_service.js'
+import * as reports_service from '../services/sql_services/report_service.js'
 import * as users_service from '../services/sql_services/users_service.js'
 
 /* config's and server consts */
@@ -74,28 +75,25 @@ usersRouter.delete(`${sql_api_path}/user/:id`, async (req, res) => {
   const isAdmin = await isAdminMiddleware(req.cookies.jwt)
   if (isAdmin.valid) {
     console.log("DELETE REQ")
-    const { id } = req.params
+    const id_param = req.params.id
+    const id = Number(id_param)
     try {
-      const user = await users_service.get_user_by_id(id)
-      const all_files = pcap_files_service.get_all_files_by_userid(id)
-      if (all_files?.files !== undefined) await pcap_files_service.delete_all_files_by_user_id(id)
+      const all_reports = await reports_service.get_reports_by_id(id)
+      if (all_reports?.reports !== undefined) await reports_service.delete_all_reports_by_user_id(id)
+      
+      const all_files = await pcap_files_service.get_all_files_by_userid(id)
+      if (all_files?.files !== undefined) {
+        console.log("Deleting all the files.");
+        await pcap_files_service.delete_all_files_by_user_id(id)
+      }
+      
       const del_user = await users_service.delete_user_by_id(id)
       if (del_user.success)
         res.status(200).send("user deleted successfully")
       else
         res.status(500).send("server error")
-      // if (!!user.user) {
-      //   if (deleted_files !== true) {
-      //     if (deleted_files.message === "no files") {
-      //     } else {
-      //       res.status(401).json({message: "oh no files:|"})
-      //     }
-      //   } else {
-      //     const del_user = await users_service.delete_user_by_id(id)
-      //     if (del_user.success === true) res.status(200).send("user deleted successfully")
-      //   }
-      // }
     } catch (exception) {
+      console.log(exception);
       if (exception.code === 404) {
         res.status(404).send("user not found")
       } else {
@@ -117,7 +115,7 @@ usersRouter.post(`${sql_api_path}/user`, async (req, res) => {
       const new_user = await users_service.create_user(un, password, isadmin)
       if (new_user.success === true) {
         /* create the directory of the new user in ./bin/users/:id where id new_user.id */
-        console.log("new user", new_user.id);
+        console.log("new user", new_user.id)
         files_service.create_folder_for_new_user(new_user.id)
         res.status(200).send("user added succesfully")
       } else {

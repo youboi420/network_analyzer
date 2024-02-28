@@ -29,9 +29,9 @@ const corsOptions = {
   // ],
   origin: true,
   credentials: true,
-};
+}
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
 dotenv.config()
@@ -39,7 +39,7 @@ dotenv.config()
 app.use('/analyze', analyzeRoute)
 app.use('/files', filesRoute)
 app.use('/auth', authRouter)
-app.use('/users', usersRouter);
+app.use('/users', usersRouter)
 app.use('/reports', reportsRouter)
 
 const initialize_server = async () => {

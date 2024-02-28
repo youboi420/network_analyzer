@@ -5,14 +5,24 @@ import { exec } from 'node:child_process'
 const users_dir = './bin/users'
 
 /**
- * dictionary of exit codes
+ * dictionary of analyzer program exit codes
  */
-const EXIT_CODE  = {
+const ANALYZE_EXIT_CODE  = {
   FAILED:    1,
   with_l2l4: 1 << 1,
   with_ddos: 1 << 2,
   with_mitm: 1 << 3
 }
+
+/**
+ * dictionary of validator program exit codes
+ */
+const VALIDATOR_EXIT_CODE = {
+  FAILED  :   1,
+  VALID   : 101,
+  INVALID : 102,
+}
+
 
 /**
  * creates the folder for a newly created user using node:child_process.exec
@@ -26,22 +36,22 @@ const create_folder_for_new_user = (id) => {
       if (err) {
         return
       }
-      console.log(err);
+      console.log(err)
       fs.mkdir(create_path + '/reports', err => {
         if (err) {
-          console.log(err);
+          console.log(err)
           return
         }
         fs.mkdir(create_path + '/pcap', err => {
           if (err) {
-            console.log(err);
+            console.log(err)
             return
           }
         })
       })
     })
   } else {
-    console.log("id is undefiend");
+    console.log("id is undefiend")
   }
 }
 
@@ -58,18 +68,18 @@ async function create_report_folder_by_id(user_id, report_id) {
   return new Promise((resolve, reject) => {
       fs.access(directoryPath, fs.constants.F_OK, (err) => {
           if (!err) {
-              resolve(directoryPath);
+              resolve(directoryPath)
           } else {
               fs.mkdir(directoryPath, { recursive: true }, (err) => {
                   if (err) {
-                      reject(err);
+                      reject(err)
                   } else {
-                      resolve(directoryPath);
+                      resolve(directoryPath)
                   }
-              });
+              })
           }
-      });
-  });
+      })
+  })
 }
 
 /**
@@ -83,16 +93,17 @@ const list_files = (path) => {
       const command = `ls -1 ${path}`
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          console.log(`error: ${error}`);
+          console.log(`error: ${error}`)
           reject({ success: false, error: error, message: "listing files failed. " + command})
           return
         } else if (stderr) {
-          console.log(`stderr: ${stderr}`);
+          console.log(`stderr: ${stderr}`)
           reject({ success: false, stderr: stderr })
           return
         } else {
-          console.log(`${stdout}`);
-          resolve({ success: true, stdout: stdout })
+          console.log(`${stdout}`)
+          const files_arr = stdout.split('\n').filter(line => line.trim() !== '')
+          resolve({ success: true, stdout: stdout, files: files_arr})
           return
         }
       })
@@ -102,4 +113,4 @@ const list_files = (path) => {
   })
 }
 
-export { create_folder_for_new_user, create_report_folder_by_id, list_files, EXIT_CODE}
+export { create_folder_for_new_user, create_report_folder_by_id, list_files, ANALYZE_EXIT_CODE, VALIDATOR_EXIT_CODE }

@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   },
   filename: function(req, file, cb) {
     const userCookie = cookie_service.decodeCookie(req.cookies)
-    console.log(userCookie);
+    console.log(userCookie)
     cb(null, file.originalname)
   }
 })
@@ -26,14 +26,13 @@ reportsRouter.use(cookieParser())
 reportsRouter.get('/user/:id', async(req, res) => {
   const { id }  = req.params
   const reports = await report_service.get_reports_by_id(id)
-  console.log("got:",reports);
+  console.log("got:",reports)
   if (reports?.valid === true) {
-    console.log("Here!!!");
     res.status(200).json(reports.reports)
   } else {
     res.status(404).json({code: 404, message: "user " + id + ": not found" })
   }
-});
+})
 
 reportsRouter.post('/upload', upload.single('file'), (req, res) => {
   const filename = req.file  

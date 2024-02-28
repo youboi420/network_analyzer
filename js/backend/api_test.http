@@ -1,13 +1,13 @@
 
-### IP ADDRESS: 192.168.68.128 
+### IP ADDRESS: 192.168.185.189 
 ### GET ALL
-GET http://192.168.68.128:8081/sql_api/all_users
+GET http://192.168.185.189:8081/sql_api/all_users
 
 ### GET ONE
-GET http://192.168.68.128:8081/sql_api/user?un=ID
+GET http://192.168.185.189:8081/sql_api/user?un=ID
 
 ### PUT
-PUT http://192.168.68.128:8081/sql_api/user/:id
+PUT http://192.168.185.189:8081/sql_api/user/:id
 Content-Type: application/json
 
 {
@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### DELETE
-DELETE http://192.168.68.128:8081/sql_api/user/:id
+DELETE http://192.168.185.189:8081/sql_api/user/:id
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 }
 
 ###POST CREATE USER
-POST http://192.168.68.128:8081/sql_api/user
+POST http://192.168.185.189:8081/sql_api/user
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ###POST CHECK USER
-POST http://192.168.68.128:8081/login
+POST http://192.168.185.189:8081/login
 Content-Type: application/json
 
 {

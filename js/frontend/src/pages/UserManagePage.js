@@ -66,7 +66,7 @@ const UserManagePage = ({ isValidUser, userData }) => {
     }
   }
   useEffect(() => {
-    document.title = "user manager page"
+    document.title = "admin panel"
     if (userData.isadmin)
       fetchDataAndSetRows()
     else
@@ -78,7 +78,7 @@ const UserManagePage = ({ isValidUser, userData }) => {
     { field: 'username', headerName: 'Username', headerAlign: 'center', align: 'center', width: 250 },
     {
       field: 'isadmin', headerName: 'Admin', headerAlign: 'center', align: 'center', width: 250, renderCell: (params) => {
-        return <span className={AnalyzePageStyle.files_grid} style={{ borderRadius: '12px', width: "20%", backgroundColor: params.value === 1 ? "#77DD76" : "#FF6962", textAlign: 'center' }}> {params.value === 1 ? "Yes" : "No"} </span>
+        return <span className={AnalyzePageStyle.files_grid} style={{ fontWeight: 'bold',borderRadius: '12px', width: "20%", backgroundColor: params.value === 1 ? "#77FF26" : "#d32f2f", textAlign: 'center' }}> {params.value === 1 ? "YES" : "NO"} </span>
       }
     },
     { field: 'file_count', headerName: 'Files', headerAlign: 'center', align: 'center', width: 250 },
@@ -101,9 +101,24 @@ const UserManagePage = ({ isValidUser, userData }) => {
               } else {
                 notify("please select a user to delete", NOTIFY_TYPES.warn)
               }
-            }} color='error' variant='contained' startIcon={<DeleteIcon />}> delete </Button>
-            <Button onClick={handleEdit} color='info' variant='contained' startIcon={<EditNote />} > UPDATE </Button>
-            <Button onClick={handleCreate} color='success' variant='contained' startIcon={<AddIcon />}> CREATE </Button>
+            }} color='error' variant='contained' >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                <span>DELETE</span>
+                <DeleteIcon style={{ marginLeft: '5px' }} />
+              </div>   
+            </Button>
+            <Button onClick={handleEdit} color='primary' variant='contained'  > 
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                <span>EDIT</span>
+                <EditNote style={{ marginLeft: '5px' }} />
+              </div>   
+            </Button>
+            <Button onClick={handleCreate} color='success' variant='contained' >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                <span>CREATE</span>
+                <AddIcon style={{ marginLeft: '5px' }} />
+              </div>   
+            </Button>
           </Stack>
         </div>
         {

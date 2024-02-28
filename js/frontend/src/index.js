@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Bounce, ToastContainer } from 'react-toastify';
+import { Slide, ToastContainer } from 'react-toastify';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ToastContainer
-      position="top-center"
+      position="top-left"
       hideProgressBar={false}
       newestOnTop={false}
       closeOnClick
@@ -17,8 +17,8 @@ root.render(
       pauseOnFocusLoss
       draggable
       pauseOnHover
-      theme="colored"
-      transition={Bounce} 
+      theme="dark"
+      transition={Slide} 
     />
     <App />
   </React.StrictMode>

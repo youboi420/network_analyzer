@@ -28,8 +28,13 @@ const AnalyzePage = ({ isValidUser, userData }) => {
   const const_width = 300
   const const_end_str = 42
 
-  const handleFileIdClick = async (fileID) => {
-    notify(`File ${fileID} pressed`, NOTIFY_TYPES.info)
+  const handleFileIdClick = async (file_id, filename) => {
+    try {
+      await files_service.download(file_id, filename)
+      notify(`Downloaded succesfully`, NOTIFY_TYPES.info)
+    } catch (error) {
+      notify("error while downloading the file.", NOTIFY_TYPES.error)
+    }
   }
   const columns = [
     {
@@ -40,10 +45,10 @@ const AnalyzePage = ({ isValidUser, userData }) => {
           btnText = btnText.slice(0, const_end_str - 3) + "..."
         }
         return (
-          <button className={AnalyzePageStyle.files_grid}  onClick={() => { handleFileIdClick(params.row.file_id) }} style={{ color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', background: 'transparent', boxShadow: '0px 0px 0px transparent', border: '0px solid transparent', textShadow: '0px 0px 0px transparent', cursor: 'pointer', borderRadius: "12px", borderStyle: 'solid', borderWidth: 'medium', borderColor: 'transparent', backgroundColor: '#1976d2', width: "100%" }} > <DownloadIcon style={{ marginRight: '5px' }} /> {btnText} </button>)
+          <button className={AnalyzePageStyle.files_grid}  onClick={() => { handleFileIdClick(params.row.file_id, params.row.filename); }} style={{ color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', background: 'transparent', boxShadow: '0px 0px 0px transparent', border: '0px solid transparent', textShadow: '0px 0px 0px transparent', cursor: 'pointer', borderRadius: "12px", borderStyle: 'solid', borderWidth: 'medium', borderColor: 'transparent', backgroundColor: '#1976d2', width: "100%" }} > <DownloadIcon style={{ marginRight: '5px' }} /> {btnText} </button>)
       }
     },
-    { field: 'path', headerName: 'path', headerAlign: 'center', width: const_width + 35 },
+    { field: 'path', headerName: 'path', headerAlign: 'center', align: 'center', width: const_width + 35 },
     {
       field: 'analyzed', headerName: 'analyzed', headerAlign: 'center', align: 'center', flex: 1, renderCell: (params) => {
         return <span className={AnalyzePageStyle.files_grid} style={{borderRadius: '12px',width: "50%", backgroundColor: params.value === 1 ? "#77DD76" : "#FF6962"}}> {params.value === 1 ? "Yes" : "No"} </span>
@@ -75,6 +80,7 @@ const AnalyzePage = ({ isValidUser, userData }) => {
         permission: userData.isadmin ? AdminMSG : UserMSG,
         numOfFiles: 0 /* need to fetch manually from reports db */
       }));
+      setRows([])
     } else {
       files = files.map((obj, i) => ({ ...obj, id: i }))
       setUserAnalyzeData((oldState) => ({
@@ -100,7 +106,10 @@ const AnalyzePage = ({ isValidUser, userData }) => {
 
   const analyzeLoading = () => {
     setIsAnalyzeLoading(true)
-    notify("LOADING...", NOTIFY_TYPES.info)
+  }
+
+  const analyzeEndError = () => {
+    setIsAnalyzeLoading(false)
   }
 
   React.useEffect(() => {
@@ -114,13 +123,9 @@ const AnalyzePage = ({ isValidUser, userData }) => {
       <div style={{ display: 'flex', height: '100%' }} className={AnalyzePageStyle.info_panel}>
         {
           isAnalyzeLoading &&
-          <Backdrop
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isAnalyzeLoading}
-          onClick={() => {setIsAnalyzeLoading(false)}}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+          <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isAnalyzeLoading} onClick={() => {setIsAnalyzeLoading(false)}} >
+            <CircularProgress color="inherit" />
+          </Backdrop>
         }
         <Box style={{ width: '40%' }} sx={{ mr: -1, color: 'black' }}>
           <Stack direction={'column'} height={"93vh"}>
@@ -140,7 +145,7 @@ const AnalyzePage = ({ isValidUser, userData }) => {
                 {
                   !gridLoading &&
                   <DataGrid
-                  sx={{ borderRadius: "10px", fontWeight: 'bold', fontFamily: 'inherit' }}
+                  sx={{ borderRadius: "10px", fontWeight: 'bold', fontFamily: 'monospace' }}
                   rows={rows}
                   columns={columns}
                   style={{ backdropFilter: "blur(300px)", fontWeight: "bold" }}
@@ -155,7 +160,7 @@ const AnalyzePage = ({ isValidUser, userData }) => {
           </Stack>
         </Box>
         <Box sx={{ color: 'black', mt: "10px", mx: "10px", p: 4, backdropFilter: "blur(100px)", borderRadius: "12px", borderStyle: 'solid', borderWidth: 'medium', borderColor: 'white' }} style={{ flex: 1, backdropFilter: "blur(100px)" }}>
-          <AnalyzePanelComp  data={selectedRow} fetchDataCallBack={fetchDataCallBack} resetDataFallBack={fallBack} analyzeLoading={analyzeLoading}/>
+          <AnalyzePanelComp  data={selectedRow} fetchDataCallBack={fetchDataCallBack} resetDataFallBack={fallBack} analyzeLoading={analyzeLoading} analyzeEndError={analyzeEndError}/>
         </Box>
       </div>
     )

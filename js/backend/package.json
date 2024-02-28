@@ -10,7 +10,7 @@
     "conf_ser_env": "node scripts/config_env.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "yair elad - (C) 2024",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.6.7",

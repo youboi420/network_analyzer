@@ -119,7 +119,6 @@ const create_user = (un, pw, isadmin) => {
           reject({success: false, message: err})
           return
         } else {
-          console.log(res);
           resolve({success: true, message: "created user", id: res.insertId})
           return
         }
