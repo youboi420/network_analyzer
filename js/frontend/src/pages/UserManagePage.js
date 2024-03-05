@@ -4,9 +4,10 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditNote from '@mui/icons-material/EditNote'
 import { DataGrid } from '@mui/x-data-grid'
-import { Button, Stack } from '@mui/material'
+import { Box, Button, LinearProgress, Stack } from '@mui/material'
 import { getAllUsers, deleteUser } from '../services/user_service'
 import AnalyzePageStyle from '../Style/AnalyzePage.module.css';
+import AdminIcon from '@mui/icons-material/AdminPanelSettings';
 
 /* my comps */
 import UserUpdateDialog from '../components/UserUpdateDialog'
@@ -16,6 +17,7 @@ import { Navigate } from 'react-router-dom'
 import GenereicDeleteDialog from '../components/GenereicDeleteDialog'
 
 const UserManagePage = ({ isValidUser, userData }) => {
+  const [gridLoading, setGridLoading] = useState(false);  
   const [rows, setRows] = useState([])
   const [selectedRow, setSelectedRow] = useState([])
   const [editData, setEditData] = useState({})
@@ -57,6 +59,7 @@ const UserManagePage = ({ isValidUser, userData }) => {
   }
 
   const fetchDataAndSetRows = async () => {
+    setGridLoading(true);
     try {
       const userData = await getAllUsers()
 
@@ -64,6 +67,7 @@ const UserManagePage = ({ isValidUser, userData }) => {
     } catch (error) {
       console.error('Error fetching user data:', error)
     }
+    setGridLoading(false);
   }
   useEffect(() => {
     document.title = "admin panel"
@@ -90,10 +94,21 @@ const UserManagePage = ({ isValidUser, userData }) => {
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", }}>
-          <DataGrid rows={rows} columns={columns} onRowDoubleClick={(row) => { setEditData(row.row); setEditDialogOpen(true); }} onRowSelectionModelChange={handleSelectionChange} style={{ backdropFilter: "blur(300px)", fontWeight: "bold"}} />
+          <Box className={AnalyzePageStyle.files_grid} sx={{ mt: "10px", mx: "10px", width: '100%' ,height: "80vh", display: 'flex', flexDirection: 'column', borderRadius: "12px", backdropFilter: "blur(100px)", borderStyle: 'solid', borderWidth: 'medium', borderColor: 'white', textAlign: 'center' }}>
+            <Box sx={{ fontSize: "10px", marginBottom: '10px', justifyContent: 'center', textAlign: 'center', paddingTop: 1 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}> <h1>Welcome Admin - {userData.username}</h1> <AdminIcon style={{ marginLeft: '5px' }} /> </Box>
+            <Box sx={{ flex: 1, overflow: 'hidden', zIndex: '-1'}}>
+              {
+                gridLoading && <LinearProgress size={75} />
+              }
+              {
+                !gridLoading &&
+                <DataGrid rows={rows} columns={columns} onRowDoubleClick={(row) => { setEditData(row.row); setEditDialogOpen(true); }} onRowSelectionModelChange={handleSelectionChange} style={{ backdropFilter: "blur(300px)", fontWeight: "bold", overflow: 'hidden', borderColor: 'transparent', borderRadius: '12px' }} />
+              }
+            </Box>
+          </Box>
         </div>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", }}>
-          <Stack spacing={2} direction="row" alignContent='center' justifyContent='center' style={{ marginTop: "10px", marginBottom: "10px", paddingTop: "20px", paddingBottom: "20px", paddingRight: "15px", paddingLeft: "15px", backdropFilter: "blur(100px)", width: "20%", borderRadius: '12px', borderStyle: 'dashed' }}>
+          <Stack spacing={2} direction="row" alignContent='center' justifyContent='center' style={{ marginTop: "10px", marginBottom: "10px", paddingTop: "20px", paddingBottom: "20px", paddingRight: "15px", paddingLeft: "15px", backdropFilter: "blur(300px)", width: "20%", borderRadius: '12px', borderStyle: 'solid', borderColor: 'white' }}>
             <Button onClick={() => {
               setDeleteId(selectedRow[0]);
               if (selectedRow[0] !== undefined) {

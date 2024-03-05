@@ -102,7 +102,7 @@ void print_general_info(gen_inf_s gis);
  * @param gis the global info table
  * @param filename the json f-name
  */
-void save_gis_to_json(gen_inf_s gis, char * filename);
+void save_gis_to_json(gen_inf_s gis, char * filename, uint32_t num_ports_g, uint32_t num_hosts_g, double duration);
 
 /**
  * @brief create's the packet time stamp 'my type' aka wrshrk time-format string

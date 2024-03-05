@@ -55,6 +55,7 @@ const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
         notify("File uploaded successfully", NOTIFY_TYPES.success);
       } else if (response?.status === 409) {
         notify("Duplicate file", NOTIFY_TYPES.warn);
+        setFile(null)
       } else {
         notify("Failed to upload file", NOTIFY_TYPES.error);
       }
@@ -63,7 +64,7 @@ const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
     } catch (error) {
       if (String(error.response.data).indexOf("-duplicate") !== -1) {
         notify("Duplicate file", NOTIFY_TYPES.warn);
-        userAnalyzeDataCallback()
+        setFile(null)
       } else {
         if (error.response?.status === 400) {
           notify("bad file uploaded. please upload a valid file.", NOTIFY_TYPES.error);

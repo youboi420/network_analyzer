@@ -1,0 +1,22 @@
+{
+  "L2_coversations":[
+    {
+      "conv_id":0,
+      "src_mac":"98:5d:82:11:54:49",
+      "dest_mac":"ff:ff:ff:ff:ff:ff",
+      "packets":1,
+      "packets_from_a_to_b":1,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Jun  3, 2021 09:16:34.917451 IDT",
+          "time_stamp_date_js":"2021-06-03T09:16:34.917451+03:00",
+          "time_stamp_raw_sec":1622700994,
+          "time_stamp_raw_usec":917451,
+          "time_stamp_rltv":0.280252,
+          "type":"ARP REQUEST"
+        }
+      ]
+    }
+  ]
+}

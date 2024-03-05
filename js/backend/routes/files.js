@@ -67,13 +67,98 @@ const upload = multer({ storage })
 
 filesRoute.use(cookieParser())
 
-filesRoute.get('/json_data/:id', async (req, res) => {
+filesRoute.get('/gis/:id', async (req, res) => {
   const options = {
     root: path.join('')
   }
-  // const file_id = req.body.file_id
   try {
+    const file_id = req.params.id
+    const userCookie = await cookie_service.decodeCookie(req.cookies)
+    if (file_id === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    }
+    else if (userCookie === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    } else {
+      let error_flag = false
+      const decoded = jwt.verify(req.cookies.jwt, SEC_KEY, (err) => {
+        if (err) {
+          error_flag = true
+        }
+      })
+      if (error_flag) {
+        res.status(403).send({message: "unauthoraized access"})
+      } else {
+        const user_id = userCookie.decoded.id
+        const file_id_as_num = Number(file_id)
+        const is_owner = await pcap_files_service.is_owner(file_id_as_num, user_id)
+        if (is_owner.success !== true) {
+          res.status(403).send({message: "unauthoraized access"})
+        } else {
+          try {
+            const file = await pcap_files_service.get_file_by_fileid(file_id)
+            const report = await reports_service.get_report_by_pcap_id(file_id)
+            console.log("got:", file);
+            console.log("got:", report);
+            if (file.success === true && report.success === true) {
+              // const fileName = file.file.path
+              const fileName = 'bin/reports/out_gis.json'
+              res.status(200).sendFile(fileName, options, function (err) {
+                if (err) {
+                  console.error('Error sending file:', err)
+                  res.status(400).send({message: "requested file is invalid."})
+                } else {
+                  console.log('Sent: ', fileName + "|:|" + file_id)
+                }
+              })
+            } else {
+              res.status(400).send({message: "requested file is invalid."})
+            }
+          } catch (error) {
+            res.status(500).send({message: error})
+          }
+        }
+      }
+    }
+  } catch (error) {
+    if (error?.decoded === undefined) {
+    res.status(401).json({ message: "no cookie provided" })
+    } else {
+      res.status(500).send()
+    }
+  }
+// })
 
+  // res.sendFile('./bin/reports/out_L2.json', (err) => {
+  //   if (err) {
+  //     console.log("Error reading file:", err)
+  //   } else {
+  //     console.log("Read file successfully...")
+  //   }
+  // })
+  // const filePath = path.join('./bin/reports/out_L4.json')
+  // fs.readFile(filePath, 'utf8', (err, data) => {
+  //   if (err) {
+  //     console.error('Error reading JSON file:', err)
+  //     res.status(500).json({ error: 'Internal Server Error' })
+  //     return
+  //   }
+  //   try {
+  //     const jsonData = JSON.parse(data)
+  //     res.json(jsonData)
+  //   } catch (parseError) {
+  //     console.error('Error parsing JSON:', parseError)
+  //     res.status(500).json({ error: 'Internal Server Error' })
+  //   }
+  // })
+})
+
+
+filesRoute.get('/l4/:id', async (req, res) => {
+  const options = {
+    root: path.join('')
+  }
+  try {
     const file_id = req.params.id
     const userCookie = await cookie_service.decodeCookie(req.cookies)
     if (file_id === undefined) {
@@ -123,33 +208,75 @@ filesRoute.get('/json_data/:id', async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).send()
+    if (error?.decoded === undefined) {
+    res.status(401).json({ message: "no cookie provided" })
+    } else {
+      res.status(500).send()
+    }
   }
-// })
+})
 
-  // res.sendFile('./bin/reports/out_L2.json', (err) => {
-  //   if (err) {
-  //     console.log("Error reading file:", err)
-  //   } else {
-  //     console.log("Read file successfully...")
-  //   }
-  // })
-  // const filePath = path.join('./bin/reports/out_L4.json')
-  // fs.readFile(filePath, 'utf8', (err, data) => {
-  //   if (err) {
-  //     console.error('Error reading JSON file:', err)
-  //     res.status(500).json({ error: 'Internal Server Error' })
-  //     return
-  //   }
-  //   try {
-  //     const jsonData = JSON.parse(data)
-  //     res.json(jsonData)
-  //   } catch (parseError) {
-  //     console.error('Error parsing JSON:', parseError)
-  //     res.status(500).json({ error: 'Internal Server Error' })
-  //   }
-  // })
+
+filesRoute.get('/l2/:id', async (req, res) => {
+  const options = {
+    root: path.join('')
+  }
+  try {
+    const file_id = req.params.id
+    const userCookie = await cookie_service.decodeCookie(req.cookies)
+    if (file_id === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    }
+    else if (userCookie === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    } else {
+      let error_flag = false
+      const decoded = jwt.verify(req.cookies.jwt, SEC_KEY, (err) => {
+        if (err) {
+          error_flag = true
+        }
+      })
+      if (error_flag) {
+        res.status(403).send({message: "unauthoraized access"})
+      } else {
+        const user_id = userCookie.decoded.id
+        const file_id_as_num = Number(file_id)
+        const is_owner = await pcap_files_service.is_owner(file_id_as_num, user_id)
+        if (is_owner.success !== true) {
+          res.status(403).send({message: "unauthoraized access"})
+        } else {
+          try {
+            const file = await pcap_files_service.get_file_by_fileid(file_id)
+            const report = await reports_service.get_report_by_pcap_id(file_id)
+            console.log("got:", file);
+            console.log("got:", report);
+            if (file.success === true && report.success === true) {
+              // const fileName = file.file.path
+              const fileName = 'bin/reports/out_L2.json'
+              res.status(200).sendFile(fileName, options, function (err) {
+                if (err) {
+                  console.error('Error sending file:', err)
+                  res.status(400).send({message: "requested file is invalid."})
+                } else {
+                  console.log('Sent: ', fileName + "|:|" + file_id)
+                }
+              })
+            } else {
+              res.status(400).send({message: "requested file is invalid."})
+            }
+          } catch (error) {
+            res.status(500).send({message: error})
+          }
+        }
+      }
+    }
+  } catch (error) {
+    if (error?.decoded === undefined) {
+    res.status(401).json({ message: "no cookie provided" })
+    } else {
+      res.status(500).send()
+    }
+  }
 })
 
 // filesRoute.get('/all', async (req, res) => {
@@ -204,7 +331,7 @@ filesRoute.post('/upload', upload.single('file'), async (req, res) => {
   const filename = req.file.filename
   const filepath = req.file.path
   if (jwtCookie === undefined) {
-    res.status(403).json({ message: "no cookie provided" })
+    res.status(401).json({ message: "no cookie provided" })
   } else {
     if (!req.file.filename.endsWith(".pcap")) {
       res.status(403).send({ success: false, message: "invalid file type" })
@@ -264,8 +391,6 @@ filesRoute.get('/download/:id', async (req, res) => {
         if (err) {
           console.error('Error sending file:', err)
           res.status(400).send({message: "requested file is invalid."})
-        } else {
-          console.log('Sent: ', file.r.path + "|:|" + file_id)
         }
       })
     } else {

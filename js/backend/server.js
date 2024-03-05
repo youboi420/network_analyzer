@@ -4,6 +4,11 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
+// import http from 'http'
+// import Socket from 'socket.io'
+// const server = http.createServer(app)
+// const io = Socket(server)
+
 /* local moudle's and servies*/
 import * as db_service from './services/sql_services/db_service.js'
 import * as users_service from './services/sql_services/users_service.js'
@@ -36,6 +41,7 @@ app.use(express.json())
 app.use(cookieParser())
 dotenv.config()
 
+
 app.use('/analyze', analyzeRoute)
 app.use('/files', filesRoute)
 app.use('/auth', authRouter)
@@ -60,3 +66,37 @@ const initialize_server = async () => {
 }
 
 initialize_server()
+
+const stocks = [
+  { id: 1, ticker: "AAPL", price: 497.48 },
+  { id: 2, ticker: "MSFT", price: 213.02 },
+  { id: 3, ticker: "AMZN", price: 3284.72 },
+]
+function getRandomStock() {
+  return Math.round(Math.random() * (2 - 0) + 0)
+}function getRandomPrice() {
+  return Math.random() * (5000 - 20) + 20
+}
+
+db_service.connection.on('update', (data) => {
+  console.log('------------- Update received:', data);
+})
+
+app.get("/stocks", function (req, res) {
+  res.status(200).json({ success: true, data: stocks })
+})
+
+app.get("/realtime-price", function (req, res) {
+  res.writeHead(200, {
+    Connection: "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  })
+  setInterval(() => {
+    res.write(
+      "data:" +
+        JSON.stringify({ ...stocks[getRandomStock()], price: getRandomPrice() })
+    )
+    res.write("\\n\\n")
+  }, 10000)
+})

@@ -29,8 +29,6 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
         onSuccess()
         onClose()
       } else {
-
-        alert("One or more fields are invalid")
         setUsernameError(isUsernameValid(newUsername) ? '' : userErrMsg)
         setPasswordError(isPasswordValid(newPassword) ? '' : passErrMsg)
         setAdminError(isAdminValid(newIsAdmin) ? '' : adminErrMsg)

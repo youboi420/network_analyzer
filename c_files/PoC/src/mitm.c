@@ -120,8 +120,10 @@ void save_L2_convs_to_json(arp_conv convs[MAX_L2_CONVERSATIONS], const char *fil
     arp_packet_node_s *temp;
     size_t i;
     FILE *fp;
-    const char ARP_REQ[] = "ARP REQUEST";
-    const char ARP_RES[] = "ARP RESPONSE";
+    /* const char ARP_REQ[] = "ARP REQUEST";
+    const char ARP_RES[] = "ARP RESPONSE"; */
+    const char ARP_REQ[] = "REQ";
+    const char ARP_RES[] = "RES";
     char *ts_date;
 
     if (convs == NULL)
@@ -171,6 +173,8 @@ void save_L2_convs_to_json(arp_conv convs[MAX_L2_CONVERSATIONS], const char *fil
                     json_object_object_add(packet_info, "time_stamp_raw_sec", json_object_new_uint64(temp->time_stamp.tv_sec));
                     json_object_object_add(packet_info, "time_stamp_raw_usec", json_object_new_uint64(temp->time_stamp.tv_usec));
                     json_object_object_add(packet_info, "time_stamp_rltv", json_object_new_double((temp->time_stamp_rltv)));
+                    json_object_object_add(packet_info, "from_mac", json_object_new_string(ether_ntoa(&(temp->src_mac))));
+                    json_object_object_add(packet_info, "to_mac", json_object_new_string(ether_ntoa(&(temp->dest_mac))));
                     json_object_object_add(packet_info, "type", json_object_new_string(temp->p_type == ARP_TYPE_REPLAY ? ARP_RES : ARP_REQ));
                     json_object_array_add(packets_arr, packet_info);
                 }

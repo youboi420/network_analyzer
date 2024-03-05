@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
+
+.data_title {
+    font-family: "Noto Serif Hebrew", serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+    color: #1976d2;
+}
+
+.gridHeader {
+    color: black;
+    font-family: "Fjalla One", sans-serif;
+    font-size: 22px;
+}
+/* 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
+
+.grid_title {
+    font-family: "Noto Serif Hebrew", serif;
+    font-family: monospace;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: bold;
+    font-variation-settings: "wdth" 100;
+    color: red;
+}
+
+.grid_content {
+    font-family: "Fjalla One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+*/

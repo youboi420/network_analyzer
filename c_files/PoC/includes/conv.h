@@ -3,6 +3,7 @@
 #include "utils.h"
 
 /* libs includes */
+#include <time.h>
 #include <pcap.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>

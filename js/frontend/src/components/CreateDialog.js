@@ -12,15 +12,15 @@ const UserCreateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, onSucc
   const [newPassword, setNewPassword] = useState('')
   const [repeatPasseord, setRepeatPasseord] = useState('')
   const [newIsAdmin, setNewIsAdmin] = useState('')
+  const [adminError, setAdminError] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [passwordMissError, setPasswordMissError] = useState('')
-  const [adminError, setAdminError] = useState('')
 
   const userErrMsg = 'No spaces allowed or special chars'
   const passErrMsg = 'Minimum length of 6 characters'
   const passErrMissMsg = "Password's do not match"
-  const adminErrMsg = ''
+  const adminErrMsg = "empty or invalid option"
 
   const isUsernameValid = (username) => /^[a-zA-Z][a-zA-Z0-9]{0,250}$/.test(username)
   const isPasswordValid = (password) => password.length >= 6 && /^.{0,250}$/.test(password)
@@ -36,7 +36,6 @@ const UserCreateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, onSucc
         onSuccess()
         onClose()
       } else {
-        alert("One or more fields are invalid")
         setUsernameError(isUsernameValid(newUsername) ? '' : userErrMsg)
         setPasswordError(isPasswordValid(newPassword) ? '' : passErrMsg)
         setAdminError(isAdminValid(newIsAdmin) ? '' : adminErrMsg)

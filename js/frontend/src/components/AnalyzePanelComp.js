@@ -1,6 +1,6 @@
 import { Box, Button, ButtonGroup, FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material';
+import { LineChart } from '@mui/x-charts/LineChart'
 import React, { useEffect, useState } from 'react';
-import { NOTIFY_TYPES, notify } from '../services/notify_service';
 
 import AnalyzeIcon from '@mui/icons-material/TravelExplore';
 import InfoIcon from '@mui/icons-material/InfoOutlined';
@@ -11,19 +11,43 @@ import SwitchIcon from '@mui/icons-material/DnsOutlined';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import DDOSIcon from '@mui/icons-material/Groups';
 import MITMIcon from '@mui/icons-material/RemoveModerator';
+import LeftIcon from '@mui/icons-material/West';
 import SouthWestIcon from '@mui/icons-material/SouthWest';
 import DeselectIcon from '@mui/icons-material/Deselect';
 import AnalyzePageStyle from '../Style/AnalyzePage.module.css';
 
+import { NOTIFY_TYPES, notify } from '../services/notify_service';
 import * as analyze_service from '../services/analyze_service'
 import * as file_service from '../services/files_service'
+import AnalyzePanelGISView from './AnalyzePanelGISView';
+import AnalyzePanelL4View from './AnalyzePanelL4View';
+import AnalyzePanelL2View from './AnalyzePanelL2View';
+import GraphL4Comp from './GraphL4Comp';
 
-function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeLoading, analyzeEndError }) {
+const sleep = (milliseconds) => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve()
+    }, milliseconds)
+  })
+}
+const SLEEP_CONST = 350
+function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeLoading, analyzeEndError, openViewPanel }) {
   const ANALYZE_L4 = "Analyze L4"
+  const GRAPH_L4 = "Graph L4"
+  const GRAPH_L2 = "Graph L2"
   const ATTACKS = "Analyze attacks"
   const [analyzeL4Mode, setAnalyzeL4Mode] = useState("both");
   const [analyzeAttacksMode, setAnalyzeAttacksMode] = useState("both");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isAnalyzeGISViewOpen, setIsAnalyzeGISViewOpen] = useState(false)
+  const [isAnalyzeL4ViewOpen, setIsAnalyzeL4ViewOpen] = useState(false)
+  const [isAnalyzeL2ViewOpen, setIsAnalyzeL2ViewOpen] = useState(false)
+  const [isGraphL4ViewOpen, setIsGraphL4ViewOpen] = useState(false)
+  const [jsonData, setJsonData] = useState({})
+  const [gisFetchingStatus, setGISFetchingStatus] = useState(false)
+  const [l4FetchingStatus, setL4FetchingStatus] = useState(false)
+  const [l2FetchingStatus, setL2FetchingStatus] = useState(false)
   
   const button_spacing = 4
 
@@ -35,24 +59,35 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
     setAnalyzeAttacksMode(event.target.value)
   }
 
-  const handleL4AnalyzeClicked = () => {
+  const handleL4AnalyzeClicked = async () => {
     if (data.file_id !== undefined) {
       if (data.analyzed !== 1) {
         notify(`FILE: ${data.filename} is not analyzed`, NOTIFY_TYPES.warn)
       } else {
-        notify(`FILE: ${data.filename} L4 pressed with mode ` + analyzeL4Mode, NOTIFY_TYPES.info)
+        /* fetch data */
+        setL4FetchingStatus(false)
+        setIsAnalyzeL4ViewOpen(true)
+        const serverJsonData = await analyze_service.getL4JsonData(data.file_id)
+        await sleep(SLEEP_CONST)
+        setJsonData(serverJsonData)
+        setL4FetchingStatus(true)
       }
     } else {
       notify("no file is selected...", NOTIFY_TYPES.short_error);
     }
   };
 
-  const handleL2AnalyzeClicked = () => {
+  const handleL2AnalyzeClicked = async () => {
     if (data.file_id !== undefined) {
       if (data.analyzed !== 1) {
         notify(`FILE: ${data.filename} is not analyzed`, NOTIFY_TYPES.warn)
       } else {
-        notify(`FILE: ${data.filename} L2 pressed...`, NOTIFY_TYPES.info)
+        const serverJsonData = await analyze_service.getL2JsonData(data.file_id)
+        setL2FetchingStatus(false)
+        setIsAnalyzeL2ViewOpen(true)
+        await sleep(SLEEP_CONST)
+        setJsonData(serverJsonData)
+        setL2FetchingStatus(true)
       }
     } else {
       notify("no file is selected...", NOTIFY_TYPES.short_error);
@@ -64,7 +99,7 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
       if (data.analyzed !== 1) {
         notify(`FILE: ${data.filename} is not analyzed`, NOTIFY_TYPES.warn)
       } else {
-        notify(`FILE: ${data.filename} Graph 1 pressed...`, NOTIFY_TYPES.info)
+        setIsGraphL4ViewOpen(true)
       }
     } else {
       notify("no file is selected...", NOTIFY_TYPES.short_error);
@@ -114,13 +149,14 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
     try {
       if (file_id !== undefined) {
         if (data.analyzed !== 1) {
-          analyzeLoading()
           const res = await analyze_service.analyze(file_id)
+          analyzeLoading()
           notify(`FILE: ${data.filename} is now analyzed!`, NOTIFY_TYPES.success);
           fetchDataCallBack()
         } else {
           notify(`FILE: ${data.filename} ALREADY ANALYZED!`, NOTIFY_TYPES.info);
-          resetDataFallBack()
+          return
+          // resetDataFallBack()
         }
       } else {
         notify("no file is selected...", NOTIFY_TYPES.short_error);
@@ -131,39 +167,53 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
     }
   }
 
+  const handleGeneralInfo = async () => {
+    // fetch the json data of file data.file_id and open the analyze panel view.
+    const serverJsonData = await analyze_service.getGISJsonData(data.file_id)
+    setGISFetchingStatus(false)
+    setIsAnalyzeGISViewOpen(true)
+    await sleep(SLEEP_CONST)
+    setJsonData(serverJsonData)
+    setGISFetchingStatus(true)
+  }
+
   return (
     <div className={AnalyzePageStyle.file_info}>
+      <AnalyzePanelGISView isOpen={isAnalyzeGISViewOpen} onCloseCallBack={() => {setIsAnalyzeGISViewOpen(false)}} fileData={data} jsonData={jsonData} fetchingStatus={gisFetchingStatus} />
+      <AnalyzePanelL4View  isOpen={isAnalyzeL4ViewOpen}  onCloseCallBack={() => {setIsAnalyzeL4ViewOpen(false)}}  fileData={data} jsonData={jsonData} fetchingStatus={l4FetchingStatus} l4Mode={analyzeL4Mode} />
+      <AnalyzePanelL2View  isOpen={isAnalyzeL2ViewOpen}  onCloseCallBack={() => {setIsAnalyzeL2ViewOpen(false)}}  fileData={data} jsonData={jsonData} fetchingStatus={l2FetchingStatus}/>
+      <GraphL4Comp isOpen={isGraphL4ViewOpen} onCloseCallBack={() => {setIsGraphL4ViewOpen(false)}} fileData={data} l4Mode={analyzeL4Mode} /* fetchingStatus={l2FetchingStatus} *//>
+
       <div style={{ textAlign: 'center', fontSize: "28px", paddingTop: 20 }}>
         <div >{(data.file_id === undefined ? "pick a file from your uploaded files" : "id {" + data.file_id + "} is selected")}</div>
         <div style={{color: data.filename === undefined ? "transparent" : "black" }} >{(data.filename === undefined ? "pick a file from your uploaded files" : "filename: " + data.filename)}</div>
-        <div style={{color: data.owner_id === undefined ? "transparent" : "black" }} >{(data.owner_id === undefined ? "pick a file from your uploaded files" : "owner's id: " + data.owner_id)}</div>
       </div>
-      <Stack sx={{ p: 2, mt: 2}} spacing={button_spacing}>
+      <Stack sx={{ p: 2, mt: 6}} spacing={button_spacing}>
         <Stack alignItems="center" justifyContent={'center'}>
-          <Button color='primary' variant='contained' size='large' onClick={handleMainAnalyzeClicked} sx={{ width: '500px' }}> <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}}> Analyze <AnalyzeIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3> </Button>
+          <Button disabled={data.analyzed  !== 1 ? false : true} color='primary' variant='contained' size='large' onClick={handleMainAnalyzeClicked} sx={{ width: '500px' }}> {data.owner_id  === undefined ? <LeftIcon style={{ paddingBottom: 5, marginRight: '5px', fontSize: '64px' }} /> : null} <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}}> {data.owner_id  !== 1 ? "Select a file"  : "Analyze"} {data.owner_id  === undefined ? null : <AnalyzeIcon style={{ paddingBottom: 5, marginLeft: '5px' }} />} </h3> </Button>
         </Stack>
 
         <Stack alignItems="center" justifyContent={'center'}>
-          <Button color='primary' variant='contained' size='large' onClick={handleMainAnalyzeClicked} sx={{ width: '500px' }}> <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}}> General Info <InfoIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3> </Button>
+          <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleGeneralInfo} sx={{ width: '500px' }}> <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}}> General Info <InfoIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3> </Button>
         </Stack>
 
-        <Stack spacing={10} direction={'row'} alignItems="center" justifyContent={'center'}>
+        <Stack spacing={1} direction={'row'} alignItems="center" justifyContent={'center'}>
           <Stack spacing={button_spacing} direction={'column'} alignItems="center" justifyContent={'center'} >
             <Stack spacing={1} direction={'row'} width={300} >
-              <FormControl color='warning' sx={{}}>
-                <InputLabel >Type</InputLabel>
-                <Select label="analyze L4" fullWidth={false} value={analyzeL4Mode} onChange={handleL4ModeSelectClicked} >
-                  <MenuItem value="both">Both</MenuItem>
-                  <MenuItem value="TCP" >TCP </MenuItem>
-                  <MenuItem value="UDP" >UDP </MenuItem>
+              <FormControl color='secondary' >
+                <InputLabel sx={{color: "black"}}>Type</InputLabel>
+                <Select disabled={data.analyzed  !== 1 ? true : false} label="analyze L4" fullWidth={false} value={analyzeL4Mode} onChange={handleL4ModeSelectClicked} >
+                  <MenuItem value={analyze_service.l4MODES.BOTH}> {analyze_service.l4MODES.BOTH} </MenuItem>
+                  <MenuItem value={analyze_service.l4MODES.TCP} > {analyze_service.l4MODES.TCP} </MenuItem>
+                  <MenuItem value={analyze_service.l4MODES.UDP} > {analyze_service.l4MODES.UDP} </MenuItem>
                 </Select>
               </FormControl>
               <ButtonGroup orientation="vertical">
-                <Button color='primary' variant='contained' size='large' onClick={handleL4AnalyzeClicked}>
-                  <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} >{analyzeL4Mode === "TCP" ? `${ANALYZE_L4} TCP` : analyzeL4Mode === "UDP" ? `${ANALYZE_L4} UDP` : `${ANALYZE_L4} All`} <SearchIcon style={{ paddingBottom: 7, marginLeft: '5px', fontSize: '22px' }}/> </h3>
+                <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleL4AnalyzeClicked}>
+                  <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} > {analyzeL4Mode === analyze_service.l4MODES.TCP ? `${ANALYZE_L4} ${analyze_service.l4MODES.TCP}` : analyzeL4Mode === analyze_service.l4MODES.UDP ? `${ANALYZE_L4} ${analyze_service.l4MODES.UDP}` : `${ANALYZE_L4} Both`} <SearchIcon style={{ paddingBottom: 7, marginLeft: '5px', fontSize: '22px' }}/> </h3>
                 </Button>
-                <Button color='primary' variant='contained' size='large' onClick={handleL2AnalyzeClicked}>
-                  <h1 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '18px', fontFamily: 'inherit'}} > Analyze L2 <SwitchIcon style={{ paddingBottom: 7, marginLeft: '5px', fontSize: '22px' }}/>  </h1>
+                <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleL2AnalyzeClicked}>
+                  <h1 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '18px', fontFamily: 'inherit'}} > Analyze L2 <SwitchIcon style={{ paddingBottom: 4, marginLeft: '5px', fontSize: '22px' }}/>  </h1>
                 </Button>
               </ButtonGroup>
             </Stack>
@@ -171,12 +221,12 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
           
           <Stack spacing={button_spacing} direction={'column'} alignItems="center" justifyContent={'center'} sx={{pr: 11}}>
             <ButtonGroup orientation="vertical">
-              <Button color='primary' variant='contained' size='large' onClick={handleGraph1Clicked}>
-                <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} >Graph 1 <GraphIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3>
+              <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleGraph1Clicked}>
+                <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} > {analyzeL4Mode === analyze_service.l4MODES.TCP ? `${GRAPH_L4} ${analyze_service.l4MODES.TCP}` : analyzeL4Mode === analyze_service.l4MODES.UDP ? `${GRAPH_L4} ${analyze_service.l4MODES.UDP}` : `${GRAPH_L4} Both`}  <GraphIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3>
               </Button>
 
-              <Button color='primary' variant='contained' size='large' onClick={handleGraph2Clicked}>
-                <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} > Graph 2 <GraphIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3>
+              <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleGraph2Clicked}>
+                <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} > {GRAPH_L2} <GraphIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3>
               </Button>
             </ButtonGroup>
           </Stack>
@@ -184,15 +234,15 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
 
         <Stack spacing={button_spacing + 5} direction={'row'} alignItems="center" justifyContent={'center'} sx={{pr: 10}}>
           <Stack spacing={2} direction={'row'} alignItems="center" justifyContent={'center'} >
-            <FormControl color='warning'>
-              <InputLabel >Type</InputLabel>
-              <Select label="analyze" fullWidth={false} value={analyzeAttacksMode} onChange={handleAttacksSelectClicked} >
+            <FormControl color='secondary'>
+              <InputLabel  sx={{color: "black"}}>Type</InputLabel>
+              <Select disabled={data.analyzed  !== 1 ? true : false} label="analyze" fullWidth={false} value={analyzeAttacksMode} onChange={handleAttacksSelectClicked} >
                 <MenuItem value="both">Both</MenuItem>
                 <MenuItem value="DDOS" >DDOS </MenuItem>
                 <MenuItem value="MITM" >MITM </MenuItem>
               </Select>
             </FormControl>
-            <Button color='primary' variant='contained' size='large' onClick={handleAttackClicked}>
+            <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleAttackClicked}>
               <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}} > {analyzeAttacksMode === "DDOS" ? `${ATTACKS} - DDOS` : analyzeAttacksMode === "MITM" ? `${ATTACKS} - MITM` : `${ATTACKS} - Both`} {analyzeAttacksMode === "DDOS" ? <DDOSIcon style={{paddingBottom: 5, marginLeft: '5px'}} /> : analyzeAttacksMode === "MITM" ? <MITMIcon style={{paddingBottom: 8, marginLeft: '5px'}} /> : <TerminalIcon style={{paddingBottom: 5, marginLeft: '5px'}} />}</h3>
             </Button>
           </Stack>
