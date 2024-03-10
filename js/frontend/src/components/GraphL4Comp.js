@@ -70,21 +70,6 @@ const GraphL4Comp = ( { isOpen, onCloseCallBack, fileData, jsonData, fetchingSta
         <div style={{ backgroundColor: "transparent", height: "100vh" }} className={AnalyzePanelViewStyle.data_title} >
           <h1 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} >{title}</h1>
           <TestChartComp xDataPoints={xDataPoints} yDataPoints={yDataPoints}/>
-          {/* {
-            conv_count !== 0 && conv_count !== undefined &&
-            <LineChart
-              xAxis={[{
-                data: xDataPoints
-              }]}
-              series={[
-                {
-                  data: [...yDataPoints],
-                },
-              ]}
-              width={1000}
-              height={500}
-            />
-          } */}
           {
             (conv_count === 0 || conv_count === undefined ) &&
             <h2 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className={AnalyzePanelViewStyle.data_title} >
