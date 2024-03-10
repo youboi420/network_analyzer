@@ -27,8 +27,7 @@ const AnalyzePanelGISView = ({ isOpen, fileData, jsonData, onCloseCallBack, fetc
   const VERBAL_BOX_HEIGHT = "75vh"
   const hostsWithIds = hosts?.map((host, index) => ({ ...host, id: `host_${index}` }));
   const portsWithIds = ports?.map((port, index) => ({ ...port, id: `port_${index}` }));
-
-
+  
   const portsGridCols = [
     { field: "count", headerName: "Number of occurrences", headerAlign: "center", align: "center", flex: 1, },
     { field: "port", headerName: "Port Number", headerAlign: "center", align: "center",  flex: 1 },
@@ -86,7 +85,7 @@ const AnalyzePanelGISView = ({ isOpen, fileData, jsonData, onCloseCallBack, fetc
           { // loading animatio
             !fetchingStatus &&
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', height: '80vh' }}>
-              <CircularProgress style={{ marginTop: '10px' }} size={"100px"} />
+              <CircularProgress style={{ marginTop: '40px' }} size={"100px"} />
             </div>
           }
           { // verbal view

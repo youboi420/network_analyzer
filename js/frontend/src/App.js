@@ -13,6 +13,7 @@ import NavbarComp from './components/NavbarComp';
 import * as user_service from './services/user_service';
 import { Box, LinearProgress } from '@mui/material';
 import LandingPage from './pages/LandingPage';
+import FilesPage from './pages/FilesPage';
 
 function App() {
   const [isValidUser, setIsValidUser] = useState(false);
@@ -57,6 +58,7 @@ function App() {
         <Route path="/users"   element={<UserManagePage isValidUser={isValidUser} userData={usersData} /> } />
         <Route path="/signup"  element={<SignUpPage     isValidUser={isValidUser}/> } />
         <Route path="/analyze" element={<AnaylzePage    isValidUser={isValidUser} userData={usersData} /> } />
+        <Route path="/files"   element={<FilesPage      isValidUser={isValidUser} userData={usersData} /> } />
         <Route path="*"        element={<NoPage         isValidUser={isValidUser}/> } />
       </Routes>
     </BrowserRouter>

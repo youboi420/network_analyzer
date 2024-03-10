@@ -91,7 +91,7 @@ const arpDataTable = (perConvData) => {
                   </h2>
                   <h3>
                     {
-                      Number(convRltvTime) === 0 ? "נשלחה רק פקטה בודדת" :
+                      Number(convRltvTime) === 0 ? "Only one packet sent" :
                         Number(convRltvTime) < 60 ?
                           Number(convRltvTime).toFixed(FLOATING_LIMITER * 3) + " 'sec" :
                           `≈ ${Math.floor(Number(convRltvTime) / 60)}:${(Number(convRltvTime) % 60).toFixed(FLOATING_LIMITER).padStart(2, '0')} 'min`

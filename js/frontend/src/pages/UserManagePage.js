@@ -11,7 +11,7 @@ import AdminIcon from '@mui/icons-material/AdminPanelSettings';
 
 /* my comps */
 import UserUpdateDialog from '../components/UserUpdateDialog'
-import UserCreateDialog from '../components/CreateDialog'
+import UserCreateDialog from '../components/UserCreateDialog'
 import { notify, NOTIFY_TYPES } from '../services/notify_service'
 import { Navigate } from 'react-router-dom'
 import GenereicDeleteDialog from '../components/GenereicDeleteDialog'

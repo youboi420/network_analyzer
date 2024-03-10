@@ -3,11 +3,11 @@ import { Button, Box, Stack, Divider, IconButton, Typography } from '@mui/materi
 import { hostsDataTable, L4_DATA_TYPES } from './L4Common';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import AnalyzePanelViewStyle from '../Style/AnalyzePanelViewStyle.module.css'
 
 const L4ConvPanel = ({ convsDataArray, singleMode, proType }) => {
   const [startIndex, setStartIndex] = React.useState(0);
   const ITEMS_PER_PAGE = proType === L4_DATA_TYPES.TCP ? (!singleMode ? 3 : 5) : (!singleMode ? 5 : 10);
-  
   const handlePrevPage = () => {
     setStartIndex(Math.max(startIndex - ITEMS_PER_PAGE, 0));
   };
@@ -20,19 +20,30 @@ const L4ConvPanel = ({ convsDataArray, singleMode, proType }) => {
 
   return (
     <div style={{ flex: 1,}}>
-      {!singleMode && <h1 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} >{proType}</h1>}
+      {!singleMode && <h1 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: -5, marginBottom: 5 }} className={AnalyzePanelViewStyle.data_title}>{proType}</h1>}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Stack direction="row" alignItems="center" >
-          <IconButton onClick={handlePrevPage} disabled={startIndex === 0}>
-            <FirstPageIcon />
-          </IconButton>
-          <Typography style={{textTransform: "none", marginTop: 5}}>
-            Page: {Math.floor(startIndex / ITEMS_PER_PAGE) + 1} of {totalPages}
-          </Typography>
-          <IconButton onClick={handleNextPage} disabled={startIndex >= convsDataArray?.length - ITEMS_PER_PAGE}>
-            <LastPageIcon />
-          </IconButton>
-        </Stack>
+        {
+          totalPages !== 0 &&
+          <Stack direction="row" alignItems="center" style={{ marginBottom: 10 }}>
+            <IconButton onClick={handlePrevPage} disabled={startIndex === 0}>
+              <FirstPageIcon />
+            </IconButton>
+            <Typography style={{ textTransform: "none", marginTop: 5 }}>
+              Page: {Math.floor(startIndex / ITEMS_PER_PAGE) + 1} of {totalPages}
+            </Typography>
+            <IconButton onClick={handleNextPage} disabled={startIndex >= convsDataArray?.length - ITEMS_PER_PAGE}>
+              <LastPageIcon />
+            </IconButton>
+          </Stack>
+        }
+        {
+          totalPages === 0 &&
+          <div>
+            <h1 className={AnalyzePanelViewStyle.data_title}>
+              {proType} conversations didn't accour
+            </h1>
+          </div>
+        }
       </div>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Stack spacing={1} style={{ width: '95%' }}>

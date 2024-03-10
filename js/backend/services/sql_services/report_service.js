@@ -99,7 +99,7 @@ const get_report_by_pcap_id = (pcap_file_id) => {
           reject({success: false, message: err})
         } else {
           if (res.length > 0) {
-            resolve({success: true, report: res})
+            resolve({success: true, report: res[0]})
           } else {
             reject({success: false})
           }

@@ -1,6 +1,5 @@
-import { Box, Button, ButtonGroup, FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart'
-import React, { useEffect, useState } from 'react';
+import { Button, ButtonGroup, FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material';
+import React from 'react';
 
 import AnalyzeIcon from '@mui/icons-material/TravelExplore';
 import InfoIcon from '@mui/icons-material/InfoOutlined';
@@ -12,8 +11,6 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 import DDOSIcon from '@mui/icons-material/Groups';
 import MITMIcon from '@mui/icons-material/RemoveModerator';
 import LeftIcon from '@mui/icons-material/West';
-import SouthWestIcon from '@mui/icons-material/SouthWest';
-import DeselectIcon from '@mui/icons-material/Deselect';
 import AnalyzePageStyle from '../Style/AnalyzePage.module.css';
 
 import { NOTIFY_TYPES, notify } from '../services/notify_service';
@@ -37,17 +34,17 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
   const GRAPH_L4 = "Graph L4"
   const GRAPH_L2 = "Graph L2"
   const ATTACKS = "Analyze attacks"
-  const [analyzeL4Mode, setAnalyzeL4Mode] = useState("both");
-  const [analyzeAttacksMode, setAnalyzeAttacksMode] = useState("both");
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [isAnalyzeGISViewOpen, setIsAnalyzeGISViewOpen] = useState(false)
-  const [isAnalyzeL4ViewOpen, setIsAnalyzeL4ViewOpen] = useState(false)
-  const [isAnalyzeL2ViewOpen, setIsAnalyzeL2ViewOpen] = useState(false)
-  const [isGraphL4ViewOpen, setIsGraphL4ViewOpen] = useState(false)
-  const [jsonData, setJsonData] = useState({})
-  const [gisFetchingStatus, setGISFetchingStatus] = useState(false)
-  const [l4FetchingStatus, setL4FetchingStatus] = useState(false)
-  const [l2FetchingStatus, setL2FetchingStatus] = useState(false)
+  const [analyzeL4Mode, setAnalyzeL4Mode] = React.useState("both");
+  const [analyzeAttacksMode, setAnalyzeAttacksMode] = React.useState("both");
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [isAnalyzeGISViewOpen, setIsAnalyzeGISViewOpen] = React.useState(false)
+  const [isAnalyzeL4ViewOpen, setIsAnalyzeL4ViewOpen] = React.useState(false)
+  const [isAnalyzeL2ViewOpen, setIsAnalyzeL2ViewOpen] = React.useState(false)
+  const [isGraphL4ViewOpen, setIsGraphL4ViewOpen] = React.useState(false)
+  const [jsonData, setJsonData] = React.useState({})
+  const [gisFetchingStatus, setGISFetchingStatus] = React.useState(false)
+  const [l4FetchingStatus, setL4FetchingStatus] = React.useState(false)
+  const [l2FetchingStatus, setL2FetchingStatus] = React.useState(false)
   
   const button_spacing = 4
 
@@ -65,11 +62,17 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
         notify(`FILE: ${data.filename} is not analyzed`, NOTIFY_TYPES.warn)
       } else {
         /* fetch data */
-        setL4FetchingStatus(false)
         setIsAnalyzeL4ViewOpen(true)
+
+        setL4FetchingStatus(false)
         const serverJsonData = await analyze_service.getL4JsonData(data.file_id)
-        await sleep(SLEEP_CONST)
+        if (serverJsonData === undefined ) {
+          setIsAnalyzeL4ViewOpen(false)
+          notify("Server failed.", NOTIFY_TYPES.error)
+          return
+        }
         setJsonData(serverJsonData)
+        await sleep(SLEEP_CONST)
         setL4FetchingStatus(true)
       }
     } else {
@@ -83,6 +86,11 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
         notify(`FILE: ${data.filename} is not analyzed`, NOTIFY_TYPES.warn)
       } else {
         const serverJsonData = await analyze_service.getL2JsonData(data.file_id)
+        if (serverJsonData === undefined ) {
+          setIsAnalyzeL2ViewOpen(false)
+          notify("Server failed.", NOTIFY_TYPES.error)
+          return
+        }
         setL2FetchingStatus(false)
         setIsAnalyzeL2ViewOpen(true)
         await sleep(SLEEP_CONST)
@@ -94,11 +102,13 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
     }
   }
 
-  const handleGraph1Clicked = () => {
+  const handleGraph1Clicked = async () => {
     if (data.file_id !== undefined) {
       if (data.analyzed !== 1) {
         notify(`FILE: ${data.filename} is not analyzed`, NOTIFY_TYPES.warn)
       } else {
+        const serverJsonData = await analyze_service.getL4JsonData(data.file_id)
+        setJsonData(serverJsonData)
         setIsGraphL4ViewOpen(true)
       }
     } else {
@@ -133,7 +143,7 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
     const file_id = data.file_id
     if (file_id !== undefined) {
       try {
-        const a = await file_service.delete_file(file_id)
+        await file_service.delete_file(file_id)
         notify("File deleted", NOTIFY_TYPES.success)
         fetchDataCallBack()
       } catch (error) {
@@ -149,14 +159,13 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
     try {
       if (file_id !== undefined) {
         if (data.analyzed !== 1) {
-          const res = await analyze_service.analyze(file_id)
           analyzeLoading()
+          await analyze_service.analyze(file_id)
           notify(`FILE: ${data.filename} is now analyzed!`, NOTIFY_TYPES.success);
           fetchDataCallBack()
         } else {
           notify(`FILE: ${data.filename} ALREADY ANALYZED!`, NOTIFY_TYPES.info);
           return
-          // resetDataFallBack()
         }
       } else {
         notify("no file is selected...", NOTIFY_TYPES.short_error);
@@ -169,9 +178,16 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
 
   const handleGeneralInfo = async () => {
     // fetch the json data of file data.file_id and open the analyze panel view.
-    const serverJsonData = await analyze_service.getGISJsonData(data.file_id)
     setGISFetchingStatus(false)
     setIsAnalyzeGISViewOpen(true)
+
+    const serverJsonData = await analyze_service.getGISJsonData(data.file_id)
+  
+    if (serverJsonData === undefined ) {
+      setIsAnalyzeGISViewOpen(false)
+      notify("Server failed.", NOTIFY_TYPES.error)
+      return
+    }
     await sleep(SLEEP_CONST)
     setJsonData(serverJsonData)
     setGISFetchingStatus(true)
@@ -179,10 +195,22 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
 
   return (
     <div className={AnalyzePageStyle.file_info}>
-      <AnalyzePanelGISView isOpen={isAnalyzeGISViewOpen} onCloseCallBack={() => {setIsAnalyzeGISViewOpen(false)}} fileData={data} jsonData={jsonData} fetchingStatus={gisFetchingStatus} />
-      <AnalyzePanelL4View  isOpen={isAnalyzeL4ViewOpen}  onCloseCallBack={() => {setIsAnalyzeL4ViewOpen(false)}}  fileData={data} jsonData={jsonData} fetchingStatus={l4FetchingStatus} l4Mode={analyzeL4Mode} />
-      <AnalyzePanelL2View  isOpen={isAnalyzeL2ViewOpen}  onCloseCallBack={() => {setIsAnalyzeL2ViewOpen(false)}}  fileData={data} jsonData={jsonData} fetchingStatus={l2FetchingStatus}/>
-      <GraphL4Comp isOpen={isGraphL4ViewOpen} onCloseCallBack={() => {setIsGraphL4ViewOpen(false)}} fileData={data} l4Mode={analyzeL4Mode} /* fetchingStatus={l2FetchingStatus} *//>
+      {
+        jsonData &&
+        <AnalyzePanelGISView isOpen={isAnalyzeGISViewOpen} onCloseCallBack={() => {setIsAnalyzeGISViewOpen(false)}} fileData={data} jsonData={jsonData} fetchingStatus={gisFetchingStatus} />
+      }
+      {
+        jsonData &&
+        <AnalyzePanelL4View  isOpen={isAnalyzeL4ViewOpen}  onCloseCallBack={() => {setIsAnalyzeL4ViewOpen(false)}}  fileData={data} jsonData={jsonData} fetchingStatus={l4FetchingStatus} l4Mode={analyzeL4Mode} />
+      }
+      {
+        jsonData &&
+        <AnalyzePanelL2View  isOpen={isAnalyzeL2ViewOpen}  onCloseCallBack={() => {setIsAnalyzeL2ViewOpen(false)}}  fileData={data} jsonData={jsonData} fetchingStatus={l2FetchingStatus}/>
+      }
+      {
+        jsonData &&
+        <GraphL4Comp isOpen={isGraphL4ViewOpen} onCloseCallBack={() => {setIsGraphL4ViewOpen(false)}} fileData={data} l4Mode={analyzeL4Mode} jsonData={jsonData} conv_count={jsonData?.conv_count} />
+      }
 
       <div style={{ textAlign: 'center', fontSize: "28px", paddingTop: 20 }}>
         <div >{(data.file_id === undefined ? "pick a file from your uploaded files" : "id {" + data.file_id + "} is selected")}</div>
@@ -190,7 +218,7 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
       </div>
       <Stack sx={{ p: 2, mt: 6}} spacing={button_spacing}>
         <Stack alignItems="center" justifyContent={'center'}>
-          <Button disabled={data.analyzed  !== 1 ? false : true} color='primary' variant='contained' size='large' onClick={handleMainAnalyzeClicked} sx={{ width: '500px' }}> {data.owner_id  === undefined ? <LeftIcon style={{ paddingBottom: 5, marginRight: '5px', fontSize: '64px' }} /> : null} <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}}> {data.owner_id  !== 1 ? "Select a file"  : "Analyze"} {data.owner_id  === undefined ? null : <AnalyzeIcon style={{ paddingBottom: 5, marginLeft: '5px' }} />} </h3> </Button>
+          <Button disabled={data.analyzed  !== 1 ? false : true} color='primary' variant='contained' size='large' onClick={handleMainAnalyzeClicked} sx={{ width: '500px' }}> {data.owner_id  === undefined ? <LeftIcon style={{ paddingBottom: 5, marginRight: '5px', fontSize: '64px' }} /> : null} <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '20px', fontFamily: 'inherit'}}> {data.file_id === undefined ? "Select a file"  : "Analyze"} {data.owner_id  === undefined ? null : <AnalyzeIcon style={{ paddingBottom: 5, marginLeft: '5px' }} />} </h3> </Button>
         </Stack>
 
         <Stack alignItems="center" justifyContent={'center'}>
@@ -224,7 +252,6 @@ function AnalyzePanelComp({ data, fetchDataCallBack, resetDataFallBack, analyzeL
               <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleGraph1Clicked}>
                 <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} > {analyzeL4Mode === analyze_service.l4MODES.TCP ? `${GRAPH_L4} ${analyze_service.l4MODES.TCP}` : analyzeL4Mode === analyze_service.l4MODES.UDP ? `${GRAPH_L4} ${analyze_service.l4MODES.UDP}` : `${GRAPH_L4} Both`}  <GraphIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3>
               </Button>
-
               <Button disabled={data.analyzed  !== 1 ? true : false} color='primary' variant='contained' size='large' onClick={handleGraph2Clicked}>
                 <h3 style={{ textTransform: 'none', display: 'flex', alignItems: 'center', fontSize: '16px', fontFamily: 'inherit'}} > {GRAPH_L2} <GraphIcon style={{ paddingBottom: 5, marginLeft: '5px' }} /> </h3>
               </Button>

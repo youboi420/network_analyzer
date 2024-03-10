@@ -23,17 +23,28 @@ const L2ConvComp = ({ convsDataArray }) => {
     <div style={{ flex: 1 }}>
       <h1 className={AnalyzePanelViewStyle.data_title}  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>Layer 2 - ARP Conversations</h1>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Stack direction="row" alignItems="center" >
-          <IconButton onClick={handlePrevPage} disabled={startIndex === 0}>
-            <FirstPageIcon />
-          </IconButton>
-          <Typography style={{textTransform: "none", marginTop: 5}}>
-            Page: {Math.floor(startIndex / ITEMS_PER_PAGE) + 1} of {totalPages}
-          </Typography>
-          <IconButton onClick={handleNextPage} disabled={startIndex >= convsDataArray?.length - ITEMS_PER_PAGE}>
-            <LastPageIcon />
-          </IconButton>
-        </Stack>
+        {
+          totalPages !== 0 &&
+          <Stack direction="row" alignItems="center" >
+            <IconButton onClick={handlePrevPage} disabled={startIndex === 0}>
+              <FirstPageIcon />
+            </IconButton>
+            <Typography style={{textTransform: "none", marginTop: 5}}>
+              Page: {Math.floor(startIndex / ITEMS_PER_PAGE) + 1} of {totalPages}
+            </Typography>
+            <IconButton onClick={handleNextPage} disabled={startIndex >= convsDataArray?.length - ITEMS_PER_PAGE}>
+              <LastPageIcon />
+            </IconButton>
+          </Stack>
+        }
+        {
+          totalPages === 0 &&
+          <div>
+            <h1 className={AnalyzePanelViewStyle.data_title}>
+              Arp conversations didn't accour
+            </h1>
+          </div>
+        }
       </div>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Stack spacing={1} style={{ width: '95%' }}>

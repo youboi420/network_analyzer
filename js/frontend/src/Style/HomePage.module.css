@@ -1,8 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap');
+
 .body {
+    margin-top: 20px;
     background-color: lightblue;
     justify-content: center;
     align-items: center;
 }
+
 .container {
     background-color: red;
+}
+
+.title {
+    font-family: "Signika Negative", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
+    text-shadow: 2px 4px 4px black;
+}
+
+.time_title {
+    font-family: "Signika Negative", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }

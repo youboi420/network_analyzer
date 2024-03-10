@@ -37,7 +37,7 @@ const getGISJsonData = async (file_id) => {
       return response.data
     }
   } catch (error) {
-    throw error
+    return undefined
   }
 }
 

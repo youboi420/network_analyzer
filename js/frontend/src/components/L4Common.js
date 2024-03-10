@@ -197,7 +197,7 @@ const hostsDataTable = (singleMode, perConvData, type) => {
                   </h2>
                   <h3>
                     {
-                      Number(convRltvTime) === 0 ? "נשלחה רק פקטה בודדת" :
+                      Number(convRltvTime) === 0 ? "Only one packet sent" :
                         Number(convRltvTime) < 60 ?
                           Number(convRltvTime).toFixed(FLOATING_LIMITER * 3) + " 'sec" :
                           `≈ ${Math.floor(Number(convRltvTime) / 60)}:${(Number(convRltvTime) % 60).toFixed(FLOATING_LIMITER).padStart(2, '0')} 'min`
@@ -209,11 +209,11 @@ const hostsDataTable = (singleMode, perConvData, type) => {
                   <h3 className={AnalyzePanelViewStyle.data_title}  >
                     Recording Time Stamp
                   </h3>
-                  <h4 style={{marginBottom: 1}}>
+                  <h4 style={{marginBottom: 4}}>
                     {convRealTime.start}
                   </h4>
                   <DownArrowIcon sx={{ml: "105px"}} />
-                  <h4 style={{marginTop: 1}}>
+                  <h4 style={{marginTop: 2}}>
                     {convRealTime.end}
                   </h4>
                 </div>
@@ -236,22 +236,31 @@ const hostsDataTable = (singleMode, perConvData, type) => {
                   </h3>
                 </div>
               </div>
-              <DataGrid
+              {
+                hostsRows !== undefined &&
+                <DataGrid
                 sx={{ height: "50vh", width: !singleMode ? "675px" : "1200px", marginLeft: 0, marginRight: 2, borderStyle: "solid", borderColor: "black", borderRadius: "18px", borderWidth: "medium", fontSize: "18px", fontFamily: "monospace" }}
                 rows={hostsRows}
                 columns={hostsColumns}
-              />
+                />
+              }
             </div>
           </Box>
           {
             type === L4_DATA_TYPES.TCP &&
-            <Box sx={{ mb: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <h1 className={AnalyzePanelViewStyle.data_title} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: 15}} >Exceptions</h1>
-              <DataGrid
-                sx={{ width: "98%", borderStyle: "solid", borderRadius: "12px", borderColor: "black", borderWidth: "medium", fontFamily: "monospace" }}
+            <Box sx={{ mb: exceptionList !== undefined ? 1 : 5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              {
+                exceptionList !== undefined &&
+                <h1 className={AnalyzePanelViewStyle.data_title} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: 15}} >Exceptions</h1>
+              }
+              {
+                exceptionList !== undefined &&
+                <DataGrid
+                sx={{ width: "98%", borderStyle: "solid", borderRadius: "12px", borderColor: "black", borderWidth: "medium", fontSize: "18px" , fontFamily: "monospace" }}
                 rows={exceptionList}
                 columns={exceptionsColumns}
-              />
+                />
+              }
             </Box>
           }
         </Stack>

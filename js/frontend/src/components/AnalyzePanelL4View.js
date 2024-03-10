@@ -14,6 +14,8 @@ import { L4_DATA_TYPES } from './L4Common'
 import * as analyze_service from '../services/analyze_service'
 import CustomReactJson from './CustomReactJson'
 import L4ConvPanel from './L4ConvComp'
+import AnalyzePanelViewStyle from '../Style/AnalyzePanelViewStyle.module.css';
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Transion direction="up" ref={ref} {...props} />
@@ -89,24 +91,28 @@ const AnalyzePanelL4View = ({ isOpen, fileData, jsonData, onCloseCallBack, fetch
           { // loading animatio
             !fetchingStatus &&
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', height: '80vh' }} >
-              <CircularProgress style={{ marginTop: '10px' }} size={"100px"} />
+              <CircularProgress style={{ marginTop: '40px' }} size={"100px"} />
             </div>
           }
           { // verbal view
             !viewMode && fetchingStatus &&
             <div >
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center'}} >{title}</h1>
+              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center'}} className={AnalyzePanelViewStyle.data_title} >{title}</h1>
               {
                 l4Mode === analyze_service.l4MODES.BOTH
                 && bothPanel(tcpConversationDetails, udpConversationDetails)
               }
               {
                 l4Mode === analyze_service.l4MODES.TCP &&
-                <L4ConvPanel convsDataArray={tcpConversationDetails} singleMode={true} proType={L4_DATA_TYPES.TCP}/>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', textAlign: 'center'}}>
+                  <L4ConvPanel convsDataArray={tcpConversationDetails} singleMode={true} proType={L4_DATA_TYPES.TCP}/>
+                </div>
               }
               {
                 l4Mode === analyze_service.l4MODES.UDP &&
-                <L4ConvPanel convsDataArray={tcpConversationDetails} singleMode={true} proType={L4_DATA_TYPES.UDP}/>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', textAlign: 'center'}}>
+                  <L4ConvPanel convsDataArray={udpConversationDetails} singleMode={true} proType={L4_DATA_TYPES.UDP}/>
+                </div>
               }
             </div>
           }

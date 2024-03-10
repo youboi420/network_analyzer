@@ -9,6 +9,7 @@ import * as pcap_files_service from '../services/sql_services/pcap_files_service
 import * as reports_service from '../services/sql_services/report_service.js'
 import * as analyze_service from '../services/analyze_services/analyze_service.js'
 import * as cookie_service from '../services/cookie_services/cookie_service.js'
+import * as files_service from '../services/files_service/file_service.js'
 import { getUserByCookie } from './auth.js'
 
 /**
@@ -98,11 +99,8 @@ filesRoute.get('/gis/:id', async (req, res) => {
           try {
             const file = await pcap_files_service.get_file_by_fileid(file_id)
             const report = await reports_service.get_report_by_pcap_id(file_id)
-            console.log("got:", file);
-            console.log("got:", report);
             if (file.success === true && report.success === true) {
-              // const fileName = file.file.path
-              const fileName = 'bin/reports/out_gis.json'
+              const fileName = report.report.path + "/out_gis.json"
               res.status(200).sendFile(fileName, options, function (err) {
                 if (err) {
                   console.error('Error sending file:', err)
@@ -189,7 +187,7 @@ filesRoute.get('/l4/:id', async (req, res) => {
             console.log("got:", report);
             if (file.success === true && report.success === true) {
               // const fileName = file.file.path
-              const fileName = 'bin/reports/out_L4.json'
+              const fileName = report.report.path + "/out_L4.json"
               res.status(200).sendFile(fileName, options, function (err) {
                 if (err) {
                   console.error('Error sending file:', err)
@@ -252,7 +250,7 @@ filesRoute.get('/l2/:id', async (req, res) => {
             console.log("got:", report);
             if (file.success === true && report.success === true) {
               // const fileName = file.file.path
-              const fileName = 'bin/reports/out_L2.json'
+              const fileName = report.report.path + "/out_L2.json"
               res.status(200).sendFile(fileName, options, function (err) {
                 if (err) {
                   console.error('Error sending file:', err)

@@ -11,17 +11,17 @@ import * as files_service from '../services/files_service'
 const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
   const [file, setFile] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
-  const PADDING_C = 15;
+  const PADDING_C = 25;
   
   const fileNotSelected = (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: "24px" }}>
       <span>Please select a file!</span>
       <PicktFileIcon style={{ marginLeft: '5px' }} />
     </div>    
   );
 
   const fileSelected = (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: "28px" }}>
       <span>Picked: {file?.name}</span>
       <CheckIcon style={{ marginLeft: '5px' }} />
     </div>
@@ -81,20 +81,20 @@ const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', borderRadius: "7px" }}>
-        {loading && <CircularProgress style={{marginTop: '10px'}} />}
+        {loading && <CircularProgress style={{marginTop: '30px'}} />}
         {
           !loading &&
           <label htmlFor="fileInput">
             <Input type='file' name='file' color='primary' inputProps={{ accept: '.pcap' }} onChange={handleFileChange} id="fileInput" style={{ position: 'absolute', top: 0, left: 0, opacity: 0, zIndex: -1 }} />
-            <div style={{ color: 'white', backgroundColor: '#1976d2', borderColor: 'transparent', borderRadius: '8px', borderStyle: 'solid', paddingTop: PADDING_C, paddingBottom: PADDING_C, paddingRight: PADDING_C, paddingLeft: PADDING_C, cursor: 'pointer', fontFamily: 'inherit', fontSize: '20px', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.25)', width: "400px" }}>
+            <div style={{ color: 'white', backgroundColor: '#1976d2', borderColor: 'transparent', borderRadius: '8px', borderStyle: 'solid', paddingTop: PADDING_C, paddingBottom: PADDING_C, paddingRight: PADDING_C, paddingLeft: PADDING_C, cursor: 'pointer', fontFamily: 'inherit', fontSize: '1px', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.25)', width: "600px" }}>
               {file?.name === undefined ? fileNotSelected : fileSelected}
             </div>
           </label>
         }
         {
           !loading &&
-          <Button sx={{ mt: 2, textTransform: 'none' }} style={{ textDecoration: 'none', color: 'white' }} onClick={handleUpload} color='primary' variant='contained' startIcon={<FileUploadIcon />}>
-              Upload
+          <Button size='large' sx={{ width: "100%", mt:  2, textTransform: 'none' }} style={{ textDecoration: 'none', color: 'white' }} onClick={handleUpload} color='primary' variant='contained' startIcon={<FileUploadIcon style={{fontSize: "28px"}} />}>
+              <Typography style={{fontSize: "24px", marginTop: 8}}>Upload</Typography>
           </Button>
         }
       </Box>
