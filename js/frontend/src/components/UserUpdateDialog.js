@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Dialog, DialogTitle, DialogContent, TextField, Button, IconButton, Stack, Select, MenuItem, FormControl, InputLabel, FormHelperText, Alert } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import EditNote from '@mui/icons-material/EditNote'
 import { updateUser } from '../services/user_service'
 import { hashPassword } from '../services/hashPassword'
 
+
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+
+
 const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userObj, onSuccess, onFailed }) => {
-  const [duplicateUsernameError, setDuplicateUsernameError] = useState('')
-  const [newUsername, setNewUsername] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [newIsAdmin, setNewIsAdmin] = useState('')
-  const [usernameError, setUsernameError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-  const [adminError, setAdminError] = useState('')
+  const [duplicateUsernameError, setDuplicateUsernameError] = React.useState('')
+  const [newUsername, setNewUsername] = React.useState('')
+  const [newPassword, setNewPassword] = React.useState('')
+  const [newIsAdmin, setNewIsAdmin] = React.useState('')
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [usernameError, setUsernameError] = React.useState('')
+  const [passwordError, setPasswordError] = React.useState('')
+  const [adminError, setAdminError] = React.useState('')
   const userErrMsg = 'No spaces allowed or special chars'
   const passErrMsg = 'Minimum length of 6 characters'
   const adminErrMsg = 'Invalid value. Please use true/false or 1/0.'
@@ -47,7 +53,11 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
     onClose()
   }
 
-  useEffect(() => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+  
+  React.useEffect(() => {
     if (isOpen) {
       if (userObj === undefined) {
         setNewUsername('')
@@ -107,9 +117,17 @@ const UserUpdateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, userOb
                 setNewPassword(e.target.value)
                 setPasswordError(isPasswordValid(e.target.value) ? '' : passErrMsg)
               }}
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               error={!!passwordError} /* covert to boolean */
               helperText={passwordError}
+              InputProps={{
+                        style: { color: "black" },
+                        endAdornment: (
+                          <IconButton onClick={togglePasswordVisibility}>
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        ),
+                      }}
             />
             <FormControl sx={{ marginBottom: 1, marginTop: 1, width: '100%' }}>
               <InputLabel>Admin</InputLabel>

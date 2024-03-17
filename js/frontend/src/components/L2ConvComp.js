@@ -39,15 +39,15 @@ const L2ConvComp = ({ convsDataArray }) => {
         }
         {
           totalPages === 0 &&
-          <div>
+          <div style={{marginTop: "calc(18%)"}}>
             <h1 className={AnalyzePanelViewStyle.data_title}>
               Arp conversations didn't accour
             </h1>
           </div>
         }
       </div>
-      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <Stack spacing={1} style={{ width: '95%' }}>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: "calc(3%)"}}>
+        <Stack spacing={1} style={{ width: '70%', height: "calc(100% + 300vh)" }}>
           {
             convsDataArray.slice(startIndex, startIndex + ITEMS_PER_PAGE).map((conversation, index) => (
               <div key={conversation.conversationId}>

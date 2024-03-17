@@ -12,16 +12,21 @@ import Container from '@mui/material/Container'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import LoginPageStyle from '../Style/LoginPage.module.css'
 
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+
 import { notify, NOTIFY_TYPES } from '../services/notify_service'
 import * as user_service from '../services/user_service'
 import { hashPassword } from '../services/hashPassword'
 import { Navigate, useNavigate } from 'react-router-dom'
 import * as utils_service from '../services/utils_service'
+import { IconButton } from '@mui/material'
 
 
 const defaultTheme = createTheme()
 
 export default function LoginPage({ isValidUser }) {
+  const [showPassword, setShowPassword] = React.useState(false)
   const [username, setUsername] = React.useState('')
   const [password_value, setPassword] = React.useState('')
   const [usernameError, setUsernameError] = React.useState('')
@@ -56,6 +61,10 @@ export default function LoginPage({ isValidUser }) {
       console.error('Error verifying JWT cookie:', error);
     }
   };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -93,6 +102,7 @@ export default function LoginPage({ isValidUser }) {
   window.onload = () => {
     verifyCookieOnLoad()
   }
+
   if (!isValidUser)
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '85vh' }} >
@@ -129,7 +139,7 @@ export default function LoginPage({ isValidUser }) {
                       fullWidth
                       name="password"
                       label="Password"
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       id="password"
                       autoComplete="new-password"
                       value={password_value}
@@ -137,6 +147,13 @@ export default function LoginPage({ isValidUser }) {
                       error={!!passwordError}
                       helperText={passwordError}
                       InputLabelProps={{ style: { color: "black"/* '#314852' */ } }}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton onClick={togglePasswordVisibility}>
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        ),
+                      }}
                     />
                   </Grid>
                 </Grid>

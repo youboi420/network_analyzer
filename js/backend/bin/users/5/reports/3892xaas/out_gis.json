@@ -1,0 +1,36 @@
+{
+  "raw_file_size":377917,
+  "file_size_mb":0.36040973663330078,
+  "num_packets":411,
+  "duration":5.8133718967437744,
+  "num_hosts":3,
+  "num_ports":3,
+  "hosts":[
+    {
+      "host_ip":"74.125.98.170",
+      "count":410
+    },
+    {
+      "host_ip":"192.168.1.28",
+      "count":411
+    },
+    {
+      "host_ip":"172.217.22.78",
+      "count":1
+    }
+  ],
+  "ports":[
+    {
+      "port":55068,
+      "count":410
+    },
+    {
+      "port":443,
+      "count":411
+    },
+    {
+      "port":56042,
+      "count":1
+    }
+  ]
+}

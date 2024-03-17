@@ -1,0 +1,74 @@
+{
+  "L2_conversations":[
+    {
+      "conv_id":0,
+      "src_mac":"0:ff:f5:26:38:80",
+      "dest_mac":"10:6f:d9:57:c3:4b",
+      "packets":2,
+      "packets_from_a_to_b":1,
+      "packets_from_b_to_a":1,
+      "packets_data":[
+        {
+          "time_stamp_date":"Mar 11, 2024 10:48:49.204153 IST",
+          "time_stamp_date_js":"2024-03-11T10:48:49.204153+02:00",
+          "time_stamp_raw_sec":1710146929,
+          "time_stamp_raw_usec":204153,
+          "time_stamp_rltv":13.560492999999999,
+          "from_mac":"0:ff:f5:26:38:80",
+          "to_mac":"10:6f:d9:57:c3:4b",
+          "type":"REQ"
+        },
+        {
+          "time_stamp_date":"Mar 11, 2024 10:48:49.204179 IST",
+          "time_stamp_date_js":"2024-03-11T10:48:49.204179+02:00",
+          "time_stamp_raw_sec":1710146929,
+          "time_stamp_raw_usec":204179,
+          "time_stamp_rltv":13.560492999999999,
+          "from_mac":"10:6f:d9:57:c3:4b",
+          "to_mac":"0:ff:f5:26:38:80",
+          "type":"RES"
+        }
+      ]
+    },
+    {
+      "conv_id":1,
+      "src_mac":"0:ff:f5:26:38:80",
+      "dest_mac":"ff:ff:ff:ff:ff:ff",
+      "packets":3,
+      "packets_from_a_to_b":3,
+      "packets_from_b_to_a":0,
+      "packets_data":[
+        {
+          "time_stamp_date":"Mar 11, 2024 10:48:55.143694 IST",
+          "time_stamp_date_js":"2024-03-11T10:48:55.143694+02:00",
+          "time_stamp_raw_sec":1710146935,
+          "time_stamp_raw_usec":143694,
+          "time_stamp_rltv":18.848960000000002,
+          "from_mac":"0:ff:f5:26:38:80",
+          "to_mac":"ff:ff:ff:ff:ff:ff",
+          "type":"REQ"
+        },
+        {
+          "time_stamp_date":"Mar 11, 2024 10:48:56.168007 IST",
+          "time_stamp_date_js":"2024-03-11T10:48:56.168007+02:00",
+          "time_stamp_raw_sec":1710146936,
+          "time_stamp_raw_usec":168007,
+          "time_stamp_rltv":20.585844000000002,
+          "from_mac":"0:ff:f5:26:38:80",
+          "to_mac":"ff:ff:ff:ff:ff:ff",
+          "type":"REQ"
+        },
+        {
+          "time_stamp_date":"Mar 11, 2024 10:48:57.089535 IST",
+          "time_stamp_date_js":"2024-03-11T10:48:57.089535+02:00",
+          "time_stamp_raw_sec":1710146937,
+          "time_stamp_raw_usec":89535,
+          "time_stamp_rltv":21.404692000000001,
+          "from_mac":"0:ff:f5:26:38:80",
+          "to_mac":"ff:ff:ff:ff:ff:ff",
+          "type":"REQ"
+        }
+      ]
+    }
+  ]
+}

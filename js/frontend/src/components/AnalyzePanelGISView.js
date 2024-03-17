@@ -7,12 +7,11 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import CloseIcon from '@mui/icons-material/Close'
 import Transion from '@mui/material/Slide'
-import { Box, CircularProgress, Stack, Switch } from '@mui/material'
+import { Box, CircularProgress, Stack, Tooltip } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import InfoIcon from '@mui/icons-material/Info';
 
 import AnalyzePanelViewStyle from '../Style/AnalyzePanelViewStyle.module.css'
-import CustomReactJson from './CustomReactJson'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Transion direction="up" ref={ref} {...props} />
@@ -29,29 +28,46 @@ const AnalyzePanelGISView = ({ isOpen, fileData, jsonData, onCloseCallBack, fetc
   const portsWithIds = ports?.map((port, index) => ({ ...port, id: `port_${index}` }));
   
   const portsGridCols = [
-    { field: "count", headerName: "Number of occurrences", headerAlign: "center", align: "center", flex: 1, },
-    { field: "port", headerName: "Port Number", headerAlign: "center", align: "center",  flex: 1 },
+    { field: "count", headerName: 
+      (
+        <Tooltip title={<Typography fontSize={16}> Number of occurrences in the file un related to a certian conversation service or protocol </Typography>} style={{ borderRadius: '12px', backgroundColor: "#1976d2", color: "white", padding: 2, cursor: 'zoom-in' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Number of occurrences <InfoIcon sx={{ml: "5px"}}/> </div>
+        </Tooltip>
+      ), 
+      headerAlign: "center", align: "center", flex: 1, },
+    { field: "port", headerName:  (
+      <Tooltip title={<Typography fontSize={16}> Ports are essential for enabling multiple network services to operate concurrently on a single device. They allow a single device to offer various services to clients over a network, such as web browsing, email, file transfer, and more. </Typography>} style={{ borderRadius: '12px', backgroundColor: "#1976d2", color: "white", padding: 2, cursor: 'zoom-in' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}> Ports <InfoIcon sx={{ml: "5px"}}/> </div>
+      </Tooltip>
+    ),  headerAlign: "center", align: "center",  flex: 1 },
   ]
   
   const hostsGridCols = [
-    { field: "count", headerName: "Number of occurrences", headerAlign: "center", align: "center" ,  flex: 1 },
-    { field: "host_ip", headerName: "Host IP", headerAlign: "center", align: "center"       ,  flex: 1 },
-  ]
-
-  const rows = [
-    { id: 1, host: "help1", count: 1},
-    { id: 2, host: "help2", count: 1},
-    { id: 3, host: "help3", count: 1},
-    { id: 4, host: "help4", count: 1},
-    { id: 5, host: "help5", count: 1},
+    { field: "count", headerName: 
+    (
+      <Tooltip title={<Typography fontSize={16}> Number of occurrences in the file un related to a certian conversation service or protocol </Typography>} style={{ borderRadius: '12px', backgroundColor: "#1976d2", color: "white", padding: 2, cursor: 'zoom-in' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Number of occurrences <InfoIcon sx={{ml: "5px"}}/> </div>
+      </Tooltip>
+    ), headerAlign: "center", align: "center" ,  flex: 1 },
+    { field: "host_ip", headerName: (
+      <Tooltip title={<Typography fontSize={16}> An IP (Internet Protocol) address is a unique numerical logical identifier assigned to each device on a network, allowing them to communicate with each other. It serves as the address system of the internet, enabling data packets to be routed to their intended destinations across the network. </Typography>} style={{ borderRadius: '12px', backgroundColor: "#1976d2", color: "white", padding: 2, cursor: 'zoom-in' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Host IP <InfoIcon sx={{ml: "5px"}}/> </div>
+      </Tooltip>
+    ), headerAlign: "center", align: "center"       ,  flex: 1 },
   ]
 
   return (
-    <React.Fragment>
+    <div>
       <Dialog fullScreen open={isOpen} onClose={() => { setViewMode(false); onCloseCallBack() }} TransitionComponent={Transition} onAbort={() => { setViewMode(false); onCloseCallBack() }} 
         PaperProps={{
           sx: {
             backgroundColor: '#EEEEEE',
+            opacity: "100%",
+            marginTop: "100px",
+            marginRight: "50px",
+            marginLeft: "50px",
+            marginTop: "100px",
+
           },
         }}
       >
@@ -70,7 +86,7 @@ const AnalyzePanelGISView = ({ isOpen, fileData, jsonData, onCloseCallBack, fetc
             </Typography>
           </Toolbar>
         </AppBar>
-        <div style={{ backgroundColor: "transparent", height: "100vh" }}>
+        <div style={{ backgroundColor: "transparent" }}>
           {/* <div>
             <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: !fetchingStatus ? "grey" : "black" }} sx={{ mt: "20px" }}>
               <Typography>
@@ -90,8 +106,8 @@ const AnalyzePanelGISView = ({ isOpen, fileData, jsonData, onCloseCallBack, fetc
           }
           { // verbal view
             !viewMode && fetchingStatus &&
-            <div>
-              <h1 className={AnalyzePanelViewStyle.data_title} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 30, paddingBottom: 30 }} >General info text based</h1>
+            <div style={{marginBottom: "calc(3%)", height: "20vh"}}>
+              <h1 className={AnalyzePanelViewStyle.data_title} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 10, paddingBottom: 10 }} >General info text based</h1>
                 <Stack direction={'row'} spacing={2} style={{ justifyContent: 'center' }} >
                   <Stack direction={'column'} sx={{ borderRadius: "12px", borderStyle: "solid", height: VERBAL_BOX_HEIGHT}} >
                     <div style={{ alignItems: 'center', justifyContent: 'flex-end', textAlign: 'center'}}>
@@ -147,24 +163,9 @@ const AnalyzePanelGISView = ({ isOpen, fileData, jsonData, onCloseCallBack, fetc
                 </Stack>
             </div>
           }
-          { // json view
-            viewMode && fetchingStatus && 0 &&
-            <div>
-              <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} >JSON - תצוגה לוגית</h1>
-              <Stack direction={'column'} spacing={2} sx={{ p: 2 , alignItems: 'center'}}>
-                  {/* <IconButton sx={{width: "20%", textTransform: 'none'}} onClick={() => navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2)) } color='primary' >
-                    Copy
-                    <ContentCopyIcon sx={{ml: "4px", mt: "4px"}}/>
-                  </IconButton> */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CustomReactJson src={jsonData} />
-                </div>
-              </Stack>
-            </div>
-          }
         </div>
       </Dialog>
-    </React.Fragment>
+    </div>
   )
 }
 

@@ -16,8 +16,8 @@
     overflow: hidden;
     transition: transform 200ms ease-in-out;
     cursor: pointer;
-    min-height: 250px;
-    min-width: 350px;
+    min-height: calc(20vh - 100px);
+    min-width: calc(20vh - 100px);
     max-height: 450px;
     max-width: 650px;
     background-color: rgba(100, 100, 100, 0.12);

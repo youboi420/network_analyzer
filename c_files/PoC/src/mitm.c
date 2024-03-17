@@ -135,7 +135,7 @@ void save_L2_convs_to_json(arp_conv convs[MAX_L2_CONVERSATIONS], const char *fil
     root = json_object_new_object();
     conversations_array = json_object_new_array();
     
-    json_object_object_add(root, "L2_coversations", conversations_array);
+    json_object_object_add(root, "L2_conversations", conversations_array);
     for(i = 0; i < MAX_L2_CONVERSATIONS; i++)
     {
         if (convs[i].src_ip.s_addr != 0)

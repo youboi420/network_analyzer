@@ -2,6 +2,8 @@ import { Box, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AnalyzePanelViewStyle from '../Style/AnalyzePanelViewStyle.module.css'
 import DownArrowIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import InfoIcon from '@mui/icons-material/Info';
+
 
 const FLOATING_LIMITER = 2
 
@@ -39,7 +41,12 @@ const explainL2Label = (value) => {
 }
 
 const arpColumns = [
-  { field: 'param', headerName: 'Parameter', width: 200, align: 'right', headerAlign: 'center', renderCell: (params) => {
+  { field: 'param', headerName: (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+      Parameter
+      <InfoIcon sx={{ml: "5px"}}/>
+    </div>
+  ), width: 150, align: 'right', headerAlign: 'center', renderCell: (params) => {
     return <Tooltip title={<Typography fontSize={16}>{explainL2Label(params.value)}</Typography>} style={{borderRadius: '12px',width: "100%", height: "50%",backgroundColor: "#1976d2", color: "white",alignItems: 'center', justifyContent: 'center', padding: 2, paddingTop: 8, cursor: 'zoom-in' }}> {params.value} </Tooltip>
   }},
   { field: 'hostA', headerName: 'Host A', flex: 1, align: 'center', headerAlign: 'center' },
@@ -55,20 +62,6 @@ const arpDataTable = (perConvData) => {
   const convNumPacketsA = perConvData.numberPacketA
   const convNumPacketsB = perConvData.numberPacketB
   const convNumberPacket = convNumPacketsA + convNumPacketsB
-  
-
-  const convDataSizeA = perConvData.packetList.reduce((accumulator, packet) => {
-    return (packet.from === perConvData.hostA) ? accumulator + packet.size_in_bytes : accumulator
-  }, 0);
-
-  const convDataSizeB = perConvData.packetList.reduce((accumulator, packet) => {
-    return (packet.from === perConvData.hostB) ? accumulator + packet.size_in_bytes : accumulator
-  }, 0);
-
-  const convDataSize = perConvData.packetList.reduce((accumulator, packet) => {
-    return accumulator + packet.size_in_bytes
-  }, 0);
-
 
   const arpRows = [
     { id: 1, param: PARAMETER_ROW.MAC, hostA: perConvData.hostA, hostB: perConvData.hostB },

@@ -1,20 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@100;200;300;400;500;600;700&family=Major+Mono+Display&family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
 
 .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.centered {
     background-color: #3b92beb2;
     border-radius: 12px;
     border: 5px solid;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 30%;
-    margin: 1rem;
-    backdrop-filter: blur(10px);
-    position: absolute;
-    top: 52%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 80%;
     border-color: #1b455a;
+    padding: 20px;
 }
 
 .title {
@@ -48,7 +47,7 @@
     font-family: "IBM Plex Sans Hebrew", sans-serif;
     font-weight: 400;
     font-style: normal;
-    text-align: center;
+    text-align: right;
     font-size: 20px;
     color: black;
     padding: 2px;

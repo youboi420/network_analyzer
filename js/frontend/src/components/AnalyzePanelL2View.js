@@ -1,17 +1,14 @@
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
-import Divider from '@mui/material/Divider'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import CloseIcon from '@mui/icons-material/Close'
 import Transion from '@mui/material/Slide'
-import { Box, CircularProgress, Stack, Switch } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { CircularProgress, Stack, Switch } from '@mui/material'
 
 import * as analyze_service from '../services/analyze_service'
-import AnalyzePanelViewStyle from '../Style/AnalyzePanelViewStyle.module.css'
 import CustomReactJson from './CustomReactJson'
 import L2ConvComp from './L2ConvComp'
 import { L2_DATA_TYPES } from './L2Common'
@@ -23,9 +20,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const AnalyzePanelL2View = ({ isOpen, fileData, jsonData, onCloseCallBack, fetchingStatus }) => {
   const [viewMode, setViewMode] = React.useState(false)
   const FLOATING_LIMITER = 3
-  const { L2_coversations } = jsonData
+  const { L2_conversations } = jsonData
 
-  const conversationDetails = L2_coversations?.map(conversation => ({
+  const conversationDetails = L2_conversations?.map(conversation => ({
     conversationId: conversation.conv_id,
     hostA: conversation.src_mac,
     hostB: conversation.dest_mac,
@@ -42,11 +39,15 @@ const AnalyzePanelL2View = ({ isOpen, fileData, jsonData, onCloseCallBack, fetch
   
 
   return (
-    <React.Fragment>
+    <div>
       <Dialog fullScreen open={isOpen} onClose={() => { setViewMode(false); onCloseCallBack() }} TransitionComponent={Transition} onAbort={() => { setViewMode(false); onCloseCallBack() }} 
         PaperProps={{
           sx: {
             backgroundColor: '#EEEEEE',
+            opacity: "100%",
+            marginTop: "100px",
+            marginRight: "50px",
+            marginLeft: "50px",
           },
         }}
       >
@@ -106,7 +107,7 @@ const AnalyzePanelL2View = ({ isOpen, fileData, jsonData, onCloseCallBack, fetch
           }
         </div>
       </Dialog>
-    </React.Fragment>
+    </div>
   )
 }
 

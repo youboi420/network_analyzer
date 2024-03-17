@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { NOTIFY_TYPES, notify } from './notify_service'
 
 /* consts and configurations */
 axios.defaults.withCredentials = true;
@@ -12,6 +11,8 @@ const ANALYZE_URL = `http://${LOCAL_IP}:${SER_PORT}${analyze_api_path}`
 const GET_GIS_JSON_URL = `http://${LOCAL_IP}:${SER_PORT}${files_api_path}/gis`
 const GET_L4_JSON_URL = `http://${LOCAL_IP}:${SER_PORT}${files_api_path}/l4`
 const GET_L2_JSON_URL = `http://${LOCAL_IP}:${SER_PORT}${files_api_path}/l2`
+const GET_DDOS_JSON_URL = `http://${LOCAL_IP}:${SER_PORT}${files_api_path}/ddos`
+const GET_MITM_JSON_URL = `http://${LOCAL_IP}:${SER_PORT}${files_api_path}/mitm`
 
 const l4MODES = {
   BOTH: "both",
@@ -63,6 +64,28 @@ const getL2JsonData = async (file_id) => {
   }
 }
 
+const getDDOSJsonData = async ( file_id ) => {
+  try {
+    if ( file_id ) {
+      const response = await axios.get(GET_DDOS_JSON_URL + "/" + file_id)
+      return response.data
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
+const getMITMJsonData = async ( file_id ) => {
+  try {
+    if ( file_id ) {
+      const response = await axios.get(GET_MITM_JSON_URL + "/" + file_id)
+      return response.data
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
 const calculateConversationDuration = (conversation) => {
   const packetsData = conversation.packets_data;
   if (packetsData.length < 2) return 0;
@@ -80,4 +103,4 @@ const calculatePacketsPerHost = (conversation) => {
   };
 }
 
-export { analyze, getGISJsonData, getL4JsonData, getL2JsonData, calculateConversationDuration, calculatePacketsPerHost, l4MODES }
+export { analyze, getGISJsonData, getL4JsonData, getL2JsonData, getDDOSJsonData, getMITMJsonData, calculateConversationDuration, calculatePacketsPerHost, l4MODES }

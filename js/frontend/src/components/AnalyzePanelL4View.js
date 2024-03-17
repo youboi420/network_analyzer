@@ -53,11 +53,15 @@ const AnalyzePanelL4View = ({ isOpen, fileData, jsonData, onCloseCallBack, fetch
   const udpConversationDetails = conversationDetails?.filter(conversation => conversation.conversationType === "UDP");
 
   return (
-    <React.Fragment>
+    <div>
       <Dialog fullScreen open={isOpen} onClose={() => { setViewMode(false); onCloseCallBack() }} TransitionComponent={Transition} onAbort={() => { setViewMode(false); onCloseCallBack() }}
         PaperProps={{
           sx: {
             backgroundColor: '#EEEEEE',
+            opacity: "100%",
+            marginTop: "100px",
+            marginRight: "50px",
+            marginLeft: "50px",
           },
         }}
       >
@@ -135,7 +139,7 @@ const AnalyzePanelL4View = ({ isOpen, fileData, jsonData, onCloseCallBack, fetch
           }
         </div>
       </Dialog>
-    </React.Fragment>
+    </div>
   )
 }
 

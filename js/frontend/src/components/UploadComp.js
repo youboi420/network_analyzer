@@ -8,6 +8,9 @@ import axios from 'axios';
 
 import * as files_service from '../services/files_service'
 
+const MAX_FILE_SIZE_MB = 16
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
   const [file, setFile] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
@@ -30,8 +33,12 @@ const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        notify(`File size exceeds (${MAX_FILE_SIZE_MB} MB) limit`, NOTIFY_TYPES.error);
+        setFile(null);
+        return;
+      }
       setFile(selectedFile);
-
       const fileExtension = selectedFile.name.split('.').pop();
       if (fileExtension.toLowerCase() !== 'pcap') {
         notify('Please select a .pcap file', NOTIFY_TYPES.error);
@@ -93,8 +100,8 @@ const UploadComp = ( {userAnalyzeDataCallback, fallBack} ) => {
         }
         {
           !loading &&
-          <Button size='large' sx={{ width: "100%", mt:  2, textTransform: 'none' }} style={{ textDecoration: 'none', color: 'white' }} onClick={handleUpload} color='primary' variant='contained' startIcon={<FileUploadIcon style={{fontSize: "28px"}} />}>
-              <Typography style={{fontSize: "24px", marginTop: 8}}>Upload</Typography>
+          <Button size='large' disabled={!file} sx={{ width: "100%", mt:  "calc(3%)", textTransform: 'none' }} style={{ textDecoration: 'none', color: 'white' }} onClick={handleUpload} color='primary' variant='contained' startIcon={<FileUploadIcon style={{fontSize: "28px"}} />}>
+              <Typography style={{fontSize: "24px", marginTop: 8}} >Upload</Typography>
           </Button>
         }
       </Box>

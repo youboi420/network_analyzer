@@ -2,19 +2,14 @@ import { keyframes } from '@emotion/react';
 import * as React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Backdrop, Box, CircularProgress, LinearProgress, Stack } from '@mui/material';
-import UploadComp from '../components/UploadComp';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import DownloadIcon from '@mui/icons-material/Download';
 import AdminIcon from '@mui/icons-material/SupervisedUserCircle';
 import UserIcon from '@mui/icons-material/AccountCircle';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { NOTIFY_TYPES, notify } from '../services/notify_service';
-import TestChartComp from '../components/TestChart';
 import AnalyzePanelComp from '../components/AnalyzePanelComp';
 import AnalyzePageStyle from '../Style/AnalyzePage.module.css';
 import * as files_service from '../services/files_service'
-import * as analyze_service from '../services/analyze_service';
 
 const AnalyzePage = ({ isValidUser, userData }) => {
   const [userAnalyzeData, setUserAnalyzeData] = React.useState({
@@ -63,7 +58,6 @@ const AnalyzePage = ({ isValidUser, userData }) => {
 
   const handleSelectionChange = (selectionModel) => {
     setSelectedRow(selectionModel[0])
-    console.log("Set:", selectedRow);
   }
 
   const PermissionsP = "Your permission's"

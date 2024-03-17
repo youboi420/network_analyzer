@@ -2,6 +2,7 @@ import { Box, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AnalyzePanelViewStyle from '../Style/AnalyzePanelViewStyle.module.css'
 import DownArrowIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import InfoIcon from '@mui/icons-material/Info';
 
 const FLOATING_LIMITER = 2
 
@@ -104,21 +105,19 @@ const exceptionColors = {
   RETRANSColors: { fg: "white", bg: "#f78786" },
   ZEROWINColors: { fg: "#f78786", bg: "#12272e" },
 }
-const exceptionText = {
-  ZEROWINDText: "zero window",
-  RETRANSText: "retransmission",
-  RESETText: "reset",
-  DUPACKAtoBText: "duplicate ack a to b",
-  DUPACKBtoAText: "duplicate ack b to a",
-}
 
 const hostsColumns = [
   { 
     field: 'param', 
-    headerName: "Parameter", 
+    headerName: (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        Parameter
+        <InfoIcon sx={{ml: "5px"}}/>
+      </div>
+    ), 
     sortable: false, 
     disableColumnMenu: true, 
-    width: 200, 
+    width: 130, 
     align: 'center', 
     headerAlign: 'center', 
     renderCell: (params) => {
@@ -138,7 +137,7 @@ const exceptionsColumns = [
   { field: 'exep_type', headerName: "Exception Type", sortable: false, disableColumnMenu: true, width: 200, align: 'center', headerAlign: 'center', renderCell: (params) => {
     return (
       <Tooltip title={<Typography fontSize={16}>{explainException(params.value)}</Typography>} style={{borderRadius: '10px',width: "100%", height: "50%",backgroundColor: getExepBG(params.value), color: getExepFG(params.value), padding: 2, paddingTop: 8  , cursor: 'zoom-in', fontSize: "14px" }}>
-        <div>{params.value}</div>
+        <div >{params.value}</div>
       </Tooltip>
     )
   }},
@@ -190,12 +189,12 @@ const hostsDataTable = (singleMode, perConvData, type) => {
         <Stack spacing={0}>
           <Box>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: type === L4_DATA_TYPES.UDP ? 20 : -20 }}>
-              <div style={{ width: '30%', textAlign: 'left', borderStyle: "solid", borderRadius: "12px", marginLeft: 10, marginRight: 10, paddingLeft: 20 }}>
+              <div style={{ width: 'calc(40%)', textAlign: 'left', borderStyle: "solid", borderRadius: "12px", marginLeft: "calc(2%)", marginRight: "calc(1%)", paddingLeft: "calc(1%)", height: "50vh"}}>
                 <div>
                   <h2 className={AnalyzePanelViewStyle.data_title} >
                     Relative Time
                   </h2>
-                  <h3>
+                  <h3 style={{marginTop: "-10px"}}>
                     {
                       Number(convRltvTime) === 0 ? "Only one packet sent" :
                         Number(convRltvTime) < 60 ?
@@ -203,13 +202,13 @@ const hostsDataTable = (singleMode, perConvData, type) => {
                           `≈ ${Math.floor(Number(convRltvTime) / 60)}:${(Number(convRltvTime) % 60).toFixed(FLOATING_LIMITER).padStart(2, '0')} 'min`
                     }
                   </h3>
-                </div>
+                </div >
                 <Divider orientation='horizontal' sx={{ bgcolor: "black", marginRight: "20px", borderBottomWidth: 2 }} />
                 <div>
-                  <h3 className={AnalyzePanelViewStyle.data_title}  >
+                  <h3 className={AnalyzePanelViewStyle.data_title}   >
                     Recording Time Stamp
                   </h3>
-                  <h4 style={{marginBottom: 4}}>
+                  <h4 style={{marginBottom: 4, marginTop: "-10px"}} >
                     {convRealTime.start}
                   </h4>
                   <DownArrowIcon sx={{ml: "105px"}} />
@@ -222,7 +221,7 @@ const hostsDataTable = (singleMode, perConvData, type) => {
                   <h2 className={AnalyzePanelViewStyle.data_title} >
                   Packet Count
                   </h2>
-                  <h3>
+                  <h3 style={{marginTop: "-10px"}}>
                     {convNumberPacket}
                   </h3>
                 </div>
@@ -231,7 +230,7 @@ const hostsDataTable = (singleMode, perConvData, type) => {
                   <h3 className={AnalyzePanelViewStyle.data_title} >
                     Transffered Data Size
                   </h3>
-                  <h3>
+                  <h3 style={{marginTop: "-10px"}}>
                     {"≈ " + ((convDataSize) / 1024 / 1024).toFixed(FLOATING_LIMITER * 3) + " mb"}
                   </h3>
                 </div>
@@ -239,9 +238,9 @@ const hostsDataTable = (singleMode, perConvData, type) => {
               {
                 hostsRows !== undefined &&
                 <DataGrid
-                sx={{ height: "50vh", width: !singleMode ? "675px" : "1200px", marginLeft: 0, marginRight: 2, borderStyle: "solid", borderColor: "black", borderRadius: "18px", borderWidth: "medium", fontSize: "18px", fontFamily: "monospace" }}
-                rows={hostsRows}
-                columns={hostsColumns}
+                  sx={{ height: "50vh", width: !singleMode ? "625px" : "1200px", marginLeft: 0, marginRight: 2, borderStyle: "solid", borderColor: "black", borderRadius: "18px", borderWidth: "medium", fontSize: "14px", fontFamily: "monospace" }}
+                  rows={hostsRows}
+                  columns={hostsColumns}
                 />
               }
             </div>
@@ -256,7 +255,7 @@ const hostsDataTable = (singleMode, perConvData, type) => {
               {
                 exceptionList !== undefined &&
                 <DataGrid
-                sx={{ width: "98%", borderStyle: "solid", borderRadius: "12px", borderColor: "black", borderWidth: "medium", fontSize: "18px" , fontFamily: "monospace" }}
+                sx={{ width: "95%", borderStyle: "solid", borderRadius: "12px", borderColor: "black", borderWidth: "medium", fontSize: "18px" , fontFamily: "monospace" }}
                 rows={exceptionList}
                 columns={exceptionsColumns}
                 />

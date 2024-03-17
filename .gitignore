@@ -5,6 +5,6 @@
 ./js/frontend/.env.development.local
 ./js/frontend/.env.test.local
 ./js/frontend/.env.production.local
-
 # back end ignores
 ./js/backend/node_modules
+./js/backend/bin/users

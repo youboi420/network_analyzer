@@ -191,7 +191,7 @@ filesRoute.get('/l4/:id', async (req, res) => {
               res.status(200).sendFile(fileName, options, function (err) {
                 if (err) {
                   console.error('Error sending file:', err)
-                  res.status(400).send({message: "requested file is invalid."})
+                  res.status(err.status).send({message: "requested file is invalid."})
                 } else {
                   console.log('Sent: ', fileName + "|:|" + file_id)
                 }
@@ -282,11 +282,148 @@ filesRoute.get('/l2/:id', async (req, res) => {
 //   res.json(results.results)
 // })
 
+filesRoute.get('/ddos/:id', async (req, res) => {
+  const options = {
+    root: path.join('')
+  }
+  try {
+    const file_id = req.params.id
+    const userCookie = await cookie_service.decodeCookie(req.cookies)
+    if (file_id === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    }
+    else if (userCookie === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    } else {
+      let error_flag = false
+      const decoded = jwt.verify(req.cookies.jwt, SEC_KEY, (err) => {
+        if (err) {
+          error_flag = true
+        }
+      })
+      if (error_flag) {
+        res.status(403).send({message: "unauthoraized access"})
+      } else {
+        const user_id = userCookie.decoded.id
+        const file_id_as_num = Number(file_id)
+        const is_owner = await pcap_files_service.is_owner(file_id_as_num, user_id)
+        if (is_owner.success !== true) {
+          res.status(403).send({message: "unauthoraized access"})
+        } else {
+          try {
+            const file = await pcap_files_service.get_file_by_fileid(file_id)
+            const report = await reports_service.get_report_by_pcap_id(file_id)
+            console.log("got:", file);
+            console.log("got:", report);
+            if (file.success === true && report.success === true) {
+              // const fileName = file.file.path
+              if (report.report.ddos_flag === 1) {
+                const fileName = report.report.path + "/out_ddos.json"
+                res.status(200).sendFile(fileName, options, function (err) {
+                  if (err) {
+                    console.error('Error sending file:', err)
+                    res.status(400).send({ message: "requested file is invalid." })
+                  } else {
+                    console.log('Sent: ', fileName + "|:|" + file_id)
+                  }
+                })
+              } else {
+                res.status(404).json({
+                  attacks: [],
+                  message: "no ddos attack in this file."
+                })
+              }
+            } else {
+              res.status(400).send({message: "requested file is invalid."})
+            }
+          } catch (error) {
+            res.status(500).send({message: error})
+          }
+        }
+      }
+    }
+  } catch (error) {
+    if (error?.decoded === undefined) {
+    res.status(401).json({ message: "no cookie provided" })
+    } else {
+      res.status(500).send()
+    }
+  }
+})
+
+filesRoute.get('/mitm/:id', async (req, res) => {
+  const options = {
+    root: path.join('')
+  }
+  try {
+    const file_id = req.params.id
+    const userCookie = await cookie_service.decodeCookie(req.cookies)
+    if (file_id === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    }
+    else if (userCookie === undefined) {
+      res.status(400).send({message: "one or more parameters missing"})
+    } else {
+      let error_flag = false
+      const decoded = jwt.verify(req.cookies.jwt, SEC_KEY, (err) => {
+        if (err) {
+          error_flag = true
+        }
+      })
+      if (error_flag) {
+        res.status(403).send({message: "unauthoraized access"})
+      } else {
+        const user_id = userCookie.decoded.id
+        const file_id_as_num = Number(file_id)
+        const is_owner = await pcap_files_service.is_owner(file_id_as_num, user_id)
+        if (is_owner.success !== true) {
+          res.status(403).send({message: "unauthoraized access"})
+        } else {
+          try {
+            const file = await pcap_files_service.get_file_by_fileid(file_id)
+            const report = await reports_service.get_report_by_pcap_id(file_id)
+            console.log("got:", file);
+            console.log("got:", report);
+            if (file.success === true && report.success === true) {
+              // const fileName = file.file.path
+              if (report.report.mitm_flag === 1) {
+                const fileName = report.report.path + "/out_mitm.json"
+                res.status(200).sendFile(fileName, options, function (err) {
+                  if (err) {
+                    console.error('Error sending file:', err)
+                    res.status(400).send({ message: "requested file is invalid." })
+                  } else {
+                    console.log('Sent: ', fileName + "|:|" + file_id)
+                  }
+                })
+              } else {
+                res.status(404).json({
+                  attacks: [],
+                  message: "no mitm attack in this file."
+                })
+              }
+            } else {
+              res.status(400).send({message: "requested file is invalid."})
+            }
+          } catch (error) {
+            res.status(500).send({message: error})
+          }
+        }
+      }
+    }
+  } catch (error) {
+    if (error?.decoded === undefined) {
+    res.status(401).json({ message: "no cookie provided" })
+    } else {
+      res.status(500).send()
+    }
+  }
+})
+
 filesRoute.get('/my_files', async (req, res) => {
   const sleep = (milliseconds) => {
     return new Promise(resolve => {
       setTimeout(() => {
-        console.log("aint no way")
         resolve()
       }, milliseconds)
     })

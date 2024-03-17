@@ -42,6 +42,7 @@ typedef struct ddos_addr_ll{
     uint32_t id;
     struct in_addr addr;
     uint32_t src_port;
+    uint32_t dest_port;
     struct ddos_addr_ll * next;
 } ddos_addr_ll;
 
@@ -96,7 +97,7 @@ int detect_flood(conv_s convo);
  * @param src_port the attacket host source port
  * @return int 1 if inserted or existed 0 if not inserted
  */
-int add_to_ddos_ll(ddos_addr_ll **root, struct in_addr atkr_addr, uint32_t src_port);
+int add_to_ddos_ll(ddos_addr_ll **root, struct in_addr atkr_addr, uint32_t src_port, uint32_t dest_port);
 
 /**
  * @brief 

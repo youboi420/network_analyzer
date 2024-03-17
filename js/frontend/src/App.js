@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import UserManagePage from './pages/UserManagePage';
 import NoPage from './pages/NoPage';
-import AnaylzePage from './pages/AnaylzePage';
 import SignUpPage from './pages/SignUpPage';
 
 import LogoutPage from './pages/LogoutPage';
@@ -16,9 +15,9 @@ import LandingPage from './pages/LandingPage';
 import FilesPage from './pages/FilesPage';
 
 function App() {
-  const [isValidUser, setIsValidUser] = useState(false);
-  const [usersData, setIsValidData] = useState({})
-  const [isLoading, setIsLoading] = useState(true)
+  const [isValidUser, setIsValidUser] = React.useState(false);
+  const [usersData, setIsValidData] = React.useState({})
+  const [isLoading, setIsLoading] = React.useState(true)
   const title = "Analyze app © Y-E "
   const fetchValidUser = async () => {
     try {
@@ -32,7 +31,7 @@ function App() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     document.title = title
     fetchValidUser();
   }, []);
@@ -57,8 +56,8 @@ function App() {
         <Route index           element={<HomePage       isValidUser={isValidUser}/> } />
         <Route path="/users"   element={<UserManagePage isValidUser={isValidUser} userData={usersData} /> } />
         <Route path="/signup"  element={<SignUpPage     isValidUser={isValidUser}/> } />
-        <Route path="/analyze" element={<AnaylzePage    isValidUser={isValidUser} userData={usersData} /> } />
-        <Route path="/files"   element={<FilesPage      isValidUser={isValidUser} userData={usersData} /> } />
+        {/* <Route path="/analyze" element={<AnaylzePage    isValidUser={isValidUser} userData={usersData} /> } /> */}
+        <Route path="/analyzeandfiles"   element={<FilesPage      isValidUser={isValidUser} userData={usersData} /> } />
         <Route path="*"        element={<NoPage         isValidUser={isValidUser}/> } />
       </Routes>
     </BrowserRouter>

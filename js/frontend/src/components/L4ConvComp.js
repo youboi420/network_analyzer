@@ -45,7 +45,7 @@ const L4ConvPanel = ({ convsDataArray, singleMode, proType }) => {
           </div>
         }
       </div>
-      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: "calc(8%)" }}>
         <Stack spacing={1} style={{ width: '95%' }}>
           {convsDataArray?.slice(startIndex, startIndex + ITEMS_PER_PAGE)?.map((conversation, index) => (
             <div key={conversation.conversationId}>

@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, TextField, Button, IconButton, Stack, Select, MenuItem, FormControl, InputLabel, FormHelperText, Alert, Typography } from '@mui/material'
+import React from 'react'
+import { Dialog, DialogTitle, DialogContent, TextField, Button, IconButton, Stack, Select, MenuItem, FormControl, InputLabel, FormHelperText, Alert } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { DB_ERROR_CODES, createUser } from '../services/user_service'
 import AddIcon from '@mui/icons-material/Add'
 import 'react-toastify/dist/ReactToastify.css'
 import { hashPassword } from '../services/hashPassword'
 
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+
 const UserCreateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, onSuccess, onFailed }) => {
-  const [duplicateUsernameError, setDuplicateUsernameError] = useState('')
-  const [newUsername, setNewUsername] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [repeatPasseord, setRepeatPasseord] = useState('')
-  const [newIsAdmin, setNewIsAdmin] = useState('')
-  const [adminError, setAdminError] = useState('')
-  const [usernameError, setUsernameError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-  const [passwordMissError, setPasswordMissError] = useState('')
+  const [duplicateUsernameError, setDuplicateUsernameError] = React.useState('')
+  const [newUsername, setNewUsername] = React.useState('')
+  const [newPassword, setNewPassword] = React.useState('')
+  const [repeatPasseord, setRepeatPasseord] = React.useState('')
+  const [newIsAdmin, setNewIsAdmin] = React.useState('')
+  const [adminError, setAdminError] = React.useState('')
+  const [usernameError, setUsernameError] = React.useState('')
+  const [passwordError, setPasswordError] = React.useState('')
+  const [passwordMissError, setPasswordMissError] = React.useState('')
+  const [showPassword, setShowPassword] = React.useState(false)
 
   const userErrMsg = 'No spaces allowed or special chars'
   const passErrMsg = 'Minimum length of 6 characters'
@@ -51,7 +55,12 @@ const UserCreateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, onSucc
     onClose()
   }
 
-  useEffect(() => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
+  
+  React.useEffect(() => {
     if (isOpen) {
       setNewUsername('')
       setNewPassword('')
@@ -93,9 +102,18 @@ const UserCreateDialog = ({ isOpen = false, onClose, fetchDataAndSetRows, onSucc
                 setNewPassword(e.target.value)
                 setPasswordError(isPasswordValid(e.target.value) ? '' : passErrMsg)
               }}
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               error={!!passwordError} /* covert to boolean */
               helperText={passwordError}
+              InputProps={{
+                style: { color: "black" },
+                endAdornment: (
+                  <IconButton onClick={togglePasswordVisibility}>
+                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                  </IconButton>
+                ),
+              }}
+
             />
             {/* need to add repeat password field */}
             {/* <TextField
